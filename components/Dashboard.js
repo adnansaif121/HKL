@@ -1,14 +1,14 @@
 import React, { Component } from 'react'
-import styles from '../../styles/LoginPage.module.css'
+import styles from '../styles/LoginPage.module.css'
 import { Table, Button, Navbar, NavbarBrand, FormGroup, Form, Input, Label } from 'reactstrap';
 import AddData from './AddData';
 import UpdateData from './UpdateData';
-import firebase from '../../config/firebase';
+import firebase from '../config/firebase';
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
-import deleteIcon from '../../public/delete.png'
-import download from '../../public/download.png'
-import edit from '../../public/edit.png'
-import controls from '../../public/controls.png'
+import deleteIcon from '../public/delete.png'
+import download from '../public/download.png'
+import edit from '../public/edit.png'
+import controls from '../public/controls.png'
 import Image from 'next/image'
 import xlsx from "json-as-xlsx"
 
@@ -79,12 +79,12 @@ export default class Dashboard extends Component {
         let result = [];
         for (let item of this.state.data) {
             if (
-                item.InvoiceDate === query ||
-                item.PartyName === query ||
-                item.VehicleNo === query ||
-                item.Destination === query ||
-                item.UnloadedAt === query ||
-                item.Weight === query
+                item.InvoiceDate.includes(query) ||
+                item.PartyName.includes(query) ||
+                item.VehicleNo.includes(query) ||
+                item.Destination.includes(query) ||
+                item.UnloadedAt.includes(query) ||
+                item.Weight.includes(query)
             ) {
                 result.push(item);
             }

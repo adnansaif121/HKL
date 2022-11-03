@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import styles from '../../styles/LoginPage.module.css'
-import firebase from '../../config/firebase';
+import styles from '../styles/LoginPage.module.css'
+import firebase from '../config/firebase';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from 'next/router'
 
-export default function LoginPage() {
+export default function LoginPage(props) {
     const router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -17,12 +17,14 @@ export default function LoginPage() {
                 // Signed in 
                 const user = userCredential.user;
                 // window.location.href = "/components/Dashboard"
-                router.push('/components/Dashboard');
+                // router.push('../components/Dashboard');
+                props.allow();
                 // ...
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+                alert("Invalid Input");
             });
     }
 
