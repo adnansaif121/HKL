@@ -49,6 +49,7 @@ export default class Dashboard extends Component {
     addData = (obj) => {
         const db = getDatabase();
         const id = new Date().getTime();
+        obj.id = id;
         set(ref(db, '/' + id), {
             ...obj
         }).then(() => {
@@ -62,7 +63,11 @@ export default class Dashboard extends Component {
         const db = getDatabase();
         set(ref(db, '/' + id), {
             ...obj
-        });
+        }).then(() => {
+            this.setState({
+                toggleUpdateBox: false
+            })
+        })
         // alert("Data Updated Successfully");
         // this.setState({
         //     toggleUpdateBox : false,
