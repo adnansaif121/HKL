@@ -181,7 +181,7 @@ export default class UpdateData extends Component {
                             <Row>
                                 <Col md={6}>
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "white" }}>Payable Freight : </span>
+                                        <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="text"
@@ -198,7 +198,7 @@ export default class UpdateData extends Component {
                                 </Col>
                                 <Col md={6}>
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "white" }}>Net Freight : </span>
+                                        <span style={{ color: "#1f5457" }}>Net Freight : </span>
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="text"

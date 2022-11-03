@@ -170,9 +170,9 @@ export default class AddData extends Component {
                             <Row>
                                 <Col md={6}>
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "white" }}>Payable Freight : </span>
+                                        <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         <input
-                                            style={{ backgroundColor: "#1f5457", color: "black" }}
+                                            style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="text"
                                             value={(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
                                             // onChange={(e) => this.setState({Comission: e.target.value})}
@@ -187,9 +187,9 @@ export default class AddData extends Component {
                                 </Col>
                                 <Col md={6}>
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "white" }}>Net Freight : </span>
+                                        <span style={{ color: "#1f5457" }}>Net Freight : </span>
                                         <input
-                                            style={{ backgroundColor: "#1f5457", color: "black" }}
+                                            style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="text"
                                             value={this.state.Weight * this.state.Rate}
                                             // onChange={(e) => this.setState({MktComission: e.target.value})}
