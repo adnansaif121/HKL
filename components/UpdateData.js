@@ -17,6 +17,9 @@ export default class UpdateData extends Component {
             Rate : this.props.data.Rate,
             Comission : this.props.data.Comission,
             MktComission : this.props.data.MktComission,
+            PaidTo : this.props.data.PaidTo,
+            MExpense : this.props.data.MExpense,
+            Remark : this.props.data.Remark,
             PayableFreight : this.props.data.PayableFreight,
             NetFreight : this.props.data.NetFreight,
             DiffPayable : this.props.data.DiffPayable,
@@ -39,13 +42,16 @@ export default class UpdateData extends Component {
             Rate : this.state.Rate,
             Comission : this.state.Comission,
             MktComission : this.state.MktComission,
+            PaidTo : this.state.PaidTo,
+            MExpense : this.state.MExpense,
+            Remark : this.state.Remark,
             PayableFreight : (this.state.Weight*this.state.Rate) - this.state.Comission - this.state.MktComission,
             NetFreight : this.state.Weight*this.state.Rate,
             DiffPayable : this.state.DiffPayable,
             PaidOn: this.state.PaidOn,
             OurRate : this.state.OurRate,
             OurFreight : (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit : ((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight*this.state.Rate) + this.state.Comission,
+            NetProfit : (parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseInt(this.state.Comission)),
             id : this.props.data.id,
         }
         // console.log(obj)
@@ -126,7 +132,7 @@ export default class UpdateData extends Component {
                                 <Col md={6}>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({Weight: e.target.value})}
                                             value={this.state.Weight}   
                                             required
@@ -139,7 +145,7 @@ export default class UpdateData extends Component {
                                 <Col md={6}>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({Rate: e.target.value})}
                                             value={this.state.Rate}   
                                             required
@@ -151,10 +157,10 @@ export default class UpdateData extends Component {
 
                             </Row>
                             <Row>
-                                <Col md={6}>
+                                <Col >
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({Comission: e.target.value})}
                                             value={this.state.Comission}   
                                             required
@@ -164,10 +170,10 @@ export default class UpdateData extends Component {
                                     </div>
 
                                 </Col>
-                                <Col md={6}>
+                                <Col >
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({MktComission: e.target.value})}
                                             value={this.state.MktComission}   
                                             required
@@ -177,6 +183,51 @@ export default class UpdateData extends Component {
                                     </div>
 
                                 </Col>
+                                {
+                                    this.state.MktComission && this.state.MktComission > 0 &&
+                                    <Col>
+                                        <div className={styles.inputBox}>
+                                            <input
+                                                type="text"
+                                                onChange={(e) => this.setState({ PaidTo: e.target.value })}
+                                                value={this.state.PaidTo}
+                                                required
+                                            />
+                                            <span>Mkt Comission Paid To</span>
+                                            <i></i>
+                                        </div>
+                                    </Col>
+                                }
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ MExpense: e.target.value })}
+                                            value={this.state.MExpense}
+                                            required
+                                        />
+                                        <span>Miscellaneous Expenses</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                                { this.state.MExpense>0 &&
+                                    <Col md={6}>
+                                        <div className={styles.inputBox}>
+                                            <input
+                                                type="text"
+                                                onChange={(e) => this.setState({ Remark: e.target.value })}
+                                                value={this.state.Remark}
+                                                required
+                                            />
+                                            <span>Remark</span>
+                                            <i></i>
+                                        </div>
+
+                                    </Col>
+                                }
                             </Row>
                             <Row>
                                 <Col md={6}>
@@ -184,7 +235,7 @@ export default class UpdateData extends Component {
                                         <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="text"
+                                            type="number"
                                             value={(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
                                             // onChange={(e) => this.setState({Comission: e.target.value})}
                                             required
@@ -201,7 +252,7 @@ export default class UpdateData extends Component {
                                         <span style={{ color: "#1f5457" }}>Net Freight : </span>
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="text"
+                                            type="number"
                                             value={this.state.Weight * this.state.Rate}
                                             // onChange={(e) => this.setState({MktComission: e.target.value})}
                                             required
@@ -216,7 +267,7 @@ export default class UpdateData extends Component {
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({DiffPayable: e.target.value})}
                                             value={this.state.DiffPayable}   
                                             required
@@ -242,12 +293,46 @@ export default class UpdateData extends Component {
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
+                                            type="number"
                                             onChange={(e) => this.setState({OurRate: e.target.value})}
                                             value={this.state.OurRate}   
                                             required
                                         />
                                         <span>Our Rate</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                            </Row>
+                            <Row>
+                                <Col md={6}>
+                                    <div className={styles.disabledInput}>
+                                        <span style={{ color: "#1f5457" }}>Our Freight : </span>
+                                        <input
+                                            style={{ backgroundColor: "#1f5457", color: "white" }}
+                                            type="number"
+                                            value={(this.state.Weight * this.state.OurRate) - this.state.DiffPayable}
+                                            // onChange={(e) => this.setState({Comission: e.target.value})}
+                                            required
+                                            readOnly
+                                        
+                                        />
+                                        <i></i>
+
+                                    </div>
+
+                                </Col>
+                                <Col md={6}>
+                                    <div className={styles.disabledInput}>
+                                        <span style={{ color: "#1f5457" }}>Net Profit : </span>
+                                        <input
+                                            style={{ backgroundColor: "#1f5457", color: "white" }}
+                                            type="number"
+                                            value={(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseInt(this.state.Comission))}
+                                            // onChange={(e) => this.setState({MktComission: e.target.value})}
+                                            required
+                                            readOnly
+                                        />
                                         <i></i>
                                     </div>
 

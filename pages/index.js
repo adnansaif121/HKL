@@ -17,12 +17,12 @@ export default function Home() {
   return (
     <>
       {
-        openDashboard ?
+        // openDashboard ?
         <Dashboard></Dashboard>
-        :
-        <div className={styles.container} >
-          <LoginPage allow={allow}></LoginPage>
-        </div>
+        // :
+        // <div className={styles.container} >
+        //   <LoginPage allow={allow}></LoginPage>
+        // </div>
 
       }
     </>
