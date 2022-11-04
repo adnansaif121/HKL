@@ -94,18 +94,17 @@ export default class Dashboard extends Component {
         onValue(starCountRef, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
-            this.UpdateLedger(data, "Ultratech");
+            this.UpdateLedger(data, this.state.db);
+            let x = (this.state.db === "Ultratech") ? [...Object.values(data.Ultratech)] : [...Object.values(data.Orient)];
             this.setState({
                 AllData : data,
                 UltratechDb: [...Object.values(data.Ultratech)],
                 OrientDb: [...Object.values(data.Orient)],
-                data: [...Object.values(data.Ultratech)],
-                displayData: [...Object.values(data.Ultratech)],
+                data: x,
+                displayData: x,
             })
         })
     }
-
-    
 
     addData = (obj) => {
         const db = getDatabase();
@@ -127,6 +126,7 @@ export default class Dashboard extends Component {
 
     updateData = (obj, id) => {
         const db = getDatabase();
+        console.log(this.state.db);
         set(ref(db, '/' + this.state.db + '/' + id), {
             ...obj
         }).then(() => {
@@ -134,27 +134,36 @@ export default class Dashboard extends Component {
                 toggleUpdateBox: false
             })
         })
-        // alert("Data Updated Successfully");
-        // this.setState({
-        //     toggleUpdateBox : false,
-        // })
     }
 
     sortOnSearch = (e) => {
         let query = e.target.value;
         let result = [];
-        for (let item of this.state.data) {
-            if (
-                item.InvoiceDate.includes(query) ||
-                item.PartyName.includes(query) ||
-                item.VehicleNo.includes(query) ||
-                item.Destination.includes(query) ||
-                item.UnloadedAt.includes(query) ||
-                item.Weight.includes(query)
-            ) {
-                result.push(item);
+        if (this.state.Ledger === "Transporter"){
+            for(let item of this.state.data){
+                if(
+                    item.InvoiceDate.includes(query) ||
+                    item.VehicleNo.includes(query) ||
+                    item.PaidTo.includes(query)
+                ){
+                    result.push(item);
+                }
+                    
             }
-
+        }
+        else{
+            for (let item of this.state.data) {
+                if (
+                    item.InvoiceDate.includes(query) ||
+                    item.PartyName.includes(query) ||
+                    item.VehicleNo.includes(query) ||
+                    item.Destination.includes(query) ||
+                    item.UnloadedAt.includes(query) ||
+                    item.Weight.includes(query)
+                ) {
+                    result.push(item);
+                }
+            }
         }
         console.log(result)
         if (result.length > 0) {
@@ -170,30 +179,66 @@ export default class Dashboard extends Component {
     }
 
     ExportData = () => {
-        let data = [
-            {
-                sheet: "MySpreadsheet",
-                columns: [
-                    { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                    { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                    { label: "PartyName", value: "PartyName" }, // Run functions
-                    { label: "Destination", value: "Destination" },
-                    { label: "UnloadedAt", value: "UnloadedAt" },
-                    { label: "Weight", value: "Weight" },
-                    { label: "Rate", value: "Rate" },
-                    { label: "Comission", value: "Comission" },
-                    { label: "MktComission", value: "MktComission" },
-                    { label: "PayableFreight", value: "PayableFreight" },
-                    { label: "NetFreight", value: "NetFreight" },
-                    { label: "DiffPayable", value: "DiffPayable" },
-                    { label: "PaidOn", value: "PaidOn" },
-                    { label: "OurRate", value: "OurRate" },
-                    { label: "OurFreight", value: "OurFreight" },
-                    { label: "NetProfit", value: "NetProfit" }
-                ],
-                content: Object.values(this.state.displayData),
-            },
-        ]
+        let data;
+        if(this.state.Ledger === "MyLedger"){
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "PartyName", value: "PartyName" }, // Run functions
+                        { label: "Destination", value: "Destination" },
+                        { label: "UnloadedAt", value: "UnloadedAt" },
+                        { label: "Weight", value: "Weight" },
+                        { label: "Rate", value: "Rate" },
+                        { label: "Comission", value: "Comission" },
+                        { label: "MktComission", value: "MktComission" },
+                        { label: "PayableFreight", value: "PayableFreight" },
+                        { label: "NetFreight", value: "NetFreight" },
+                        { label: "DiffPayable", value: "DiffPayable" },
+                        { label: "PaidOn", value: "PaidOn" },
+                        { label: "OurRate", value: "OurRate" },
+                        { label: "OurFreight", value: "OurFreight" },
+                        { label: "NetProfit", value: "NetProfit" }
+                    ],
+                    content: Object.values(this.state.displayData),
+                },
+            ]
+        }
+        else if(this.state.Ledger === "Company"){
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "MktComission", value: "MktComission" },
+                        { label: "Paid To", value: "PaidTo"},
+                        { label: "PaidOn", value: "PaidOn" },
+                    ],
+                    content: Object.values(this.state.displayData),
+                },
+            ]
+        }
+        else{
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "PartyName", value: "PartyName" }, // Run functions
+                        { label: "Destination", value: "Destination" },
+                        { label: "UnloadedAt", value: "UnloadedAt" },
+                        { label: "Weight", value: "Weight" },
+                        { label: "DiffPayable", value: "DiffPayable" },
+                        { label: "PaidOn", value: "PaidOn" },
+                    ],
+                    content: Object.values(this.state.displayData),
+                },
+            ]
+        }
 
         console.log(Object.values(this.state.displayData));
         let settings = {
