@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-// import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
-// import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
 import * as XLSX from 'xlsx'
 import { make_cols } from '../components/MakeColumns';
 import { SheetJSFT } from '../components/types';

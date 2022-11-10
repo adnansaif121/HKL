@@ -41,9 +41,9 @@ export default class Dashboard extends Component {
             UltratechDb: null,
             OrientDb: null,
             Ledger: "MyLedger",
-            myLedger: null,
-            Transporter: null,
-            Company: null,
+            myLedger: [],
+            Transporter: [],
+            Company: [],
             // isOrient : true,
         }
     }
@@ -53,10 +53,10 @@ export default class Dashboard extends Component {
         let Transporter = [];
         let Company = [];
         if (db === "Ultratech") {
-            myLedger = [...Object.values(data.Ultratech)];
+            myLedger = data.Ultratech ? [...Object.values(data.Ultratech)] : [];
         }
         else {
-            myLedger = [...Object.values(data.Orient)];
+            myLedger = data.Orient ? [...Object.values(data.Orient)] : [];
         }
         for (let item of myLedger) {
             if (item.MktComission != undefined && item.MktComission != null && item.MktComission != 0) {
@@ -99,12 +99,15 @@ export default class Dashboard extends Component {
             console.log(data);
             console.log(data.ourRate.data);
             this.UpdateLedger(data, this.state.db);
-            let x = (this.state.db === "Ultratech") ? [...Object.values(data.Ultratech)] : [...Object.values(data.Orient)];
+
+            let UltraDb = data.Ultratech !== undefined ? [...Object.values(data.Ultratech)] : [];
+            let OriDb = data.Orient !== undefined ? [...Object.values(data.Orient)] : [];
+            let x = (this.state.db === "Ultratech") ? UltraDb : OriDb;
 
             this.setState({
                 AllData: data,
-                UltratechDb: [...Object.values(data.Ultratech)],
-                OrientDb: [...Object.values(data.Orient)],
+                UltratechDb: UltraDb,
+                OrientDb: OriDb,
                 data: x,
                 displayData: x,
                 RateData : data.ourRate.data,
@@ -408,7 +411,7 @@ export default class Dashboard extends Component {
                                 <Image
                                     style={{ width: "20px", height: "20px" }}
                                     src={controls}
-                                    // alt="Picture of the author"
+                                    alt="Picture of the author"
                                     width="10px"
                                     height="10px"
                                 />
@@ -416,7 +419,7 @@ export default class Dashboard extends Component {
                             <Image
                                     style={{ width: "2.5rem", height: "2.5rem", marginLeft: "0.5rem", borderRadius: "10%" }}
                                     src={logo}
-                                    // alt="Picture of the author"
+                                    alt="Picture of the author"
                                     width="10px"
                                     height="10px"
                                 />
