@@ -13,6 +13,7 @@ import download from '../public/download.png'
 import arrow from '../public/arrow.png';
 import edit from '../public/edit.png';
 import logo from '../public/logo.png';
+import upload from '../public/file.png';
 import controls from '../public/controls.png'
 import Image from 'next/image'
 import xlsx from "json-as-xlsx";
@@ -416,13 +417,13 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
-                            <Image
+                            {/* <Image
                                     style={{ width: "2.5rem", height: "2.5rem", marginLeft: "0.5rem", borderRadius: "10%" }}
                                     src={logo}
                                     alt="Picture of the author"
                                     width="10px"
                                     height="10px"
-                                />
+                                /> */}
                         </NavbarBrand>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -448,12 +449,6 @@ export default class Dashboard extends Component {
                                     </div>
 
                                     <div>
-
-                                            <Link href="/ExcelReader">
-                                                <Button outline style={{marginRight: "8px"}}>
-                                                    Upload
-                                                </Button>
-                                            </Link>
 
                                         <div className={styles.dropdown} style={{ marginRight: "8px" }}>
                                             <Button outline className={styles.dropbtn}>
@@ -513,7 +508,7 @@ export default class Dashboard extends Component {
                                         </div>
 
                                         <Button outline
-                                            style={{ marginRight: "50px" }}
+                                            // style={{ }}
                                             onClick={this.ExportData}
                                         >
                                             <Image
@@ -524,6 +519,18 @@ export default class Dashboard extends Component {
                                                 height="10px"
                                             />
                                         </Button>
+
+                                        <Link href="/ExcelReader">
+                                                <Button outline style={{marginLeft: "8px"}} >
+                                                    <Image
+                                                        style={{ width: "25px", height: "25px" }}
+                                                        src={upload}
+                                                        alt="Picture of the author"
+                                                        width="10px"
+                                                        height="10px"
+                                                    />
+                                                </Button>
+                                            </Link>
                                     </div>
                                 </>
                         }
@@ -544,6 +551,7 @@ export default class Dashboard extends Component {
                                 height: '400px',
                                 overflowY: "scroll",
                                 overflowX: "scroll",
+                                
                             }}>
 
                                 {

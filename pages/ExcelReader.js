@@ -31,14 +31,16 @@ class ExcelReader extends Component {
     componentDidMount() {
         const db = getDatabase();
         const starCountRef = ref(db, '/');
-        get(starCountRef, (snapshot) => {
+        onValue(starCountRef, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
             this.setState({
                 AllData: data,
-                UltratechDb: data.Ultratech,
-                OrientDb: data.Orient,
+                UltratechDb: data.Ultratech!==undefined ? data.Ultratech : [],
+                OrientDb: data.Orient !== undefined ? data.Orient : [],
             })
+        }, {
+            onlyOnce: true
         })
     }
 
@@ -84,11 +86,12 @@ class ExcelReader extends Component {
         }
         set(ref(db, '/ourRate'), {
             data
-        })
-        this.setState({
-            isDataUploaded: true,
-        }, () => {
-            alert("Data Uploaded Sucessfully !!!");
+        }).then(() => {
+            this.setState({
+                isDataUploaded: true,
+            }, () => {
+                alert("Data Uploaded Sucessfully !!!");
+            })
         })
     }
 
@@ -99,33 +102,40 @@ class ExcelReader extends Component {
                 return i["ToT Freight (PMT)"]
             }
         }
-        return 500;
+        return -1;
     }
 
     updateDb = (db) => {
+        console.log("update Db call for ", db);
         for (let item in db) {
             console.log(item, db[item]);
             let itemDate = new Date(db[item].InvoiceDate);
             let applyDate = new Date(this.state.applyDate);
             if (itemDate >= applyDate) {
                 let rate = parseFloat(this.findRate(db[item].Destination, db[item].Classification));
+                if(rate === -1)continue;
                 db[item].OurRate = rate;
                 db[item].OurFreight = (db[item].Weight * rate) - db[item].DiffPayable,
-                    db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - (db[item].Weight * db[item].Rate)) + parseFloat(db[item].Comission))
+                db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - ((db[item].Weight * db[item].Rate) + db[item].MExpense)) + parseFloat(db[item].Comission))
             }
-
+            console.log(db[item]);
         }
         return db;
     }
+
     updateRates = () => {
         if (this.state.applyDate === null) {
             alert("Enter Apply Date !");
             return;
         }
-        console.log(this.state.UltratechDb)
+
+        console.log("Update Attempted");
 
         let newUltratechDb = this.updateDb(this.state.UltratechDb);
         let newOrientDb = this.updateDb(this.state.OrientDb);
+
+        console.log("new UltratechDb", newUltratechDb);
+        console.log("new Orient", newOrientDb);
 
         const db = getDatabase();
         set(ref(db, '/Ultratech/'), {
@@ -147,7 +157,7 @@ class ExcelReader extends Component {
                 // color="dark"
                 // dark
                 >
-                    <NavbarBrand>
+                    {/* <NavbarBrand> */}
                         <Link href="/">
                             <Button outline>
                                 Back
@@ -160,7 +170,7 @@ class ExcelReader extends Component {
                             width="10px"
                             height="10px"
                         />
-                    </NavbarBrand>
+                    {/* </NavbarBrand> */}
                 </Navbar>
 
                 <div>

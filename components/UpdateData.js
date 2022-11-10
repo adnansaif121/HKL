@@ -54,17 +54,24 @@ export default class UpdateData extends Component {
             MExpense : this.state.MExpense,
             Remark : this.state.Remark,
             PayableFreight : (this.state.Weight*this.state.Rate) - this.state.Comission - this.state.MktComission,
-            NetFreight : this.state.Weight*this.state.Rate,
+            NetFreight : (this.state.Weight*this.state.Rate) + this.state.MExpense,
             DiffPayable : this.state.DiffPayable,
             PaidOn: this.state.PaidOn,
             OurRate : this.state.OurRate,
             OurFreight : (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit : (parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseInt(this.state.Comission)),
+            NetProfit : (parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)),
             id : this.props.data.id,
         }
         // console.log(obj)
         this.props.updateData(obj, this.props.data.id);
     }
+
+    handleOnSearch = (string, results) => {
+        // console.log(string, results);
+        this.setState({
+            Destination : string,
+        })
+    };
 
     handleOnSelect = (item) => {
         let ownedItem = item;
@@ -180,7 +187,7 @@ export default class UpdateData extends Component {
                                             items={this.state.RateData}
                                             fuseOptions={{ keys: ["id", "Name of Destination", "Classification Name"] }} // Search on both fields
                                             resultStringKeyName="Name of Destination" // String to display in the results
-                                            // onSearch={this.handleOnSearch}
+                                            onSearch={this.handleOnSearch}
                                             // onHover={this.handleOnHover}
                                             onSelect={this.handleOnSelect}
                                             placeholder={this.state.Destination}
@@ -378,7 +385,7 @@ export default class UpdateData extends Component {
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="number"
-                                            value={this.state.Weight * this.state.Rate}
+                                            value={(this.state.Weight*this.state.Rate) + this.state.MExpense}
                                             // onChange={(e) => this.setState({MktComission: e.target.value})}
                                             required
                                             readOnly
@@ -453,7 +460,7 @@ export default class UpdateData extends Component {
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="number"
-                                            value={(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseFloat(this.state.Comission))}
+                                            value={(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission))}
                                             // onChange={(e) => this.setState({MktComission: e.target.value})}
                                             required
                                             readOnly
