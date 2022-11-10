@@ -2,8 +2,13 @@ import React, { Component } from 'react'
 import {
     Row,
     Col,
+    FormGroup,
+    Input,
+    Label,
 } from 'reactstrap'
 import styles from '../styles/AddData.module.css';
+import { ReactSearchAutocomplete } from 'react-search-autocomplete';
+
 export default class UpdateData extends Component {
     constructor(props){
         super(props);
@@ -12,6 +17,7 @@ export default class UpdateData extends Component {
             VehicleNo : this.props.data.VehicleNo !== undefined ? this.props.data.VehicleNo : "",
             PartyName : this.props.data.PartyName !== undefined ? this.props.data.PartyName : "",
             Destination : this.props.data.Destination !== undefined ? this.props.data.Destination : "",
+            Classification : this.props.data.Classification !== undefined ? this.props.data.Classification : "OWNED",
             UnloadedAt : this.props.data.UnloadedAt !== undefined ? this.props.data.UnloadedAt : "",
             Weight : this.props.data.Weight !== undefined ? this.props.data.Weight : 0,
             Rate : this.props.data.Rate !== undefined ? this.props.data.Rate : 0,
@@ -28,6 +34,7 @@ export default class UpdateData extends Component {
             OurFreight : this.props.data.OurFreight !== undefined ? this.props.data.OurFreight : 0,
             NetProfit : this.props.data.NetProfit !== undefined ? this.props.data.NetProfit : 0,
             id : this.props.data.id,
+            RateData: this.props.RateData
         }
     }
 
@@ -37,6 +44,7 @@ export default class UpdateData extends Component {
             VehicleNo : this.state.VehicleNo,
             PartyName : this.state.PartyName,
             Destination : this.state.Destination,
+            Classification : this.state.Classification,
             UnloadedAt : this.state.UnloadedAt,
             Weight : this.state.Weight,
             Rate : this.state.Rate,
@@ -57,6 +65,55 @@ export default class UpdateData extends Component {
         // console.log(obj)
         this.props.updateData(obj, this.props.data.id);
     }
+
+    handleOnSelect = (item) => {
+        let ownedItem = item;
+        if(item["Classification Name"] !== this.state.Classification){
+            for(let i of this.state.RateData){
+                if(i["Name of Destination"] === item["Name of Destination"] && i["Classification Name"] === this.state.Classification ){
+                    ownedItem = i;
+                    break;
+                }
+            }
+        }
+        this.setState({
+            Destination: item["Name of Destination"],
+            OurRate: parseFloat(ownedItem["ToT Freight (PMT)"])
+        })
+        console.log(ownedItem);
+      };
+
+      handleClass = (Classification) => {
+        if(this.state.Destination === ""){
+            alert("Destination not selected");
+            this.setState({
+                Classification : Classification
+            })
+            return;
+        }
+        let item;
+        for(let i of this.state.RateData){
+            if(i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification){
+                item = i;
+                break;
+            }
+        }
+        if(item === undefined){
+            alert("Destination do not exist in list. Are you sure to continue?");
+            this.setState({
+                Classification : Classification
+            })
+        }
+        else{
+            // console.log(item);
+            this.setState({
+                Destination : item["Name of Destination"],
+                OurRate : parseFloat(item["ToT Freight (PMT)"]),
+                Classification : Classification
+            })
+        }
+      }
+
     render() {
         return (
             <>
@@ -103,7 +160,7 @@ export default class UpdateData extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                                <Col>
+                                {/* <Col>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -114,7 +171,75 @@ export default class UpdateData extends Component {
                                         <span>Destination</span>
                                         <i></i>
                                     </div>
+                                </Col> */}
+                                    <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        {/* <h2>My custom searchbox!</h2> */}
+                                        <div style={{ marginBottom: 0 }}>Destination</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.RateData}
+                                            fuseOptions={{ keys: ["id", "Name of Destination", "Classification Name"] }} // Search on both fields
+                                            resultStringKeyName="Name of Destination" // String to display in the results
+                                            // onSearch={this.handleOnSearch}
+                                            // onHover={this.handleOnHover}
+                                            onSelect={this.handleOnSelect}
+                                            placeholder={this.state.Destination}
+                                            // onFocus={this.handleOnFocus}
+                                            // onClear={this.handleOnClear}
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                // heightFocus: "34px",
+                                                // border: "1px solid darkgreen",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                // fontFamily: "Courier",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 20,
+                                            }}
+                                        />
+                                        {/* <div style={{ marginTop: 20 }}>This text will be covered!</div> */}
+                                    </div>
                                 </Col>
+                                
+                                <Col style={{ marginTop: "30px" }}>
+                                    <h5 style={{display: "flex", justifyContent: "center", color:"#1f5457"}}>
+                                        {this.state.Classification}
+                                    </h5>
+                                    <div style={{ display: "flex", justifyContent: "center" }}>
+                                        <FormGroup>
+                                            <Input 
+                                                onChange={() => this.handleClass("OWNED")} 
+                                                style={{ width: "30px", height: "30px" }} 
+                                                name='class' 
+                                                type="radio" 
+                                            />
+                                            {' '}
+                                            <Label style={{ marginTop: "8px" }}>Owned</Label>
+                                        </FormGroup>
+                                        <FormGroup style={{ marginLeft: "10%" }}>
+                                            <Input 
+                                                onChange={() => this.handleClass("MARKET")} 
+                                                style={{ width: "30px", height: "30px" }} 
+                                                name='class' 
+                                                type="radio" 
+                                            />
+                                            {' '}
+                                            <Label style={{ marginTop: "8px" }}>Market</Label>
+                                        </FormGroup>
+                                    </div>
+
+                                </Col>
+
+
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
@@ -133,7 +258,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Weight: e.target.value})}
+                                            onChange={(e) => this.setState({Weight: parseFloat(e.target.value)})}
                                             value={this.state.Weight}   
                                             required
                                         />
@@ -146,7 +271,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Rate: e.target.value})}
+                                            onChange={(e) => this.setState({Rate: parseFloat(e.target.value)})}
                                             value={this.state.Rate}   
                                             required
                                         />
@@ -161,7 +286,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Comission: e.target.value})}
+                                            onChange={(e) => this.setState({Comission: parseFloat(e.target.value)})}
                                             value={this.state.Comission}   
                                             required
                                         />
@@ -174,7 +299,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({MktComission: e.target.value})}
+                                            onChange={(e) => this.setState({MktComission: parseFloat(e.target.value)})}
                                             value={this.state.MktComission}   
                                             required
                                         />
@@ -204,7 +329,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({ MExpense: e.target.value })}
+                                            onChange={(e) => this.setState({ MExpense: parseFloat(e.target.value) })}
                                             value={this.state.MExpense}
                                             required
                                         />
@@ -268,7 +393,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({DiffPayable: e.target.value})}
+                                            onChange={(e) => this.setState({DiffPayable: parseFloat(e.target.value)})}
                                             value={this.state.DiffPayable}   
                                             required
                                         />
@@ -294,7 +419,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({OurRate: e.target.value})}
+                                            onChange={(e) => this.setState({OurRate: parseFloat(e.target.value)})}
                                             value={this.state.OurRate}   
                                             required
                                         />
@@ -328,7 +453,7 @@ export default class UpdateData extends Component {
                                         <input
                                             style={{ backgroundColor: "#1f5457", color: "white" }}
                                             type="number"
-                                            value={(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseInt(this.state.Comission))}
+                                            value={(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - (this.state.Weight * this.state.Rate)) + parseFloat(this.state.Comission))}
                                             // onChange={(e) => this.setState({MktComission: e.target.value})}
                                             required
                                             readOnly

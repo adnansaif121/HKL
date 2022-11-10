@@ -15,7 +15,7 @@ export default class MyLedger extends Component {
     render() {
         return (
             <Table striped bordered style={{
-                width: "90vw", color: "black", margin: "3%", border: "1px solid grey",
+             color: "black", border: "1px solid grey",
 
 
             }}>
@@ -104,7 +104,7 @@ export default class MyLedger extends Component {
                                     {item.PartyName}
                                 </td>
                                 <td>
-                                    {item.Destination}
+                                    {`${item.Destination} (${item.Classification})`}
                                 </td>
                                 <td>
                                     {item.UnloadedAt}
