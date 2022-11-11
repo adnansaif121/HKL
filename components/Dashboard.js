@@ -33,7 +33,7 @@ export default class Dashboard extends Component {
             toggleUpdateBox: false,
             toggleSidebar: false,
             sortOldToNew: true,
-            filter: "showAll",
+            filter: "Last7",
             showDate: false,
             startDate: null,
             endDate: null,
@@ -110,8 +110,10 @@ export default class Dashboard extends Component {
                 UltratechDb: UltraDb,
                 OrientDb: OriDb,
                 data: x,
-                displayData: x,
+                // displayData: x,
                 RateData : data.ourRate.data,
+            }, () => {
+                this.handleApply();
             })
         })
     }
@@ -551,7 +553,7 @@ export default class Dashboard extends Component {
                                 height: '400px',
                                 overflowY: "scroll",
                                 overflowX: "scroll",
-                                
+                                boxShadow: "rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px"
                             }}>
 
                                 {
