@@ -564,7 +564,7 @@ export default class Dashboard extends Component {
 
                         <>
                             <div style={{width: "90vw",margin: "auto", color: "#1f5457"}}>
-                                <h3>{this.state.db.toUpperCase}</h3>
+                                <h3>{this.state.db.toUpperCase()}</h3>
                             </div>
                             <div style={{
                                 color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto",
