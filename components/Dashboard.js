@@ -136,6 +136,27 @@ export default class Dashboard extends Component {
         this.setState({ toUpdate: item, toggleUpdateBox: true })
     }
 
+    handleDelete = (id) => {
+        const db = getDatabase();
+        set(ref(db, '/' + this.state.db + '/' + id), {});
+    }
+
+    onTransferClick = (item) => {
+        this.handleDelete(item.id);
+        const db = getDatabase();
+        console.log(item);
+        if(this.state.db === "Ultratech"){
+            set(ref(db, '/Orient/' + item.id), {
+                ...item
+            })
+        }
+        else{
+            set(ref(db, '/Ultratech/' + item.id), {
+                ...item
+            })
+        }
+    }
+
     updateData = (obj, id) => {
         const db = getDatabase();
         console.log(this.state.db);
@@ -261,11 +282,6 @@ export default class Dashboard extends Component {
             RTL: false, // Display the columns from right-to-left (the default value is false)
         }
         xlsx(data, settings) // Will download the excel file
-    }
-
-    handleDelete = (id) => {
-        const db = getDatabase();
-        set(ref(db, '/' + this.state.db + '/' + id), {});
     }
 
     handleApply = () => {
@@ -547,8 +563,11 @@ export default class Dashboard extends Component {
                         :
 
                         <>
+                            <div style={{width: "90vw",margin: "auto", color: "#1f5457"}}>
+                                <h3>{this.state.db.toUpperCase}</h3>
+                            </div>
                             <div style={{
-                                color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto", marginTop: "30px",
+                                color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto",
                                 display: "block",
                                 height: '400px',
                                 overflowY: "scroll",
@@ -558,7 +577,12 @@ export default class Dashboard extends Component {
 
                                 {
                                     this.state.Ledger === "MyLedger" &&
-                                    <MyLedger displayData={this.state.displayData} handleDelete={this.handleDelete} onEditClick={this.onEditClick}></MyLedger>
+                                    <MyLedger 
+                                        displayData={this.state.displayData} 
+                                        handleDelete={this.handleDelete} 
+                                        onEditClick={this.onEditClick}
+                                        onTransferClick={this.onTransferClick}
+                                    ></MyLedger>
                                 }
                                 {
                                     this.state.Ledger === "Company" &&

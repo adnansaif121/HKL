@@ -145,7 +145,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({VehicleNo: e.target.value})}
+                                            onChange={(e) => this.setState({VehicleNo: e.target.value.toUpperCase()})}
                                             value={this.state.VehicleNo}   
                                             required
                                         />
@@ -157,7 +157,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({PartyName: e.target.value})}
+                                            onChange={(e) => this.setState({PartyName: e.target.value.toUpperCase()})}
                                             value={this.state.PartyName}   
                                             required
                                         />
@@ -251,7 +251,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({UnloadedAt: e.target.value})}
+                                            onChange={(e) => this.setState({UnloadedAt: e.target.value.toUpperCase()})}
                                             value={this.state.UnloadedAt}   
                                             required
                                         />
@@ -265,7 +265,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Weight: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({Weight: (e.target.value === "") ? 0 : parseFloat(e.target.value)})}
                                             value={this.state.Weight}   
                                             required
                                         />
@@ -278,7 +278,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Rate: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({Rate: (e.target.value === "") ? 0 : parseFloat(e.target.value)})}
                                             value={this.state.Rate}   
                                             required
                                         />
@@ -293,7 +293,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({Comission: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({Comission: (e.target.value === "") ? 0 : parseFloat(e.target.value)})}
                                             value={this.state.Comission}   
                                             required
                                         />
@@ -306,7 +306,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({MktComission: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({MktComission: (e.target.value === "") ? 0 : parseFloat(e.target.value)})}
                                             value={this.state.MktComission}   
                                             required
                                         />
@@ -321,7 +321,7 @@ export default class UpdateData extends Component {
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
-                                                onChange={(e) => this.setState({ PaidTo: e.target.value })}
+                                                onChange={(e) => this.setState({ PaidTo: e.target.value.toUpperCase() })}
                                                 value={this.state.PaidTo}
                                                 required
                                             />
@@ -336,7 +336,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({ MExpense: parseFloat(e.target.value) })}
+                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 :  parseFloat(e.target.value) })}
                                             value={this.state.MExpense}
                                             required
                                         />
@@ -350,7 +350,7 @@ export default class UpdateData extends Component {
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
-                                                onChange={(e) => this.setState({ Remark: e.target.value })}
+                                                onChange={(e) => this.setState({ Remark: e.target.value.toUpperCase() })}
                                                 value={this.state.Remark}
                                                 required
                                             />
@@ -400,7 +400,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({DiffPayable: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({DiffPayable: (e.target.value === "") ? 0 :  parseFloat(e.target.value)})}
                                             value={this.state.DiffPayable}   
                                             required
                                         />
@@ -426,7 +426,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
-                                            onChange={(e) => this.setState({OurRate: parseFloat(e.target.value)})}
+                                            onChange={(e) => this.setState({OurRate: (e.target.value === "") ? 0 : parseFloat(e.target.value)})}
                                             value={this.state.OurRate}   
                                             required
                                         />
