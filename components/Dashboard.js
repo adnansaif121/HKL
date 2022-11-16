@@ -89,7 +89,9 @@ export default class Dashboard extends Component {
             myLedger,
             Transporter,
             Company,
+        
         })
+        
     }
 
     componentDidMount() {
@@ -170,29 +172,28 @@ export default class Dashboard extends Component {
     }
 
     sortOnSearch = (e) => {
-        let query = e.target.value;
+        let query = e.target.value.toUpperCase();
         let result = [];
         if (this.state.Ledger === "Transporter") {
             for (let item of this.state.data) {
                 if (
                     item.InvoiceDate.includes(query) ||
-                    item.VehicleNo.includes(query) ||
-                    item.PaidTo.includes(query)
+                    item.VehicleNo.toUpperCase().includes(query) ||
+                    item.PaidTo.toUpperCase().includes(query)
                 ) {
                     result.push(item);
                 }
-
             }
         }
         else {
             for (let item of this.state.data) {
                 if (
-                    item.InvoiceDate.includes(query) ||
-                    item.PartyName.includes(query) ||
-                    item.VehicleNo.includes(query) ||
-                    item.Destination.includes(query) ||
-                    item.UnloadedAt.includes(query) ||
-                    item.Weight.includes(query)
+                    item.InvoiceDate.toUpperCase().includes(query) ||
+                    item.PartyName.toUpperCase().includes(query) ||
+                    item.VehicleNo.toUpperCase().includes(query) ||
+                    item.Destination.toUpperCase().includes(query) ||
+                    item.UnloadedAt.toUpperCase().includes(query) 
+                    // item.Weight.includes(query)
                 ) {
                     result.push(item);
                 }
@@ -365,6 +366,7 @@ export default class Dashboard extends Component {
         else {
             if (newdb == "Ultratech") {
                 this.UpdateLedger(this.state.AllData, "Ultratech");
+                // this.changeLedger(this.state.Ledger);
                 this.setState({
                     data: this.state.UltratechDb,
                     displayData: this.state.UltratechDb,
@@ -372,7 +374,8 @@ export default class Dashboard extends Component {
                 })
             }
             else {
-                this.UpdateLedger(this.state.AllData, "Orient")
+                this.UpdateLedger(this.state.AllData, "Orient");
+                // this.changeLedger(this.state.Ledger);
                 this.setState({
                     data: this.state.OrientDb,
                     displayData: this.state.OrientDb,
@@ -383,10 +386,10 @@ export default class Dashboard extends Component {
     }
 
     changeLedger = (newLedger) => {
-        if (newLedger === this.state.Ledger) {
-            alert("This Ledger is already selected " + newLedger);
-            return;
-        }
+        // if (newLedger === this.state.Ledger) {
+        //     alert("This Ledger is already selected " + newLedger);
+        //     return;
+        // }
 
         if (newLedger === "MyLedger") {
             this.setState({
