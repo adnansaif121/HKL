@@ -26,7 +26,7 @@ export default class Dashboard extends Component {
         this.state = {
             AllData: null,
             data: [],
-            RateData : [],
+            RateData: [],
             displayData: [],
             toggle: false,
             toUpdate: null,
@@ -89,9 +89,9 @@ export default class Dashboard extends Component {
             myLedger,
             Transporter,
             Company,
-        
+
         })
-        
+
     }
 
     componentDidMount() {
@@ -113,7 +113,7 @@ export default class Dashboard extends Component {
                 OrientDb: OriDb,
                 data: x,
                 // displayData: x,
-                RateData : data.ourRate.data,
+                RateData: data.ourRate.data,
             }, () => {
                 this.handleApply();
             })
@@ -139,20 +139,24 @@ export default class Dashboard extends Component {
     }
 
     handleDelete = (id) => {
-        const db = getDatabase();
-        set(ref(db, '/' + this.state.db + '/' + id), {});
+        let toDelete = confirm("Are you sure you want to delete this field?");
+        if(toDelete){
+            const db = getDatabase();
+            set(ref(db, '/' + this.state.db + '/' + id), {});
+        }
+        
     }
 
     onTransferClick = (item) => {
         this.handleDelete(item.id);
         const db = getDatabase();
         console.log(item);
-        if(this.state.db === "Ultratech"){
+        if (this.state.db === "Ultratech") {
             set(ref(db, '/Orient/' + item.id), {
                 ...item
             })
         }
-        else{
+        else {
             set(ref(db, '/Ultratech/' + item.id), {
                 ...item
             })
@@ -192,7 +196,7 @@ export default class Dashboard extends Component {
                     item.PartyName.toUpperCase().includes(query) ||
                     item.VehicleNo.toUpperCase().includes(query) ||
                     item.Destination.toUpperCase().includes(query) ||
-                    item.UnloadedAt.toUpperCase().includes(query) 
+                    item.UnloadedAt.toUpperCase().includes(query)
                     // item.Weight.includes(query)
                 ) {
                     result.push(item);
@@ -337,7 +341,7 @@ export default class Dashboard extends Component {
             x.sort((a, b) => {
                 let InvoiceA = new Date(a.InvoiceDate);
                 let InvoiceB = new Date(b.InvoiceDate);
-                if(InvoiceA >= InvoiceB)return 1;
+                if (InvoiceA >= InvoiceB) return 1;
                 else return -1;
             });
         }
@@ -345,7 +349,7 @@ export default class Dashboard extends Component {
             x.sort((b, a) => {
                 let InvoiceA = new Date(a.InvoiceDate);
                 let InvoiceB = new Date(b.InvoiceDate);
-                if(InvoiceA >= InvoiceB)return 1;
+                if (InvoiceA >= InvoiceB) return 1;
                 else return -1;
             });
         }
@@ -473,7 +477,7 @@ export default class Dashboard extends Component {
 
                                         <div className={styles.dropdown} style={{ marginRight: "8px" }}>
                                             <Button outline className={styles.dropbtn}>
-                                                {this.state.Ledger} 
+                                                {this.state.Ledger}
                                             </Button>
                                             <div className={styles.dropdownContent}>
                                                 {
@@ -542,16 +546,16 @@ export default class Dashboard extends Component {
                                         </Button>
 
                                         <Link href="/ExcelReader">
-                                                <Button outline style={{marginLeft: "8px"}} >
-                                                    <Image
-                                                        style={{ width: "25px", height: "25px" }}
-                                                        src={upload}
-                                                        alt="Picture of the author"
-                                                        width="10px"
-                                                        height="10px"
-                                                    />
-                                                </Button>
-                                            </Link>
+                                            <Button outline style={{ marginLeft: "8px" }} >
+                                                <Image
+                                                    style={{ width: "25px", height: "25px" }}
+                                                    src={upload}
+                                                    alt="Picture of the author"
+                                                    width="10px"
+                                                    height="10px"
+                                                />
+                                            </Button>
+                                        </Link>
                                     </div>
                                 </>
                         }
@@ -566,53 +570,53 @@ export default class Dashboard extends Component {
                         :
 
                         <>
-                            <div style={{width: "90vw",margin: "auto", color: "#1f5457"}}>
+                            <div style={{ width: "60vw", margin: "auto", color: "#1f5457", display: "flex",justifyContent:"space-between" }}>
                                 <h3>{this.state.db.toUpperCase()}</h3>
+                                <div>
+
+                                    {this.state.toggle === false ?
+                                        <Button outline style={{ width: "100px" }} onClick={() => this.setState({ toggle: !this.state.toggle })}>Enter</Button>
+                                        :
+                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>Close</Button>
+                                    }
+                                </div>
                             </div>
-                            <div style={{
-                                color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto",
-                                display: "block",
-                                height: '400px',
-                                overflowY: "scroll",
-                                overflowX: "scroll",
-                                boxShadow: "rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px"
-                            }}>
-
-                                {
-                                    this.state.Ledger === "MyLedger" &&
-                                    <MyLedger 
-                                        displayData={this.state.displayData} 
-                                        handleDelete={this.handleDelete} 
-                                        onEditClick={this.onEditClick}
-                                        onTransferClick={this.onTransferClick}
-                                    ></MyLedger>
-                                }
-                                {
-                                    this.state.Ledger === "Company" &&
-                                    <Company displayData={this.state.displayData}></Company>
-                                }
-                                {
-                                    this.state.Ledger === "Transporter" &&
-                                    <Transporter displayData={this.state.displayData}></Transporter>
-                                }
-                            </div>
-
-
-                            <div style={{ display: "flex", justifyContent: "center", margin: "10px" }}>
-
-                                {this.state.toggle === false ?
-                                    <Button outline style={{ width: "100px" }} onClick={() => this.setState({ toggle: !this.state.toggle })}>Enter</Button>
-                                    :
-                                    <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>Close</Button>
-                                }
-                            </div>
-
                             {
-                                this.state.toggle === true &&
+                                this.state.toggle === true ?
                                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
                                     <AddData updateData={this.addData} RateData={this.state.RateData}></AddData>
                                 </div>
+                                :
+                                <div style={{
+                                    color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto",
+                                    display: "block",
+                                    height: '80vh',
+                                    overflowY: "scroll",
+                                    overflowX: "scroll",
+                                    boxShadow: "rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px"
+                                }}>
+    
+                                    {
+                                        this.state.Ledger === "MyLedger" &&
+                                        <MyLedger
+                                            displayData={this.state.displayData}
+                                            handleDelete={this.handleDelete}
+                                            onEditClick={this.onEditClick}
+                                            onTransferClick={this.onTransferClick}
+                                        ></MyLedger>
+                                    }
+                                    {
+                                        this.state.Ledger === "Company" &&
+                                        <Company displayData={this.state.displayData}></Company>
+                                    }
+                                    {
+                                        this.state.Ledger === "Transporter" &&
+                                        <Transporter displayData={this.state.displayData}></Transporter>
+                                    }
+                                </div>
+    
                             }
+                            
                         </>
 
                     }
@@ -654,28 +658,28 @@ export default class Dashboard extends Component {
                                         this.state.showDate
                                             ?
                                             <>
-                                                <div style={{ width: "300px", margin:"8px" }}>
+                                                <div style={{ width: "300px", margin: "8px" }}>
                                                     <InputGroup>
                                                         <InputGroupText>
                                                             Start Date
                                                         </InputGroupText>
-                                                        
+
                                                         <Input
                                                             type="date"
-                                                            style={{colorScheme:"black"}}
+                                                            style={{ colorScheme: "black" }}
                                                             onChange={(e) => this.setState({ startDate: e.target.value })}
                                                         // required
                                                         />
                                                     </InputGroup>
                                                 </div>
-                                                <div style={{ width: "300px", margin:"8px" }}>
+                                                <div style={{ width: "300px", margin: "8px" }}>
                                                     <InputGroup>
                                                         <InputGroupText>
                                                             End Date
                                                         </InputGroupText>
                                                         <Input
                                                             type="date"
-                                                            style={{colorScheme:"black"}}
+                                                            style={{ colorScheme: "black" }}
                                                             onChange={(e) => this.setState({ endDate: e.target.value })}
                                                         // required
                                                         />

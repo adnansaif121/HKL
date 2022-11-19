@@ -256,7 +256,7 @@ export default class AddData extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                                <Col md={6}>
+                                <Col md={3}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -268,7 +268,7 @@ export default class AddData extends Component {
                                     </div>
 
                                 </Col>
-                                <Col md={6}>
+                                <Col md={3}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -280,9 +280,7 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
 
-                            </Row>
-                            <Row>
-                                <Col>
+                                <Col md={3}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -294,7 +292,7 @@ export default class AddData extends Component {
                                     </div>
 
                                 </Col>
-                                <Col>
+                                <Col md={3}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -306,7 +304,7 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
                                 {
-                                    this.state.MktComission && this.state.MktComission > 0 &&
+                                    (this.state.MktComission && this.state.MktComission > 0) ?
                                     <Col>
                                         <div className={styles.inputBox}>
                                             <input
@@ -319,10 +317,14 @@ export default class AddData extends Component {
                                             <i></i>
                                         </div>
                                     </Col>
+                                    : 
+                                    null
                                 }
                             </Row>
                             <Row>
-                                <Col md={6}>
+                            </Row>
+                            <Row>
+                                <Col>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -335,7 +337,7 @@ export default class AddData extends Component {
 
                                 </Col>
                                 {this.state.MExpense > 0 &&
-                                    <Col md={6}>
+                                    <Col>
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
@@ -349,42 +351,6 @@ export default class AddData extends Component {
 
                                     </Col>
                                 }
-                            </Row>
-                            <Row>
-                                <Col md={6}>
-                                    <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Payable Freight : </span>
-                                        <input
-                                            style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="number"
-                                            value={(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
-                                            // onChange={(e) => this.setState({Comission: e.target.value})}
-                                            required
-                                            readOnly
-
-                                        />
-                                        <i></i>
-
-                                    </div>
-
-                                </Col>
-                                <Col md={6}>
-                                    <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Freight : </span>
-                                        <input
-                                            style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="number"
-                                            value={(this.state.Weight*this.state.Rate) + this.state.MExpense}
-                                            // onChange={(e) => this.setState({MktComission: e.target.value})}
-                                            required
-                                            readOnly
-                                        />
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-                            </Row>
-                            <Row>
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
@@ -409,7 +375,10 @@ export default class AddData extends Component {
                                     </div>
 
                                 </Col>
-                                <Col>
+                            </Row>
+                            
+                            <Row style={{display: "flex", justifyContent: "center"}}>
+                                <Col md={6}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -424,38 +393,40 @@ export default class AddData extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                                <Col md={6}>
+                                <Col >
+                                    <div className={styles.disabledInput}>
+                                        <span style={{ color: "#1f5457" }}>Payable Freight : </span>
+                                        {(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
+                                    </div>
+
+                                </Col>
+                                <Col >
+                                    <div className={styles.disabledInput}>
+                                        <span style={{ color: "#1f5457" }}>Net Freight : </span>
+                                        {(this.state.Weight*this.state.Rate) + this.state.MExpense}
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                                <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Our Freight : </span>
-                                        <input
-                                            style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="number"
-                                            value={(this.state.Weight * this.state.OurRate) - this.state.DiffPayable}
-                                            // onChange={(e) => this.setState({Comission: e.target.value})}
-                                            required
-                                            readOnly
-
-                                        />
+                                        {(this.state.Weight * this.state.OurRate) - this.state.DiffPayable}
                                         <i></i>
 
                                     </div>
 
                                 </Col>
-                                <Col md={6}>
+                                <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        <input
-                                            style={{ backgroundColor: "#1f5457", color: "white" }}
-                                            type="number"
-                                            value={(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission))}
-                                            // onChange={(e) => this.setState({MktComission: e.target.value})}
-                                            required
-                                            readOnly
-                                        />
+                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission))}
                                         <i></i>
                                     </div>
 
                                 </Col>
+                            </Row>
+                            <Row>
                             </Row>
                             <button onClick={this.addData} className={styles.button}><span>Add</span></button>
                         </div>
