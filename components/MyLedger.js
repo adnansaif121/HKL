@@ -48,16 +48,16 @@ export default class MyLedger extends Component {
             }}>
 
                 <thead>
-                    <tr>
-                        <th>
+                    <tr style={{position: "sticky", top: "0", backgroundColor: "#59C1BD", color: "white", border: "2px solid black"}}>
+                        <th >
                             <div style={{ marginRight: "90px" }}>
                                 #
                             </div>
                         </th>
-                        <th>
+                        <th >
                             Invoice Date
                         </th>
-                        <th>
+                        <th >
                             Vehicle No.
                         </th>
                         <th>

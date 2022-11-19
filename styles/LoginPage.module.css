@@ -228,3 +228,9 @@ background: #1f5457;
   /* .dropdown:hover .dropbtn {
     background-color: #3e8e41;
   } */
+
+  .stickTop{
+    position: sticky;
+    top: 0; 
+    background-Color: "blue";
+  }

@@ -16,7 +16,7 @@ export default class Company extends Component {
 
             }}>
                 <thead>
-                    <tr>
+                    <tr style={{position: "sticky", top: "0", backgroundColor: "#59C1BD", color: "white", border: "2px solid black"}}>
                         <th>
                             #
                         </th>
