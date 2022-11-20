@@ -10,13 +10,9 @@ export default class Transporter extends Component {
 
     render() {
         return (
-            <Table striped bordered style={{
-                width: "90vw", color: "black", margin: "3%", border: "1px solid grey",
-
-
-            }}>
+            <Table striped bordered >
                 <thead>
-                    <tr style={{position: "sticky", top: "0", backgroundColor: "#59C1BD", color: "white", border: "2px solid black"}}>
+                    <tr style={{position: "sticky", top: "0", backgroundColor: "#59C1BD", color: "black"}}>
                         <th>
                             #
                         </th>

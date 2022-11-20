@@ -8,6 +8,10 @@ import Company from './Company';
 import Transporter from './Transporter';
 import firebase from '../config/firebase';
 import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import Image from 'next/image'
+import xlsx from "json-as-xlsx";
+import Link from 'next/link';
+// Icons
 import deleteIcon from '../public/delete.png'
 import download from '../public/download.png'
 import arrow from '../public/arrow.png';
@@ -15,9 +19,8 @@ import edit from '../public/edit.png';
 import logo from '../public/logo.png';
 import upload from '../public/file.png';
 import controls from '../public/controls.png'
-import Image from 'next/image'
-import xlsx from "json-as-xlsx";
-import Link from 'next/link';
+import plus from '../public/plus.png'
+import reject from '../public/reject.png'
 
 export default class Dashboard extends Component {
 
@@ -93,7 +96,7 @@ export default class Dashboard extends Component {
         })
 
     }
-
+    
     componentDidMount() {
         const db = getDatabase();
         const starCountRef = ref(db, '/');
@@ -503,7 +506,6 @@ export default class Dashboard extends Component {
                                                 }
                                             </div>
                                         </div>
-
                                         <div className={styles.dropdown} style={{ marginRight: "8px" }}>
                                             <Button outline className={styles.dropbtn}>
                                                 <Image
@@ -570,14 +572,27 @@ export default class Dashboard extends Component {
                         :
 
                         <>
-                            <div style={{ width: "60vw", margin: "auto", color: "#1f5457", display: "flex",justifyContent:"space-between" }}>
+                            {/* Heading above table */}
+                            <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex" , justifyContent: "space-between"}}>
                                 <h3>{this.state.db.toUpperCase()}</h3>
                                 <div>
 
                                     {this.state.toggle === false ?
-                                        <Button outline style={{ width: "100px" }} onClick={() => this.setState({ toggle: !this.state.toggle })}>Enter</Button>
+                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                            <Image
+                                                    style={{ width: "20px", height: "20px" }}
+                                                    src={plus}
+                                                    alt="Picture of the author"     
+                                            />
+                                        </Button>
                                         :
-                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>Close</Button>
+                                        <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                            <Image
+                                                style={{ width: "20px", height: "20px" }}
+                                                src={reject}
+                                                alt="Picture of the author"
+                                            />
+                                        </Button>
                                     }
                                 </div>
                             </div>
