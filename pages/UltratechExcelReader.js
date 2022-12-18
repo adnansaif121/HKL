@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx'
 import { make_cols } from '../components/MakeColumns';
 import { SheetJSFT } from '../components/types';
 import { Input, Button, Label, Row, Col, Container, Navbar, NavbarBrand } from 'reactstrap';
-import RateLedger from '../components/RateLedger';
+import UltratechRateLedger from '../components/UltratechRateLedger';
 import firebase from '../config/firebase';
 import { getDatabase, ref, set, onValue, update, get } from "firebase/database";
 import Link from 'next/link';
@@ -20,7 +20,7 @@ class ExcelReader extends Component {
             toggle: false,
             isDataUploaded: false,
             applyDate: null,
-            OrientDb: null
+            UltratechDb: null,
         }
         this.handleFile = this.handleFile.bind(this);
         this.handleChange = this.handleChange.bind(this);
@@ -28,12 +28,12 @@ class ExcelReader extends Component {
 
     componentDidMount() {
         const db = getDatabase();
-        const starCountRef = ref(db, '/Orient');
+        const starCountRef = ref(db, '/Ultratech');
         onValue(starCountRef, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
             this.setState({
-                OrientDb: data !== undefined ? data : [],
+                UltratechDb: data !==undefined ? data : [],
             })
         }, {
             onlyOnce: true
@@ -80,7 +80,7 @@ class ExcelReader extends Component {
         for (let i = 0; i < data.length; i++) {
             data[i].id = i + 1;
         }
-        set(ref(db, '/ourRate'), {
+        set(ref(db, '/UltratechRate'), {
             data
         }).then(() => {
             this.setState({
@@ -127,20 +127,14 @@ class ExcelReader extends Component {
 
         console.log("Update Attempted");
 
-        // let newUltratechDb = this.updateDb(this.state.UltratechDb);
-        let newOrientDb = this.updateDb(this.state.OrientDb);
+        let newUltratechDb = this.updateDb(this.state.UltratechDb);
 
-        // console.log("new UltratechDb", newUltratechDb);
-        console.log("new Orient", newOrientDb);
+        console.log("new UltratechDb", newUltratechDb);
 
         const db = getDatabase();
-        
-            set(ref(db, '/Orient/'), {
-                ...newOrientDb
-            }).then(() => {
-                alert("Data Updated Successfully !!")
-            })
-        
+        set(ref(db, '/Ultratech/'), {
+            ...newUltratechDb
+        })
     }
 
     render() {
@@ -150,7 +144,7 @@ class ExcelReader extends Component {
                     className="my-2"
                 >
                     {/* <NavbarBrand> */}
-                        <Link href="/dashboard?db=Orient">
+                        <Link href="/dashboard?db=Ultratech">
                             <Button outline>
                                 Back
                             </Button>
@@ -183,7 +177,7 @@ class ExcelReader extends Component {
                     {
                         this.state.toggle &&
                         <>
-                            <RateLedger displayData={this.state.data}></RateLedger>
+                            <UltratechRateLedger displayData={this.state.data}></UltratechRateLedger>
                             <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
                                 <Button outline onClick={this.handleUpload}>
                                     Upload

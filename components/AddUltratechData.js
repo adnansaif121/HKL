@@ -10,7 +10,7 @@ import {
 import styles from '../styles/AddData.module.css';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 
-export default class AddData extends Component {
+export default class AddUltratechData extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,7 +18,7 @@ export default class AddData extends Component {
             VehicleNo: "",
             PartyName: "",
             Destination: "",
-            Classification: "MARKET",
+            Classification: "Owned",
             UnloadedAt: "",
             Weight: 0,
             Rate: 0,
@@ -34,33 +34,91 @@ export default class AddData extends Component {
             OurRate: 0,
             OurFreight: 0,
             NetProfit: 0,
-
             RateData: [],
+
+            VehicleReturnState : "Non-Empty",
+            VehicleOwnership : "Owned",
+            kmsLead : 0,
             RateSelected : null,
+
+            // IF ATTACHED
+            Diesel : 0,
+            Toll : 0,
+            Warai : 0,
+
+            // Vehicle Owner
+            VehicleOwnerName : "",
+
+            // PartyNameList
+            PartyNameList : [],
+
         }
     }
 
-    componentDidMount() {
-        // console.log(t)
+    componentDidMount(){
+
+        // RateData Filter
+        console.log(this.props.RateData);
         let rates = [];
         for(let item of this.props.RateData){
             rates.push({
-                id : item.id,
-                displayName: `${item["Name of Destination"]} (${item["Classification Name"]})`,
+                id: item.id,
+                displayName : `${item.DESTINATION} (${item.TONNAGE})`,
             })
         }
         this.setState({
             RateData : rates,
         })
+
+        // Party Name Cache List
+        let entries = Object.values(this.props.AllData)
+        let PartyNameList = [];
+        let set = new Set();
+        for(let item of entries){
+            set.add(item.PartyName);
+        }
+        // for(let item of )
+        // console.log(set.entries());
+        let setArr = [...set];
+        let i = 0;
+        for(let item of setArr){
+            PartyNameList.push({
+                Name : item,
+                id : i
+            })
+            i++;
+        }
+        this.setState({
+            PartyNameList,
+        })
+
     }
 
     addData = () => {
+        if(this.state.Diesel=== undefined){
+            alert("Please Enter a value in Diesel");
+            return;
+        }
+        else if(this.state.Toll === undefined){
+            alert("Please Enter a value in Toll");
+            return;
+        }
+        else if(this.state.Warai === undefined){
+            alert("Please Enter a value in Warai");
+            return;
+        }
+
         let obj = {
             InvoiceDate: this.state.InvoiceDate,
             VehicleNo: (this.state.VehicleNo).toUpperCase(),
             PartyName: this.state.PartyName.toUpperCase(),
             Destination: this.state.Destination.toUpperCase(),
-            Classification: this.state.Classification,
+            Classification: this.state.VehicleOwnership,
+            VehicleReturnState : this.state.VehicleReturnState,
+            // VehicleOwnership : this.state.VehicleOwnership,
+            VehicleOwnerName : this.state.VehicleOwnerName,
+            kmsLead : this.state.kmsLead,
+
             UnloadedAt: this.state.UnloadedAt.toUpperCase(),
             Weight: this.state.Weight,
             Rate: this.state.Rate,
@@ -75,7 +133,13 @@ export default class AddData extends Component {
             PaidOn: this.state.PaidOn,
             OurRate: this.state.OurRate,
             OurFreight: (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)),
+            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
+
+             // IF ATTACHED
+             Diesel : this.state.Diesel,
+             Toll : this.state.Toll,
+             Warai : this.state.Warai,
+
         }
         // console.log(obj)
         this.props.updateData(obj);
@@ -87,29 +151,42 @@ export default class AddData extends Component {
             Destination : string,
         })
     };
- 
+
     handleOnSelect = (item) => {
-        console.log(item.id);
         let ownedItem = item;
         let index = item.id - 1;
         let RateItem = this.props.RateData[index];
         let OurRate = "";
-        // if (item["Classification Name"] !== this.state.Classification) {
-        //     for (let i of this.state.RateData) {
-        //         if (i["Name of Destination"] === item["Name of Destination"] && i["Classification Name"] === this.state.Classification) {
-        //             ownedItem = i;
-        //             break;
-        //         }
-        //     }
-        // }
+        let kmsLead = 0;
+        if (this.state.VehicleReturnState === "Non-Empty") {
+            OurRate = RateItem.FREIGHT;
+            kmsLead = RateItem["KMS LEAD"];
+        }
+        else{
+            OurRate = RateItem["NET FREIGHT"];
+            kmsLead = 2*RateItem["KMS LEAD"];
+        }
+
         this.setState({
-            // Destination: item["Name of Destination"],
-            Destination : `${RateItem["Name of Destination"]} (${RateItem["Classification Name"]})`,
-            // OurRate: parseFloat(ownedItem["ToT Freight (PMT)"])
-            OurRate : parseFloat(RateItem["ToT Freight (PMT)"])
+            Destination: `${RateItem["DESTINATION"]} (${RateItem["TONNAGE"]})`,
+            OurRate: parseFloat(OurRate),
+            kmsLead : kmsLead,
+            RateSelected : this.props.RateData[index],
         })
         console.log(ownedItem);
     };
+
+    handleOnSearchPartyName = (string) => {
+        this.setState({
+            PartyName : string
+        })
+    }
+
+    handleOnSelectPartyName = (item) => {
+        this.setState({
+            PartyName : item.Name,
+        })
+    }
 
     // handleClass = (Classification) => {
     //     if (this.state.Destination === "") {
@@ -142,6 +219,52 @@ export default class AddData extends Component {
     //     }
     // }
 
+    changeVehicleOwnership = (Ownership) => {
+        if(Ownership === "Owned"){
+            this.setState({
+                Diesel : 0,
+                Toll : 0,
+                Warai : 0,
+            })
+        }
+        this.setState({
+            VehicleOwnership : Ownership,
+        })
+    }
+
+    changeVehicleReturnState = (State) => {
+        let OurRate = 0;
+        let kmsLead = 0;
+        let RateItem = this.state.RateSelected;
+        if(this.state.RateSelected !== null){
+            if (State === "Non-Empty") {
+                OurRate = RateItem.FREIGHT;
+                kmsLead = RateItem["KMS LEAD"];
+            }
+            else{
+                OurRate = RateItem["NET FREIGHT"];
+                kmsLead = 2*RateItem["KMS LEAD"];
+            }
+            console.log(OurRate, kmsLead, State);
+            this.setState({
+                OurRate : OurRate,
+                kmsLead: kmsLead,
+                VehicleReturnState : State,
+            })
+        }
+        else{
+            this.setState({
+                VehicleReturnState : State,
+            })
+        }
+    }
+
+    calExpense = (ExpenseType, value) => {
+        this.setState({
+            [ExpenseType] : parseFloat(value)
+        })
+    }
+
     render() {
         return (
             <>
@@ -150,6 +273,7 @@ export default class AddData extends Component {
                         <div className={styles.form}>
                             {/* <h2>Add Data</h2> */}
                             <Row>
+
                                 {/* INVOICE DATE */}
                                 <Col md={4}>
                                     <div className={styles.inputBox}>
@@ -178,7 +302,7 @@ export default class AddData extends Component {
                                 </Col>
 
                                 {/* PARTY NAME */}
-                                <Col md={4}>
+                                {/* <Col md={4}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -189,13 +313,42 @@ export default class AddData extends Component {
                                         <span>Party Name</span>
                                         <i></i>
                                     </div>
+                                </Col> */}
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        <div style={{ marginBottom: 0 }}>Party Name</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.PartyNameList}
+                                            fuseOptions={{ keys: ["Name", "id"] }} // Search on both fields
+                                            resultStringKeyName="Name" // String to display in the results
+                                            onSearch={this.handleOnSearchPartyName}
+                                            onSelect={this.handleOnSelectPartyName}
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 20,
+                                            }}
+                                        />
+                                    </div>
                                 </Col>
+
                             </Row>
-                            <Row>
+
+                            <Row style={{ paddingBottom:"30px"}}>
                                 {/* DESTINATION */}
                                 <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
-                                        {/* <h2>My custom searchbox!</h2> */}
                                         <div style={{ marginBottom: 0 }}>Destination</div>
                                         <ReactSearchAutocomplete
                                             items={this.state.RateData}
@@ -220,10 +373,139 @@ export default class AddData extends Component {
                                                 zIndex: 20,
                                             }}
                                         />
-                                        {/* <div style={{ marginTop: 20 }}>This text will be covered!</div> */}
+                                    </div>
+                                </Col>
+                                
+                                <Col>
+                                    <div style={{display: "flex", justifyContent: "space-between", padding: "0px 30px 0px 30px"}}>
+
+                                        {/* Empty/NonEmpty */}
+                                            <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%" }}>
+                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
+                                                    {this.state.VehicleReturnState}
+                                                </Button>
+                                                <div className={styles.dropdownContent} style={{width: "200px"}}>
+                                                    {
+                                                        this.state.VehicleReturnState === "Non-Empty"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }}>Non-Empty</div>
+                                                        :
+                                                        <div onClick={() => this.changeVehicleReturnState("Non-Empty")}>Non-Empty</div>
+                                                    }
+                                                    {
+                                                        this.state.VehicleReturnState === "Empty"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} >Empty</div>
+                                                        :
+                                                        <div onClick={() => this.changeVehicleReturnState("Empty")}>Empty</div>
+                                                    }
+                                                        
+                                                </div>
+                                            </div>
+                                        
+                                        {/* Owned/Attached */}
+                                            <div className={styles.dropdown} style={{ marginTop: "30px" }}>
+                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
+                                                    {this.state.VehicleOwnership}
+                                                </Button>
+                                                <div className={styles.dropdownContent} style={{width:"200px"}}>
+                                                    {
+                                                        this.state.VehicleOwnership === "Owned"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }}>Owned</div>
+                                                        :
+                                                        <div onClick={() => this.changeVehicleOwnership("Owned")}>Owned</div>
+                                                    }
+                                                    {
+                                                        this.state.VehicleOwnership === "Attached"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }}>Attached</div>
+                                                        :
+                                                        <div onClick={() => this.changeVehicleOwnership("Attached")}>Attached</div>
+                                                    }
+                                                        
+                                                </div>
+                                            </div>
+                                        
                                     </div>
                                 </Col>
 
+                            </Row>
+
+                            <Row style={{marginBottom : "20px"}}>
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                            <input
+                                                type="text"
+                                                onChange={(e) => this.setState({ VehicleOwnerName: e.target.value.toUpperCase() })}
+                                                value={this.state.VehicleOwnerName}
+                                                required
+                                            />
+                                            <span>Vehicle Owner Name</span>
+                                            <i></i>
+                                        </div>
+                                </Col>
+                            </Row>
+
+                            {this.state.VehicleOwnership === "Attached"
+                                ?
+                                <div style={{border: "1px solid black", padding: "30px"}}>
+                                    <Row>
+                                        EXTRA ATTACHED EXPENSES
+                                    </Row>
+                                    <Row>
+                                        {/* Diesel */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("Diesel", e.target.value) }
+                                                    value={this.state.Diesel === 0 ? 0 : this.state.Diesel}
+                                                    required
+                                                />
+                                                <span>Diesel</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Toll */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("Toll", e.target.value)}
+                                                    value={this.state.Toll === undefined ? 0 : this.state.Toll }
+                                                    required
+                                                />
+                                                <span>Toll</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Warai */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("Warai", e.target.value)}
+                                                    value={this.state.Warai === undefined ? 0 : this.state.Warai}
+                                                    required
+                                                />
+                                                <span>Warai</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+                                    </Row>
+
+                                    <Row style={{display : "flex", justifyContent: 'center', marginTop: "20px"}}>
+                                        Total : {this.state.Diesel + this.state.Toll + this.state.Warai}
+                                    </Row>
+                                </div>
+                                :
+                                null
+                            }
+
+                            <Row>
                                 {/* OWNED/MARKET */}
                                 {/* <Col style={{ marginTop: "30px" }}>
                                     <div style={{ display: "flex", justifyContent: "center" }}>
@@ -241,8 +523,22 @@ export default class AddData extends Component {
 
                                 </Col> */}
                                  
+                                {/* KMS Lead */}
+                                <Col md={2}>
+                                <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ OurRate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.kmsLead}
+                                            required
+                                        />
+                                        <span>KMS Lead</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
                                 {/* Unloaded At */}
-                                <Col>
+                                <Col md={10}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -254,8 +550,10 @@ export default class AddData extends Component {
                                         <i></i>
                                     </div>
                                 </Col>
+
                             </Row>
                             <Row>
+
                                 {/* WEIGHT */}
                                 <Col md={3}>
                                     <div className={styles.inputBox}>
@@ -310,22 +608,23 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
                                 {
-                                    (this.state.MktComission && this.state.MktComission > 0) ?
+                                    (this.state.MktComission && this.state.MktComission > 0) 
+                                    ?
                                     // PAID TO
-                                    <Col>
-                                        <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ PaidTo: e.target.value.toUpperCase() })}
-                                                value={this.state.PaidTo}
-                                                required
-                                            />
-                                            <span>Mkt Comission Paid To</span>
-                                            <i></i>
-                                        </div>
-                                    </Col>
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="text"
+                                                    onChange={(e) => this.setState({ PaidTo: e.target.value.toUpperCase() })}
+                                                    value={this.state.PaidTo}
+                                                    required
+                                                />
+                                                <span>Mkt Comission Paid To</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
                                     : 
-                                    null
+                                        null
                                 }
                             </Row>
                             
@@ -406,6 +705,7 @@ export default class AddData extends Component {
 
                                 </Col>
                             </Row>
+
                             <Row>
                                 {/* Payable Freight */}
                                 <Col >
@@ -441,7 +741,7 @@ export default class AddData extends Component {
                                 <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission))}
+                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                         <i></i>
                                     </div>
 

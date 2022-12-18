@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 import styles from '../styles/LoginPage.module.css'
 import { Table, Button, Navbar, NavbarBrand, FormGroup, Form, Input, Label, Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Nav, NavItem, NavLink, UncontrolledDropdown, InputGroup, InputGroupText } from 'reactstrap';
 import AddData from './AddData';
+import AddUltratechData from './AddUltratechData';
 import UpdateData from './UpdateData';
+import UpdateUltratechData from './UpdateUltratechData';
 import MyLedger from './MyLedger';
 import Company from './Company';
 import Transporter from './Transporter';
 import firebase from '../config/firebase';
-import { getDatabase, ref, set, onValue, update } from "firebase/database";
+import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
 import Image from 'next/image'
 import xlsx from "json-as-xlsx";
 import Link from 'next/link';
@@ -24,8 +26,8 @@ import reject from '../public/reject.png'
 
 export default class Dashboard extends Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             AllData: null,
             data: [],
@@ -41,9 +43,7 @@ export default class Dashboard extends Component {
             startDate: null,
             endDate: null,
             dropdownOpen: false,
-            db: "Ultratech",
-            UltratechDb: null,
-            OrientDb: null,
+            db: this.props.DB,
             Ledger: "MyLedger",
             myLedger: [],
             Transporter: [],
@@ -52,16 +52,10 @@ export default class Dashboard extends Component {
         }
     }
 
-    UpdateLedger = (data, db) => {
-        let myLedger;
+    UpdateLedger = (data) => {
+        let myLedger = data ? [...Object.values(data)] : [];
         let Transporter = [];
         let Company = [];
-        if (db === "Ultratech") {
-            myLedger = data.Ultratech ? [...Object.values(data.Ultratech)] : [];
-        }
-        else {
-            myLedger = data.Orient ? [...Object.values(data.Orient)] : [];
-        }
         for (let item of myLedger) {
             if (item.MktComission != undefined && item.MktComission != null && item.MktComission != 0) {
                 let obj = {
@@ -88,6 +82,7 @@ export default class Dashboard extends Component {
                 Company.push(obj);
             }
         }
+
         this.setState({
             myLedger,
             Transporter,
@@ -99,28 +94,53 @@ export default class Dashboard extends Component {
     
     componentDidMount() {
         const db = getDatabase();
-        const starCountRef = ref(db, '/');
-        onValue(starCountRef, (snapshot) => {
+        const Ref = ref(db, '/'+this.props.DB);
+        console.log(this.props.DB); 
+        onValue(Ref, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
-            console.log(data.ourRate.data);
-            this.UpdateLedger(data, this.state.db);
-
-            let UltraDb = data.Ultratech !== undefined ? [...Object.values(data.Ultratech)] : [];
-            let OriDb = data.Orient !== undefined ? [...Object.values(data.Orient)] : [];
-            let x = (this.state.db === "Ultratech") ? UltraDb : OriDb;
+            // console.log(data.ourRate.data);
+            this.UpdateLedger(data);
+            let x = (data !== undefined) ? [...Object.values(data)] : [];
 
             this.setState({
                 AllData: data,
-                UltratechDb: UltraDb,
-                OrientDb: OriDb,
                 data: x,
                 // displayData: x,
-                RateData: data.ourRate.data,
+                // RateData: data.ourRate.data,//abhi hatayo
             }, () => {
-                this.handleApply();
+                this.handleApply(x);
             })
         })
+
+        // FETCHING RATEDATA
+        const dbRef = ref(getDatabase());
+        if(this.props.DB === "Ultratech"){
+            get(child(dbRef, '/UltratechRate/data')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    console.log(snapshot.val());
+                    this.setState({ RateData: snapshot.val() })
+                } else {
+                    console.log("No data available");
+                }
+            }
+            ).catch((error) => {
+                console.error(error);
+            });
+        }
+        else{
+            get(child(dbRef, '/ourRate/data')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    console.log(snapshot.val());
+                    this.setState({ RateData: snapshot.val() })
+                } else {
+                    console.log("No data available");
+                }
+            }
+            ).catch((error) => {
+                console.error(error);
+            });
+        }
     }
 
     addData = (obj) => {
@@ -292,8 +312,9 @@ export default class Dashboard extends Component {
         xlsx(data, settings) // Will download the excel file
     }
 
-    handleApply = () => {
-        let x = this.state.data;
+    // NO ISSUE HERE
+    handleApply = (data) => {
+        let x = data;   
         let today = new Date();
         let monthPriorDate = new Date(new Date().setDate(today.getDate() - 30));
         let weekPriorDate = new Date(new Date().setDate(today.getDate() - 7));
@@ -360,36 +381,10 @@ export default class Dashboard extends Component {
         console.log(x);
         this.setState({
             displayData: x,
+            data: data,
             toggleSidebar: false,
         })
         // console.log(today,monthPriorDate, weekPriorDate);
-    }
-
-    changeDb = (newdb) => {
-        if (newdb == this.state.db) {
-            alert("The Data is of " + newdb + " already");
-            return;
-        }
-        else {
-            if (newdb == "Ultratech") {
-                this.UpdateLedger(this.state.AllData, "Ultratech");
-                // this.changeLedger(this.state.Ledger);
-                this.setState({
-                    data: this.state.UltratechDb,
-                    displayData: this.state.UltratechDb,
-                    db: newdb
-                })
-            }
-            else {
-                this.UpdateLedger(this.state.AllData, "Orient");
-                // this.changeLedger(this.state.Ledger);
-                this.setState({
-                    data: this.state.OrientDb,
-                    displayData: this.state.OrientDb,
-                    db: newdb
-                })
-            }
-        }
     }
 
     changeLedger = (newLedger) => {
@@ -399,22 +394,25 @@ export default class Dashboard extends Component {
         // }
 
         if (newLedger === "MyLedger") {
-            this.setState({
-                data: this.state.myLedger,
-                displayData: this.state.myLedger
-            })
+            this.handleApply(this.state.myLedger);
+            // this.setState({
+            //     data: this.state.myLedger,
+            //     displayData: this.state.myLedger
+            // })
         }
         else if (newLedger === "Company") {
-            this.setState({
-                data: this.state.Company,
-                displayData: this.state.Company,
-            })
+            this.handleApply(this.state.Company);
+            // this.setState({
+            //     data: this.state.Company,
+            //     displayData: this.state.Company,
+            // })
         }
         else {
-            this.setState({
-                data: this.state.Transporter,
-                displayData: this.state.Transporter,
-            })
+            this.handleApply(this.state.Transporter);
+            // this.setState({
+            //     data: this.state.Transporter,
+            //     displayData: this.state.Transporter,
+            // })
         }
 
         this.setState({
@@ -445,13 +443,6 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
-                            {/* <Image
-                                    style={{ width: "2.5rem", height: "2.5rem", marginLeft: "0.5rem", borderRadius: "10%" }}
-                                    src={logo}
-                                    alt="Picture of the author"
-                                    width="10px"
-                                    height="10px"
-                                /> */}
                         </NavbarBrand>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -506,34 +497,7 @@ export default class Dashboard extends Component {
                                                 }
                                             </div>
                                         </div>
-                                        <div className={styles.dropdown} style={{ marginRight: "8px" }}>
-                                            <Button outline className={styles.dropbtn}>
-                                                <Image
-                                                    style={{ width: "20px", height: "20px" }}
-                                                    src={arrow}
-                                                    alt="Picture of the author"
-                                                    width="10px"
-                                                    height="10px"
-                                                />
-                                            </Button>
-                                            <div className={styles.dropdownContent}>
-                                                {
-                                                    this.state.db === "Ultratech"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeDb("Ultratech")}><h6>Ultratech</h6></div>
-                                                        :
-                                                        <div onClick={() => this.changeDb("Ultratech")}><h6>Ultratech</h6></div>
-                                                }
-                                                {
-                                                    this.state.db === "Orient"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeDb("Orient")}><h6>Orient</h6></div>
-                                                        :
-                                                        <div onClick={() => this.changeDb("Orient")}><h6>Orient</h6></div>
-                                                }
-                                            </div>
-                                        </div>
-
+                                        
                                         <Button outline
                                             // style={{ }}
                                             onClick={this.ExportData}
@@ -546,18 +510,33 @@ export default class Dashboard extends Component {
                                                 height="10px"
                                             />
                                         </Button>
-
-                                        <Link href="/ExcelReader">
-                                            <Button outline style={{ marginLeft: "8px" }} >
-                                                <Image
-                                                    style={{ width: "25px", height: "25px" }}
-                                                    src={upload}
-                                                    alt="Picture of the author"
-                                                    width="10px"
-                                                    height="10px"
-                                                />
-                                            </Button>
-                                        </Link>
+                                        
+                                        {
+                                            this.props.DB === "Ultratech" ?
+                                            <Link href="/UltratechExcelReader">
+                                                <Button outline style={{ marginLeft: "8px" }} >
+                                                    <Image
+                                                        style={{ width: "25px", height: "25px" }}
+                                                        src={upload}
+                                                        alt="Picture of the author"
+                                                        width="10px"
+                                                        height="10px"
+                                                    />
+                                                </Button>
+                                            </Link>
+                                            :
+                                            <Link href="/ExcelReader">
+                                                <Button outline style={{ marginLeft: "8px" }} >
+                                                    <Image
+                                                        style={{ width: "25px", height: "25px" }}
+                                                        src={upload}
+                                                        alt="Picture of the author"
+                                                        width="10px"
+                                                        height="10px"
+                                                    />
+                                                </Button>
+                                            </Link>
+                                        }
                                     </div>
                                 </>
                         }
@@ -567,13 +546,23 @@ export default class Dashboard extends Component {
 
                     {this.state.toggleUpdateBox ?
 
-                        <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
+                        
+                            this.props.DB === "Ultratech" ?
+                        
+                            <UpdateUltratechData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData}></UpdateUltratechData>
+                            
+                            :
+
+                            <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
 
                         :
 
                         <>
                             {/* Heading above table */}
                             <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex" , justifyContent: "space-between"}}>
+                                <Link href="/Options">
+                                    <Button outline>Back</Button>
+                                </Link>
                                 <h3>{this.state.db.toUpperCase()}</h3>
                                 <div>
 
@@ -599,18 +588,16 @@ export default class Dashboard extends Component {
                             {
                                 this.state.toggle === true ?
                                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
-                                    <AddData updateData={this.addData} RateData={this.state.RateData}></AddData>
+                                    {
+                                        this.props.DB === "Ultratech" ?
+                                        <AddUltratechData updateData={this.addData} RateData={this.state.RateData} AllData={this.state.AllData}></AddUltratechData>
+                                        :
+                                        <AddData updateData={this.addData} RateData={this.state.RateData}></AddData>
+
+                                    }
                                 </div>
                                 :
-                                <div style={{
-                                    color: "black", width: "90vw", display: "flex", justifyContent: "center", margin: "auto",
-                                    display: "block",
-                                    height: '80vh',
-                                    overflowY: "scroll",
-                                    overflowX: "scroll",
-                                    boxShadow: "rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px"
-                                }}>
-    
+                                <div>
                                     {
                                         this.state.Ledger === "MyLedger" &&
                                         <MyLedger
@@ -618,17 +605,26 @@ export default class Dashboard extends Component {
                                             handleDelete={this.handleDelete}
                                             onEditClick={this.onEditClick}
                                             onTransferClick={this.onTransferClick}
+                                            filter={this.state.filter}
                                         ></MyLedger>
                                     }
                                     {
                                         this.state.Ledger === "Company" &&
-                                        <Company displayData={this.state.displayData}></Company>
+                                        <Company 
+                                            displayData={this.state.displayData}
+                                            filter={this.state.filter}
+                                        ></Company>
                                     }
                                     {
                                         this.state.Ledger === "Transporter" &&
-                                        <Transporter displayData={this.state.displayData}></Transporter>
+                                        <Transporter 
+                                            displayData={this.state.displayData}
+                                            filter={this.state.filter}
+                                        ></Transporter>
                                     }
+
                                 </div>
+    
     
                             }
                             
@@ -708,7 +704,7 @@ export default class Dashboard extends Component {
                             </div>
 
                             <div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>
-                                <Button onClick={this.handleApply} outline color='info' style={{ width: "100%" }}>
+                                <Button onClick={() => this.handleApply(this.state.data)} outline color='info' style={{ width: "100%" }}>
                                     Apply
                                 </Button>
                             </div>
