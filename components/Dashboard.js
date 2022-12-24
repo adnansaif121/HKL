@@ -563,7 +563,7 @@ export default class Dashboard extends Component {
                                 <Link href="/Options">
                                     <Button outline>Back</Button>
                                 </Link>
-                                <h3>{this.state.db.toUpperCase()}</h3>
+                                <h3>{this.props.DB.toUpperCase()}</h3>
                                 <div>
 
                                     {this.state.toggle === false ?
