@@ -199,7 +199,7 @@ export default class Dashboard extends Component {
     }
 
     sortOnSearch = (e) => {
-        let query = e.target.value.toUpperCase();
+        let query = e.target.value !== undefined ? e.target.value.toUpperCase() : "";
         let result = [];
         if (this.state.Ledger === "Transporter") {
             for (let item of this.state.data) {
