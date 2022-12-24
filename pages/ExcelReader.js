@@ -45,7 +45,7 @@ class ExcelReader extends Component {
         if (files && files[0]) this.setState({ file: files[0] });
     };
 
-    handleFile() {
+    handleFile() {  
         /* Boilerplate to set up FileReader */
         const reader = new FileReader();
         const rABS = !!reader.readAsBinaryString;
@@ -150,7 +150,7 @@ class ExcelReader extends Component {
                     className="my-2"
                 >
                     {/* <NavbarBrand> */}
-                        <Link href="/dashboard?db=Orient">
+                        <Link href="/Dashboard?db=Orient">
                             <Button outline>
                                 Back
                             </Button>

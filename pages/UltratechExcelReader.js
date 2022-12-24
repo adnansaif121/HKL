@@ -144,7 +144,7 @@ class ExcelReader extends Component {
                     className="my-2"
                 >
                     {/* <NavbarBrand> */}
-                        <Link href="/dashboard?db=Ultratech">
+                        <Link href="/Dashboard?db=Ultratech">
                             <Button outline>
                                 Back
                             </Button>
