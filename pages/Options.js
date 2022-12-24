@@ -42,10 +42,10 @@ export default class Options extends Component {
         <>
             {
                 <div style={body}>
-                    <Link href="/dashboard?db=Ultratech">
+                    <Link href="/Dashboard?db=Ultratech">
                         <Button outline style={style} onClick={this.openUltratech}>ULTRATECH</Button>
                     </Link>
-                    <Link href="/dashboard?db=Orient">
+                    <Link href="/Dashboard?db=Orient">
                         <Button outline style={style} onClick={this.openOrient}>ORIENT</Button>
                     </Link>
                 </div>
