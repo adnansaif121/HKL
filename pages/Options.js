@@ -14,28 +14,28 @@ const body = {
     height: "100vh",
 }
 export default class Options extends Component {
-    constructor(){
-        super();
-        this.openUltratech = this.openUltratech.bind(this);
-        this.openOrient = this.openOrient.bind(this);
-        this.state={
-            DB : null,
-        }
-    }
+    // constructor(){
+    //     super();
+    //     this.openUltratech = this.openUltratech.bind(this);
+    //     this.openOrient = this.openOrient.bind(this);
+    //     this.state={
+    //         DB : null,
+    //     }
+    // }
 
-    openUltratech = () => {
-        console.log("Ultratech");
-        this.setState({
-            DB : "Ultratech"
-        })
-    }
+    // openUltratech = () => {
+    //     console.log("Ultratech");
+    //     this.setState({
+    //         DB : "Ultratech"
+    //     })
+    // }
 
-    openOrient = () => {
-        console.log("Orient");
-        this.setState({
-            DB : "Orient"
-        })
-    }
+    // openOrient = () => {
+    //     console.log("Orient");
+    //     this.setState({
+    //         DB : "Orient"
+    //     })
+    // }
     
   render() {
     return (
@@ -43,10 +43,10 @@ export default class Options extends Component {
             {
                 <div style={body}>
                     <Link href="/Dashboard?db=Ultratech">
-                        <Button outline style={style} onClick={this.openUltratech}>ULTRATECH</Button>
+                        <Button outline style={style} >ULTRATECH</Button>
                     </Link>
                     <Link href="/Dashboard?db=Orient">
-                        <Button outline style={style} onClick={this.openOrient}>ORIENT</Button>
+                        <Button outline style={style} >ORIENT</Button>
                     </Link>
                 </div>
              

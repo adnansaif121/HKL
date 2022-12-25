@@ -195,7 +195,7 @@ export default class Dashboard extends Component {
             this.setState({
                 toggleUpdateBox: false
             })
-        })
+        })  
     }
 
     sortOnSearch = (e) => {
