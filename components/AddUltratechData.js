@@ -110,16 +110,16 @@ export default class AddUltratechData extends Component {
 
         let obj = {
             InvoiceDate: this.state.InvoiceDate,
-            VehicleNo: this.state.VehicleNo !== undefined ? (this.state.VehicleNo).toUpperCase() : "",
-            PartyName: this.state.PartyName !== undefined ? this.state.PartyName.toUpperCase() : "",
-            Destination: this.state.Destination !== undefined ? this.state.Destination.toUpperCase() : "",
+            VehicleNo: (this.state.VehicleNo || ""),
+            PartyName: (this.state.PartyName || ""),
+            Destination: (this.state.Destination || ""),
             Classification: this.state.VehicleOwnership,
             VehicleReturnState : this.state.VehicleReturnState,
             // VehicleOwnership : this.state.VehicleOwnership,
             VehicleOwnerName : this.state.VehicleOwnerName,
             kmsLead : this.state.kmsLead,
 
-            UnloadedAt: this.state.UnloadedAt !== undefined ? this.state.UnloadedAt.toUpperCase() : "",
+            UnloadedAt: (this.state.UnloadedAt || ""),
             Weight: this.state.Weight,
             Rate: this.state.Rate,
             Comission: this.state.Comission,
@@ -136,9 +136,9 @@ export default class AddUltratechData extends Component {
             NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
 
              // IF ATTACHED
-             Diesel : this.state.Diesel,
-             Toll : this.state.Toll,
-             Warai : this.state.Warai,
+             Diesel : (this.state.Diesel || 0 ),
+             Toll : (this.state.Toll || 0),
+             Warai : (this.state.Warai || 0),
 
         }
         // console.log(obj)
@@ -292,7 +292,7 @@ export default class AddUltratechData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ VehicleNo: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
+                                            onChange={(e) => this.setState({ VehicleNo: (e.target.value || "").toUpperCase() })}
                                             value={this.state.VehicleNo}
                                             required
                                         />
@@ -432,24 +432,24 @@ export default class AddUltratechData extends Component {
 
                             </Row>
 
-                            <Row style={{marginBottom : "20px"}}>
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ VehicleOwnerName: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
-                                                value={this.state.VehicleOwnerName}
-                                                required
-                                            />
-                                            <span>Vehicle Owner Name</span>
-                                            <i></i>
-                                        </div>
-                                </Col>
-                            </Row>
 
                             {this.state.VehicleOwnership === "Attached"
                                 ?
                                 <div style={{border: "1px solid black", padding: "30px"}}>
+                                    <Row style={{marginBottom : "20px"}}>
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ VehicleOwnerName: (e.target.value || "").toUpperCase() })}
+                                                        value={this.state.VehicleOwnerName}
+                                                        required
+                                                    />
+                                                    <span>Vehicle Owner Name</span>
+                                                    <i></i>
+                                                </div>
+                                        </Col>
+                                    </Row>
                                     <Row>
                                         EXTRA ATTACHED EXPENSES
                                     </Row>
@@ -542,7 +542,7 @@ export default class AddUltratechData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ UnloadedAt: e.target.value !== undefined ? e.target.value.toUpperCase() : "" })}
+                                            onChange={(e) => this.setState({ UnloadedAt: (e.target.value || "").toUpperCase() })}
                                             value={this.state.UnloadedAt}
                                             required
                                         />
@@ -615,7 +615,7 @@ export default class AddUltratechData extends Component {
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="text"
-                                                    onChange={(e) => this.setState({ PaidTo: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
+                                                    onChange={(e) => this.setState({ PaidTo: (e.target.value || "").toUpperCase() })}
                                                     value={this.state.PaidTo}
                                                     required
                                                 />
@@ -649,7 +649,7 @@ export default class AddUltratechData extends Component {
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
-                                                onChange={(e) => this.setState({ Remark: e.target.value !== undefined ? e.target.value.toUpperCase() : "" })}
+                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
                                                 value={this.state.Remark}
                                                 required
                                             />

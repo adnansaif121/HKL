@@ -199,14 +199,14 @@ export default class Dashboard extends Component {
     }
 
     sortOnSearch = (e) => {
-        let query = e.target.value !== undefined ? e.target.value.toUpperCase() : "";
+        let query = (e.target.value || "").toUpperCase();
         let result = [];
         if (this.state.Ledger === "Transporter") {
             for (let item of this.state.data) {
                 if (
-                    item.InvoiceDate.includes(query) ||
-                    item.VehicleNo.toUpperCase().includes(query) ||
-                    item.PaidTo.toUpperCase().includes(query)
+                    (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
+                    (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
+                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query))
                 ) {
                     result.push(item);
                 }
@@ -215,11 +215,11 @@ export default class Dashboard extends Component {
         else {
             for (let item of this.state.data) {
                 if (
-                    item.InvoiceDate.toUpperCase().includes(query) ||
-                    item.PartyName.toUpperCase().includes(query) ||
-                    item.VehicleNo.toUpperCase().includes(query) ||
-                    item.Destination.toUpperCase().includes(query) ||
-                    item.UnloadedAt.toUpperCase().includes(query)
+                    (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
+                    (item.PartyName && item.PartyName.toUpperCase().includes(query)) ||
+                    (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
+                    (item.Destination && item.Destination.toUpperCase().includes(query)) ||
+                    (item.UnloadedAt && item.UnloadedAt.toUpperCase().includes(query))
                     // item.Weight.includes(query)
                 ) {
                     result.push(item);
@@ -563,7 +563,7 @@ export default class Dashboard extends Component {
                                 <Link href="/Options">
                                     <Button outline>Back</Button>
                                 </Link>
-                                <h3>{this.props.DB.toUpperCase()}</h3>
+                                <h3>{this.props.DB}</h3>
                                 <div>
 
                                     {this.state.toggle === false ?

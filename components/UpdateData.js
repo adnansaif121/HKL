@@ -145,7 +145,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ VehicleNo: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
+                                            onChange={(e) => this.setState({ VehicleNo: (e.target.value || "").toUpperCase()})}
                                             value={this.state.VehicleNo}
                                             required
                                         />
@@ -157,7 +157,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ PartyName: e.target.value !== undefined ? e.target.value.toUpperCase() : "" })}
+                                            onChange={(e) => this.setState({ PartyName: (e.target.value || "").toUpperCase() })}
                                             value={this.state.PartyName}
                                             required
                                         />
@@ -239,7 +239,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ UnloadedAt: e.target.value!==undefined ? e.target.value.toUpperCase() : ""})}
+                                            onChange={(e) => this.setState({ UnloadedAt: (e.target.value|| "").toUpperCase() })}
                                             value={this.state.UnloadedAt}
                                             required
                                         />
@@ -310,7 +310,7 @@ export default class UpdateData extends Component {
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="text"
-                                                    onChange={(e) => this.setState({ PaidTo: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
+                                                    onChange={(e) => this.setState({ PaidTo: (e.target.value || "").toUpperCase() })}
                                                     value={this.state.PaidTo}
                                                     required
                                                 />
@@ -341,7 +341,7 @@ export default class UpdateData extends Component {
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
-                                                onChange={(e) => this.setState({ Remark: e.target.value !== undefined ? e.target.value.toUpperCase() : ""})}
+                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
                                                 value={this.state.Remark}
                                                 required
                                             />
