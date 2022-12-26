@@ -260,8 +260,11 @@ export default class AddUltratechData extends Component {
     }
 
     calExpense = (ExpenseType, value) => {
+        if(value === null){
+            return;
+        }
         this.setState({
-            [ExpenseType] : parseFloat(value)
+            [ExpenseType] : parseFloat(value),
         })
     }
 

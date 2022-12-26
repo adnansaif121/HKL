@@ -48,6 +48,7 @@ export default class Dashboard extends Component {
             myLedger: [],
             Transporter: [],
             Company: [],
+            filterChangeTo : "Last7",
             // isOrient : true,
         }
     }
@@ -101,7 +102,8 @@ export default class Dashboard extends Component {
             console.log(data);
             // console.log(data.ourRate.data);
             this.UpdateLedger(data);
-            let x = (data !== undefined) ? [...Object.values(data)] : [];
+            // let x = (data !== undefined) ? [...Object.values(data)] : [];
+            let x = [...Object.values(data || {})];
 
             this.setState({
                 AllData: data,
@@ -319,7 +321,7 @@ export default class Dashboard extends Component {
         let monthPriorDate = new Date(new Date().setDate(today.getDate() - 30));
         let weekPriorDate = new Date(new Date().setDate(today.getDate() - 7));
 
-        if (this.state.filter === 'Last30') {
+        if (this.state.filterChangeTo === 'Last30') {
             x = x.filter(e => {
                 let InvoiceDate = e.InvoiceDate;
                 InvoiceDate = new Date(InvoiceDate);
@@ -328,7 +330,7 @@ export default class Dashboard extends Component {
                 }
             })
         }
-        else if (this.state.filter === 'Last7') {
+        else if (this.state.filterChangeTo === 'Last7') {
             x = x.filter(e => {
                 let InvoiceDate = e.InvoiceDate;
                 InvoiceDate = new Date(InvoiceDate);
@@ -337,7 +339,7 @@ export default class Dashboard extends Component {
                 }
             })
         }
-        else if (this.state.filter === "ByDate") {
+        else if (this.state.filterChangeTo === "ByDate") {
             if (this.state.startDate == null || this.state.endDate == null) {
                 alert("Please Fill start and end date fields");
                 return;
@@ -383,6 +385,7 @@ export default class Dashboard extends Component {
             displayData: x,
             data: data,
             toggleSidebar: false,
+            filter : this.state.filterChangeTo,
         })
         // console.log(today,monthPriorDate, weekPriorDate);
     }
@@ -651,19 +654,19 @@ export default class Dashboard extends Component {
 
                             <div style={{ border: "2px solid grey", borderRadius: "10%", padding: "10px 10px", marginTop: "10px" }}>
                                 <FormGroup >
-                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filter: "showAll", showDate: false })} />
+                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filterChangeTo: "showAll", showDate: false })} />
                                     <Label check> Show All </Label>
                                 </FormGroup>
                                 <FormGroup >
-                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filter: "Last30", showDate: false })} />
+                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filterChangeTo: "Last30", showDate: false })} />
                                     <Label check> Last 30 Days </Label>
                                 </FormGroup>
                                 <FormGroup >
-                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filter: "Last7", showDate: false })} />
+                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filterChangeTo: "Last7", showDate: false })} />
                                     <Label check> Last 7 Days </Label>
                                 </FormGroup>
                                 <FormGroup >
-                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filter: "ByDate", showDate: true })} />
+                                    <Input style={{ margin: "5px", width: "20px", height: "20px" }} name='filter' type="radio" onChange={(e) => this.setState({ filterChangeTo: "ByDate", showDate: true })} />
                                     <Label check> Search by date </Label>
                                     {
                                         this.state.showDate

@@ -145,13 +145,13 @@ export default class MyLedger extends Component {
                                                     {item.PartyName}
                                                 </td>
                                                 <td>
-                                                    {`${item.Destination} (${item.Classification})`}
+                                                    {`${item.Destination} (${item.Classification})`} {item.kmsLead || null}
                                                 </td>
                                                 <td>
                                                     {item.UnloadedAt}
                                                 </td>
                                                 <td>
-                                                    {item.VehicleOwnerName !== undefined ? item.VehicleOwnerName : "Not Available"}
+                                                    {item.VehicleOwnerName || "Not Available"}
                                                 </td>
                                                 <td>
                                                     {item.Weight}
