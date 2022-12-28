@@ -36,7 +36,7 @@ export default class AddUltratechData extends Component {
             NetProfit: 0,
             RateData: [],
 
-            VehicleReturnState : "Non-Empty",
+            VehicleReturnState : "Empty",
             VehicleOwnership : "Owned",
             kmsLead : 0,
             RateSelected : null,
@@ -188,6 +188,21 @@ export default class AddUltratechData extends Component {
         })
     }
 
+    handleOnSearchVehicleNo = (string) => {
+        this.setState({
+            VehicleNo : string
+        })
+    }
+
+    handleOnSelectVehicleNo = (item) => {
+        this.setState({
+            VehicleNo : item.vehicleNo,
+            VehicleOwnerName : item.vehicleOwner,
+            Weight : item.weight,
+            VehicleOwnership : "Attached",
+        })
+    }
+
     // handleClass = (Classification) => {
     //     if (this.state.Destination === "") {
     //         alert("Destination not selected");
@@ -291,7 +306,7 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* VEHICLE NO. */}
-                                <Col md={4}>
+                                {/* <Col md={4}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -301,6 +316,34 @@ export default class AddUltratechData extends Component {
                                         />
                                         <span>Vehicle No.</span>
                                         <i></i>
+                                    </div>
+                                </Col> */}
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        <div style={{ marginBottom: 0 }}>Vehicle No</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.props.attachedVehicleData}
+                                            fuseOptions={{ keys: ["vehicleNo", "id"] }} // Search on both fields
+                                            resultStringKeyName="vehicleNo" // String to display in the results
+                                            onSearch={this.handleOnSearchVehicleNo}
+                                            onSelect={this.handleOnSelectVehicleNo}
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 30,
+                                            }}
+                                        />
                                     </div>
                                 </Col>
 
@@ -563,6 +606,7 @@ export default class AddUltratechData extends Component {
                                         <input
                                             type="number"
                                             onChange={(e) => this.setState({ Weight: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.Weight}
                                             required
                                         />
                                         <span>Weight (MT)</span>

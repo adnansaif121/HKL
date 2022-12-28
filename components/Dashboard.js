@@ -19,6 +19,7 @@ import download from '../public/download.png'
 import arrow from '../public/arrow.png';
 import edit from '../public/edit.png';
 import logo from '../public/logo.png';
+import cells from '../public/cells.png';
 import upload from '../public/file.png';
 import controls from '../public/controls.png'
 import plus from '../public/plus.png'
@@ -50,6 +51,8 @@ export default class Dashboard extends Component {
             Company: [],
             filterChangeTo : "Last7",
             // isOrient : true,
+
+            attachedVehicleData: [],
         }
     }
 
@@ -95,6 +98,8 @@ export default class Dashboard extends Component {
     
     componentDidMount() {
         const db = getDatabase();
+
+        // FETCHING DATA
         const Ref = ref(db, '/'+this.props.DB);
         console.log(this.props.DB); 
         onValue(Ref, (snapshot) => {
@@ -143,6 +148,20 @@ export default class Dashboard extends Component {
                 console.error(error);
             });
         }
+
+        // FETCHNG attachedVehicleData
+        const dbRef2 = ref(getDatabase());
+        get(child(dbRef2, '/attachedVehicleData')).then((snapshot) => {
+            if (snapshot.exists()) {
+                console.log(snapshot.val());
+                this.setState({ attachedVehicleData: snapshot.val() })
+            } else {
+                console.log("No data available");
+            }
+        }
+        ).catch((error) => {
+            console.error(error);
+        });
     }
 
     addData = (obj) => {
@@ -501,6 +520,21 @@ export default class Dashboard extends Component {
                                             </div>
                                         </div>
                                         
+                                        <Link href="/attachedVehiclesTable">
+                                            <Button outline
+                                                style={{marginRight: "10px"}}
+                                                // onClick={this.ExportData}
+                                            >
+                                                <Image
+                                                    style={{ width: "20px", height: "20px" }}
+                                                    src={cells}
+                                                    alt="Picture of the author"
+                                                    width="10px"
+                                                    height="10px"
+                                                />
+                                            </Button>
+                                        </Link>
+
                                         <Button outline
                                             // style={{ }}
                                             onClick={this.ExportData}
@@ -593,9 +627,9 @@ export default class Dashboard extends Component {
                                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
                                     {
                                         this.props.DB === "Ultratech" ?
-                                        <AddUltratechData updateData={this.addData} RateData={this.state.RateData} AllData={this.state.AllData}></AddUltratechData>
+                                        <AddUltratechData updateData={this.addData} RateData={this.state.RateData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
                                         :
-                                        <AddData updateData={this.addData} RateData={this.state.RateData}></AddData>
+                                        <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
 
                                     }
                                 </div>

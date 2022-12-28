@@ -22,6 +22,10 @@ export default class NoData extends Component {
                     this.props.filter === "showAll" &&
                     <h3>No Entries</h3>
                  }
+                 {
+                    this.props.filter === "Vehicle Details" &&
+                    <h3>No Entries</h3>
+                 }
              </div>
     )
   }
