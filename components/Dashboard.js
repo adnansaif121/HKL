@@ -248,7 +248,7 @@ export default class Dashboard extends Component {
                 if (
                     (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
-                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query))
+                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query)) 
                 ) {
                     result.push(item);
                 }
@@ -261,7 +261,9 @@ export default class Dashboard extends Component {
                     (item.PartyName && item.PartyName.toUpperCase().includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
                     (item.Destination && item.Destination.toUpperCase().includes(query)) ||
-                    (item.UnloadedAt && item.UnloadedAt.toUpperCase().includes(query))
+                    (item.UnloadedAt && item.UnloadedAt.toUpperCase().includes(query)) ||
+                    (item.PetrolPumpName && item.PetrolPumpName.toUpperCase().includes(query)) ||
+                    (item.VehicleOwnerName && item.VehicleOwnerName.toUpperCase().includes(query)) 
                     // item.Weight.includes(query)
                 ) {
                     result.push(item);
@@ -324,7 +326,7 @@ export default class Dashboard extends Component {
                 },
             ]
         }
-        else {
+        else if(this.state.Ledger === "Transporter"){
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -340,6 +342,38 @@ export default class Dashboard extends Component {
                     ],
                     content: Object.values(this.state.displayData),
                 },
+            ]
+        }
+        else if(this.state.Ledger === "PetrolLedger"){
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "PetrolPumpName", value: "PetrolPumpName" }, // Run functions
+                        { lebel: "Diesel", value: "Diesel" },
+                        { label: "DieselRate", value: "DieselRate" },
+                        { label: "DieselQuantity", value: "DieselQuantity" },
+                        { label: "isDieselAmountPaid", value: "isDieselAmountPaid" },
+                    ],
+                    content: Object.values(this.state.displayData),
+                }
+            ]
+        }
+        else if(this.state.Ledger === "OwnerLedger"){
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "VehicleOwnerName", value: "VehicleOwnerName" }, // Run functions
+                        { lebel: "VehicleRent", value: "VehicleRent" },
+                        { label: "isPaid", value: "isVehicleRentPaid" },
+                    ],
+                    content: Object.values(this.state.displayData),
+                }
             ]
         }
 

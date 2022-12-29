@@ -66,7 +66,7 @@ export default class AddUltratechData extends Component {
         for(let item of this.props.RateData){
             rates.push({
                 id: item.id,
-                displayName : `${item.DESTINATION} (${item.TONNAGE})`,
+                displayName : `${item.DESTINATION} (${item.TONNAGE}) - ${item["SALES OFFICE"]}`,
             })
         }
         this.setState({
