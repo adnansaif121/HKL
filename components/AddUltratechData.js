@@ -495,15 +495,6 @@ export default class AddUltratechData extends Component {
                                             </div>
                                         </Col>
 
-                                        {/* Diesel */}
-                                        <Col>
-                                            <div className={styles.inputBox}>
-                                                <span>Diesel</span>
-                                                <p>{this.state.DieselRate * this.state.DieselQuantity || 0}</p>
-                                                <i></i>
-                                            </div>
-                                        </Col>
-
                                         {/* Toll */}
                                         <Col>
                                             <div className={styles.inputBox}>
@@ -534,7 +525,13 @@ export default class AddUltratechData extends Component {
                                     </Row>
 
                                     <Row style={{display : "flex", justifyContent: 'center', marginTop: "20px"}}>
-                                        Total : {(this.state.DieselRate * this.state.DieselQuantity) + this.state.Toll + this.state.Warai}
+                                        {/* Diesel */}
+                                        <Col>
+                                            Diesel : {this.state.DieselRate * this.state.DieselQuantity || 0}
+                                        </Col>
+                                        <Col>
+                                            Total : {(this.state.DieselRate * this.state.DieselQuantity) + this.state.Toll + this.state.Warai}
+                                        </Col>
                                     </Row>
 
                                     <Row>
