@@ -37,51 +37,55 @@ export default class UpdateData extends Component {
             id: this.props.data.id,
             // RateData: this.props.RateData,
 
-            VehicleReturnState : this.props.data.VehicleReturnState !== undefined ? this.props.data.VehicleReturnState : "Non-Empty",
-            VehicleOwnership : this.props.data.Classification !== undefined ? this.props.data.Classification : "Owned",
-            kmsLead : this.props.data.KmsLead !== undefined ? this.props.data.KmsLead : 0,
-            RateSelected : null,
+            VehicleReturnState: this.props.data.VehicleReturnState !== undefined ? this.props.data.VehicleReturnState : "Non-Empty",
+            VehicleOwnership: this.props.data.Classification !== undefined ? this.props.data.Classification : "Owned",
+            kmsLead: this.props.data.KmsLead !== undefined ? this.props.data.KmsLead : 0,
+            RateSelected: null,
 
             // IF ATTACHED
-            Diesel : this.props.data.Diesel !== undefined ? this.props.data.Diesel : 0, 
-            Toll : this.props.data.Toll !== undefined ? this.props.data.Toll : 0,
-            Warai : this.props.data.Warai !== undefined ? this.props.data.Warai : 0,
+            Diesel: this.props.data.Diesel !== undefined ? this.props.data.Diesel : 0,
+            DieselRate: this.props.data.DieselRate || 0,
+            DieselQuantity: this.props.data.DieselQuantity || 0,
+            Toll: this.props.data.Toll !== undefined ? this.props.data.Toll : 0,
+            Warai: this.props.data.Warai !== undefined ? this.props.data.Warai : 0,
+            PetrolPumpName: this.props.data.PetrolPumpName || "",
 
-            VehicleOwnerName : this.props.data.VehicleOwnerName !== undefined ? this.props.data.VehicleOwnerName : "",
+            // Vehicle Owner Name
+            VehicleOwnerName: this.props.data.VehicleOwnerName !== undefined ? this.props.data.VehicleOwnerName : "",
 
             // PartyNameList 
-            PartyNameList : [],
+            PartyNameList: [],
         }
     }
 
-    componentDidMount(){
+    componentDidMount() {
         console.log(this.props.RateData);
         let rates = [];
-        for(let item of this.props.RateData){
+        for (let item of this.props.RateData) {
             rates.push({
                 id: item.id,
-                displayName : `${item.DESTINATION} (${item.TONNAGE})`,
+                displayName: `${item.DESTINATION} (${item.TONNAGE})`,
             })
         }
         this.setState({
-            RateData : rates,
+            RateData: rates,
         })
 
         // Party Name Cache List
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
         let set = new Set();
-        for(let item of entries){
+        for (let item of entries) {
             set.add(item.PartyName);
         }
         // for(let item of )
         // console.log(set.entries());
         let setArr = [...set];
         let i = 0;
-        for(let item of setArr){
+        for (let item of setArr) {
             PartyNameList.push({
-                Name : item,
-                id : i
+                Name: item,
+                id: i
             })
             i++;
         }
@@ -93,15 +97,15 @@ export default class UpdateData extends Component {
 
 
     addData = () => {
-        if(this.state.Diesel=== undefined){
-            alert("Please Enter a value in Diesel");
+        if (this.state.DieselRate === undefined || this.state.DieselQuantity === 0) {
+            alert("Please Enter a value in Diesel Rate and Quantity");
             return;
         }
-        else if(this.state.Toll === undefined){
+        else if (this.state.Toll === undefined) {
             alert("Please Enter a value in Toll");
             return;
         }
-        else if(this.state.Warai === undefined){
+        else if (this.state.Warai === undefined) {
             alert("Please Enter a value in Warai");
             return;
         }
@@ -112,13 +116,13 @@ export default class UpdateData extends Component {
             PartyName: this.state.PartyName,
             Destination: this.state.Destination,
             Classification: this.state.VehicleOwnership,
-            VehicleReturnState : this.state.VehicleReturnState,
-            KmsLead : this.state.kmsLead,
+            VehicleReturnState: this.state.VehicleReturnState,
+            KmsLead: this.state.kmsLead,
 
             UnloadedAt: this.state.UnloadedAt,
 
             // Vehicle Owner Name
-            VehicleOwnerName : this.state.VehicleOwnerName,
+            VehicleOwnerName: this.state.VehicleOwnerName,
             Weight: this.state.Weight,
             Rate: this.state.Rate,
             Comission: this.state.Comission,
@@ -132,13 +136,16 @@ export default class UpdateData extends Component {
             PaidOn: this.state.PaidOn,
             OurRate: this.state.OurRate,
             OurFreight: (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit: (parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
+            NetProfit: (parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(this.state.DieselRate * this.state.DieselQuantity) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
             id: this.props.data.id,
 
             // IF ATTACHED
-            Diesel : this.state.Diesel,
-            Toll : this.state.Toll,
-            Warai : this.state.Warai,
+            Diesel: (this.state.DieselRate * this.state.DieselQuantity || 0),
+            DieselRate: (this.state.DieselRate || 0),
+            DieselQuantity: (this.state.DieselQuantity || 0),
+            PetrolPumpName: (this.state.PetrolPumpName || ""),
+            Toll: (this.state.Toll || 0),
+            Warai: (this.state.Warai || 0),
         }
         // console.log(obj)
         this.props.updateData(obj, this.props.data.id);
@@ -161,73 +168,57 @@ export default class UpdateData extends Component {
             OurRate = RateItem.FREIGHT;
             kmsLead = RateItem["KMS LEAD"];
         }
-        else{
+        else {
             OurRate = RateItem["NET FREIGHT"];
-            kmsLead = 2*RateItem["KMS LEAD"];
+            kmsLead = 2 * RateItem["KMS LEAD"];
         }
 
         this.setState({
             Destination: `${RateItem["DESTINATION"]} (${RateItem["TONNAGE"]})`,
             OurRate: parseFloat(OurRate),
-            kmsLead : kmsLead,
-            RateSelected : this.props.RateData[index],
+            kmsLead: kmsLead,
+            RateSelected: this.props.RateData[index],
         })
         console.log(ownedItem);
     };
 
     handleOnSearchPartyName = (string) => {
         this.setState({
-            PartyName : string
+            PartyName: string
         })
     }
 
     handleOnSelectPartyName = (item) => {
         this.setState({
-            PartyName : item.Name,
+            PartyName: item.Name,
         })
     }
 
-    // handleClass = (Classification) => {
-    //     if (this.state.Destination === "") {
-    //         alert("Destination not selected");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //         return;
-    //     }
-    //     let item;
-    //     for (let i of this.state.RateData) {
-    //         if (i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification) {
-    //             item = i;
-    //             break;
-    //         }
-    //     }
-    //     if (item === undefined) {
-    //         alert("Destination do not exist in list. Are you sure to continue?");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //     }
-    //     else {
-    //         // console.log(item);
-    //         this.setState({
-    //             Destination: item["Name of Destination"],
-    //             OurRate: parseFloat(item["ToT Freight (PMT)"]),
-    //             Classification: Classification
-    //         })
-    //     }
-    // }
+    handleOnSearchVehicleNo = (string) => {
+        this.setState({
+            VehicleNo: (string || "").toUpperCase()
+        })
+    }
+
+    handleOnSelectVehicleNo = (item) => {
+        this.setState({
+            VehicleNo: item.vehicleNo,
+            VehicleOwnerName: item.vehicleOwner,
+            Weight: item.weight,
+            VehicleOwnership: "Attached",
+        })
+    }
 
     changeVehicleOwnership = (Ownership) => {
-        if(Ownership === "Owned"){
+        if (Ownership === "Owned") {
             this.setState({
-                Diesel : 0,
-                Toll : 0,
-                Warai : 0,
+                Diesel: 0,
+                Toll: 0,
+                Warai: 0,
             })
         }
         this.setState({
-            VehicleOwnership : Ownership,
+            VehicleOwnership: Ownership,
         })
     }
 
@@ -235,32 +226,32 @@ export default class UpdateData extends Component {
         let OurRate = 0;
         let kmsLead = 0;
         let RateItem = this.state.RateSelected;
-        if(this.state.RateSelected !== null){
+        if (this.state.RateSelected !== null) {
             if (State === "Non-Empty") {
                 OurRate = RateItem.FREIGHT;
                 kmsLead = RateItem["KMS LEAD"];
             }
-            else{
+            else {
                 OurRate = RateItem["NET FREIGHT"];
-                kmsLead = 2*RateItem["KMS LEAD"];
+                kmsLead = 2 * RateItem["KMS LEAD"];
             }
             console.log(OurRate, kmsLead, State);
             this.setState({
-                OurRate : OurRate,
+                OurRate: OurRate,
                 kmsLead: kmsLead,
-                VehicleReturnState : State,
+                VehicleReturnState: State,
             })
         }
-        else{
+        else {
             this.setState({
-                VehicleReturnState : State,
+                VehicleReturnState: State,
             })
         }
     }
 
     calExpense = (ExpenseType, value) => {
         this.setState({
-            [ExpenseType] : parseFloat(value)
+            [ExpenseType]: parseFloat(value)
         })
     }
 
@@ -288,16 +279,33 @@ export default class UpdateData extends Component {
                                 </Col>
 
                                 {/* VEHICLE NO. */}
-                                <Col md={4}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="text"
-                                            onChange={(e) => this.setState({ VehicleNo: (e.target.value || "").toUpperCase() })}
-                                            value={this.state.VehicleNo}
-                                            required
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        <div style={{ marginBottom: 0 }}>Vehicle No</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.props.attachedVehicleData}
+                                            fuseOptions={{ keys: ["vehicleNo", "id"] }} // Search on both fields
+                                            resultStringKeyName="vehicleNo" // String to display in the results
+                                            onSearch={this.handleOnSearchVehicleNo}
+                                            onSelect={this.handleOnSelectVehicleNo}
+                                            placeholder={this.state.VehicleNo}
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 30,
+                                            }}
                                         />
-                                        <span>Vehicle No.</span>
-                                        <i></i>
                                     </div>
                                 </Col>
 
@@ -315,7 +323,7 @@ export default class UpdateData extends Component {
                                     </div>
                                 </Col> */}
 
-<Col>
+                                <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
                                         <div style={{ marginBottom: 0 }}>Party Name</div>
                                         <ReactSearchAutocomplete
@@ -347,7 +355,7 @@ export default class UpdateData extends Component {
 
                             </Row>
 
-                            <Row style={{marginBottom : "35px"}}>
+                            <Row style={{ marginBottom: "35px" }}>
                                 {/* DESTINATION */}
                                 <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
@@ -381,7 +389,7 @@ export default class UpdateData extends Component {
                                     </div>
                                 </Col>
 
-                                            
+
                                 {/* <Col style={{ marginTop: "30px" }}>
                                     <h5 style={{ display: "flex", justifyContent: "center", color: "#1f5457" }}>
                                         {this.state.Classification}
@@ -412,93 +420,115 @@ export default class UpdateData extends Component {
                                 </Col> */}
 
                                 <Col>
-                                    <div style={{display: "flex", justifyContent: "space-between", padding: "0px 30px 0px 30px"}}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0px 30px 0px 30px" }}>
 
                                         {/* Empty/NonEmpty */}
-                                            <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%" }}>
-                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
-                                                    {this.state.VehicleReturnState}
-                                                </Button>
-                                                <div className={styles.dropdownContent} style={{width: "200px"}}>
-                                                    {
-                                                        this.state.VehicleReturnState === "Non-Empty"
+                                        <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%" }}>
+                                            <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                                {this.state.VehicleReturnState}
+                                            </Button>
+                                            <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                                {
+                                                    this.state.VehicleReturnState === "Non-Empty"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Non-Empty</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleReturnState("Non-Empty")}>Non-Empty</div>
-                                                    }
-                                                    {
-                                                        this.state.VehicleReturnState === "Empty"
+                                                }
+                                                {
+                                                    this.state.VehicleReturnState === "Empty"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }} >Empty</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleReturnState("Empty")}>Empty</div>
-                                                    }
-                                                        
-                                                </div>
+                                                }
+
                                             </div>
-                                        
+                                        </div>
+
                                         {/* Owned/Attached */}
-                                            <div className={styles.dropdown} style={{ marginTop: "30px" }}>
-                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
-                                                    {this.state.VehicleOwnership}
-                                                </Button>
-                                                <div className={styles.dropdownContent} style={{width:"200px"}}>
-                                                    {
-                                                        this.state.VehicleOwnership === "Owned"
+                                        <div className={styles.dropdown} style={{ marginTop: "30px" }}>
+                                            <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                                {this.state.VehicleOwnership}
+                                            </Button>
+                                            <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                                {
+                                                    this.state.VehicleOwnership === "Owned"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Owned</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleOwnership("Owned")}>Owned</div>
-                                                    }
-                                                    {
-                                                        this.state.VehicleOwnership === "Attached"
+                                                }
+                                                {
+                                                    this.state.VehicleOwnership === "Attached"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Attached</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleOwnership("Attached")}>Attached</div>
-                                                    }
-                                                        
-                                                </div>
+                                                }
+
                                             </div>
-                                        
+                                        </div>
+
                                     </div>
                                 </Col>
 
                             </Row>
 
-                            <Row style={{marginBottom : "20px"}}>
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ VehicleOwnerName: (e.target.value || "").toUpperCase() })}
-                                                value={this.state.VehicleOwnerName}
-                                                required
-                                            />
-                                            <span>Vehicle Owner Name</span>
-                                            <i></i>
-                                        </div>
-                                </Col>
-                            </Row>
-
                             {this.state.VehicleOwnership === "Attached"
                                 ?
-                                <div style={{border: "1px solid black", padding: "30px"}}>
+                                <div style={{ border: "1px solid black", padding: "30px" }}>
+                                    <Row style={{ marginBottom: "20px" }}>
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="text"
+                                                    onChange={(e) => this.setState({ VehicleOwnerName: (e.target.value || "").toUpperCase() })}
+                                                    value={this.state.VehicleOwnerName}
+                                                    required
+                                                />
+                                                <span>Vehicle Owner Name</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+                                    </Row>
                                     <Row>
                                         EXTRA ATTACHED EXPENSES
                                     </Row>
                                     <Row>
-                                        {/* Diesel */}
+                                        {/* Diesel Rate */}
                                         <Col>
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="number"
-                                                    onChange={(e) => this.calExpense("Diesel", e.target.value) }
-                                                    value={this.state.Diesel === 0 ? 0 : this.state.Diesel}
+                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value) }
+                                                    value={this.state.DieselRate === 0 ? 0 : this.state.DieselRate}
                                                     required
                                                 />
+                                                <span>Diesel Rate</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Diesel Quantity */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("DieselQuantity", e.target.value) }
+                                                    value={this.state.DieselQuantity === 0 ? 0 : this.state.DieselQuantity}
+                                                    required
+                                                />
+                                                <span>Diesel Quantity</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Diesel */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
                                                 <span>Diesel</span>
+                                                <p>{this.state.DieselRate * this.state.DieselQuantity || 0}</p>
                                                 <i></i>
                                             </div>
                                         </Col>
@@ -509,7 +539,7 @@ export default class UpdateData extends Component {
                                                 <input
                                                     type="number"
                                                     onChange={(e) => this.calExpense("Toll", e.target.value)}
-                                                    value={this.state.Toll === undefined ? 0 : this.state.Toll }
+                                                    value={this.state.Toll === undefined ? 0 : this.state.Toll}
                                                     required
                                                 />
                                                 <span>Toll</span>
@@ -532,8 +562,24 @@ export default class UpdateData extends Component {
                                         </Col>
                                     </Row>
 
-                                    <Row style={{display : "flex", justifyContent: 'center', marginTop: "20px"}}>
-                                        Total : {this.state.Diesel + this.state.Toll + this.state.Warai}
+                                    <Row style={{ display: "flex", justifyContent: 'center', marginTop: "20px" }}>
+                                    Total : {(this.state.DieselRate * this.state.DieselQuantity) + this.state.Toll + this.state.Warai}
+                                    </Row>
+
+                                    <Row>
+                                        {/* Petrol Pump Name */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="text"
+                                                    onChange={(e) => this.setState({ PetrolPumpName: (e.target.value || "").toUpperCase() })}
+                                                    value={this.state.PetrolPumpName}
+                                                    required
+                                                />
+                                                <span>Petrol Pump Name</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
                                     </Row>
                                 </div>
                                 :
@@ -543,7 +589,7 @@ export default class UpdateData extends Component {
 
                                 {/* KMS Lead */}
                                 <Col md={2}>
-                                <div className={styles.inputBox}>
+                                    <div className={styles.inputBox}>
                                         <input
                                             type="number"
                                             onChange={(e) => this.setState({ OurRate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
@@ -560,7 +606,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ UnloadedAt: (e.target.value || "").toUpperCase()})}
+                                            onChange={(e) => this.setState({ UnloadedAt: (e.target.value || "").toUpperCase() })}
                                             value={this.state.UnloadedAt}
                                             required
                                         />
@@ -662,7 +708,7 @@ export default class UpdateData extends Component {
                                         <div className={styles.inputBox}>
                                             <input
                                                 type="text"
-                                                onChange={(e) => this.setState({ Remark: (e.target.value ||"").toUpperCase() })}
+                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
                                                 value={this.state.Remark}
                                                 required
                                             />
@@ -699,8 +745,8 @@ export default class UpdateData extends Component {
 
                                 </Col>
                             </Row>
-                            
-                            <Row style={{display: "flex", justifyContent: "center"}}>
+
+                            <Row style={{ display: "flex", justifyContent: "center" }}>
 
                                 <Col md={6}>
                                     <div className={styles.inputBox}>
@@ -717,7 +763,7 @@ export default class UpdateData extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                            <Col >
+                                <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         {(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
@@ -728,7 +774,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Freight : </span>
                                         {(this.state.Weight * this.state.Rate) + this.state.MExpense}
-                                        
+
                                     </div>
 
                                 </Col>
@@ -736,7 +782,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Our Freight : </span>
                                         {(this.state.Weight * this.state.OurRate) - this.state.DiffPayable}
-                                    
+
                                     </div>
 
                                 </Col>

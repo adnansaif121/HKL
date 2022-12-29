@@ -694,7 +694,7 @@ export default class Dashboard extends Component {
                         
                             this.props.DB === "Ultratech" ?
                         
-                            <UpdateUltratechData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData}></UpdateUltratechData>
+                            <UpdateUltratechData  updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></UpdateUltratechData>
                             
                             :
 

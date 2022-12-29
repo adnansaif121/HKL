@@ -119,7 +119,7 @@ export default class AddUltratechData extends Component {
             Classification: this.state.VehicleOwnership,
             VehicleReturnState : this.state.VehicleReturnState,
             // VehicleOwnership : this.state.VehicleOwnership,
-            VehicleOwnerName : this.state.VehicleOwnerName,
+            VehicleOwnerName : (this.state.VehicleOwnerName || ""),
             kmsLead : this.state.kmsLead,
 
             UnloadedAt: (this.state.UnloadedAt || ""),
