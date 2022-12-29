@@ -549,6 +549,9 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
+                            <Link href="/Options" style={{marginLeft: "5px"}}>
+                                    <Button outline>Back</Button>
+                                </Link>
                         </NavbarBrand>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -705,9 +708,6 @@ export default class Dashboard extends Component {
                         <>
                             {/* Heading above table */}
                             <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex" , justifyContent: "space-between"}}>
-                                <Link href="/Options">
-                                    <Button outline>Back</Button>
-                                </Link>
                                 <h3>{this.props.DB}</h3>
                                 <div>
 
