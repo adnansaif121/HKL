@@ -5,11 +5,16 @@ import AddData from './AddData';
 import AddUltratechData from './AddUltratechData';
 import UpdateData from './UpdateData';
 import UpdateUltratechData from './UpdateUltratechData';
+// Different Ledgers
 import MyLedger from './MyLedger';
 import Company from './Company';
 import Transporter from './Transporter';
+import OwnerLedger from './OwnerLedger';
+import PetrolLedger from './PetrolLedger';
+// Firebase
 import firebase from '../config/firebase';
 import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
+
 import Image from 'next/image'
 import xlsx from "json-as-xlsx";
 import Link from 'next/link';
@@ -46,9 +51,13 @@ export default class Dashboard extends Component {
             dropdownOpen: false,
             db: this.props.DB,
             Ledger: "MyLedger",
+
             myLedger: [],
             Transporter: [],
             Company: [],
+            OwnerLedger: [],
+            PetrolLedger: [],
+
             filterChangeTo : "Last7",
             // isOrient : true,
 
@@ -60,6 +69,9 @@ export default class Dashboard extends Component {
         let myLedger = data ? [...Object.values(data)] : [];
         let Transporter = [];
         let Company = [];
+        let OwnerLedger = [];
+        let PetrolLedger = [];
+
         for (let item of myLedger) {
             if (item.MktComission != undefined && item.MktComission != null && item.MktComission != 0) {
                 let obj = {
@@ -85,13 +97,22 @@ export default class Dashboard extends Component {
                 };
                 Company.push(obj);
             }
+
+            if(this.props.DB === "Ultratech" && item.Classification === "Attached" && item.Classification !== null ){
+                
+                OwnerLedger.push(item);
+
+                PetrolLedger.push(item);
+            }
+
         }
 
         this.setState({
             myLedger,
             Transporter,
             Company,
-
+            OwnerLedger,
+            PetrolLedger,
         })
 
     }
@@ -410,36 +431,65 @@ export default class Dashboard extends Component {
     }
 
     changeLedger = (newLedger) => {
-        // if (newLedger === this.state.Ledger) {
-        //     alert("This Ledger is already selected " + newLedger);
-        //     return;
-        // }
 
         if (newLedger === "MyLedger") {
             this.handleApply(this.state.myLedger);
-            // this.setState({
-            //     data: this.state.myLedger,
-            //     displayData: this.state.myLedger
-            // })
         }
         else if (newLedger === "Company") {
             this.handleApply(this.state.Company);
-            // this.setState({
-            //     data: this.state.Company,
-            //     displayData: this.state.Company,
-            // })
         }
-        else {
+        else if(newLedger === "Transporter"){
             this.handleApply(this.state.Transporter);
-            // this.setState({
-            //     data: this.state.Transporter,
-            //     displayData: this.state.Transporter,
-            // })
+        }
+        else if(newLedger === "OwnerLedger"){
+            this.handleApply(this.state.OwnerLedger);
+        }
+        else if(newLedger === "PetrolLedger"){
+            this.handleApply(this.state.PetrolLedger);
         }
 
         this.setState({
             Ledger: newLedger,
         })
+    }
+
+    // TO change the status of Vehicle Rent Paid or Not from Owner Ledger
+    handlePaid = (item, isPaid) => {
+        // seting data
+        let obj = item;
+        obj.isVehicleRentPaid = isPaid;
+       
+        const db = getDatabase();
+        set(ref(db, '/' + this.state.db + '/' + item.id), {
+            ...obj
+        })
+        console.log(obj);
+    }
+
+    // TO confirm the amount of Vehicle Rent from Owner Ledger
+    handleConfirm = (item, amount) => {
+        // seting data
+        let obj = item;
+        obj.VehicleRent = amount;
+        
+        const db = getDatabase();
+        set(ref(db, '/' + this.state.db + '/' + item.id), {
+            ...obj
+        })
+        console.log(obj);
+    }
+
+    // To change the status of Petrol Paid or Not from Petrol Ledger
+    handleDieselPaid = (item, isPaid) => {
+        // seting data
+        let obj = item;
+        obj.isDieselAmountPaid = isPaid;
+
+        const db = getDatabase();
+        set(ref(db, '/' + this.state.db + '/' + item.id), {
+            ...obj
+        })
+        console.log(obj);
     }
 
     render() {
@@ -516,6 +566,30 @@ export default class Dashboard extends Component {
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("Transporter")}>Transporter</div>
                                                         :
                                                         <div onClick={() => this.changeLedger("Transporter")}>Transporter</div>
+                                                }
+
+                                                {
+                                                    this.props.DB === "Ultratech" && this.state.Ledger === "OwnerLedger"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
+                                                        :
+                                                        this.props.DB === "Ultratech" 
+                                                            ?
+                                                            <div onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
+                                                            :
+                                                            null
+                                                }
+                                                {
+                                                    this.props.DB === "Ultratech" && this.state.Ledger === "PetrolLedger"
+                                                        ?
+                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("PetrolLedger")}>Petrol Ledger</div>
+                                                        :
+                                                        this.props.DB === "Ultratech"
+                                                            ?
+                                                            <div onClick={() => this.changeLedger("PetrolLedger")}>Petrol Ledger</div>
+                                                            :
+                                                            null
+                                                        
                                                 }
                                             </div>
                                         </div>
@@ -658,6 +732,23 @@ export default class Dashboard extends Component {
                                             displayData={this.state.displayData}
                                             filter={this.state.filter}
                                         ></Transporter>
+                                    }
+                                    {
+                                        this.state.Ledger === "OwnerLedger" &&
+                                        <OwnerLedger
+                                            displayData={this.state.displayData}
+                                            filter={this.state.filter}
+                                            handleConfirm = {this.handleConfirm}
+                                            handlePaid = {this.handlePaid}
+                                        ></OwnerLedger>    
+                                    }
+                                    {
+                                        this.state.Ledger === "PetrolLedger" &&
+                                        <PetrolLedger
+                                            displayData={this.state.displayData}
+                                            filter={this.state.filter}
+                                            handleDieselPaid = {this.handleDieselPaid}
+                                        ></PetrolLedger>
                                     }
 
                                 </div>

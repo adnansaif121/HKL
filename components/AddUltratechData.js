@@ -43,8 +43,11 @@ export default class AddUltratechData extends Component {
 
             // IF ATTACHED
             Diesel : 0,
+            DieselRate : 0,
+            DieselQuantity : 0,
             Toll : 0,
             Warai : 0,
+            PetrolPumpName: "",
 
             // Vehicle Owner
             VehicleOwnerName : "",
@@ -95,8 +98,8 @@ export default class AddUltratechData extends Component {
     }
 
     addData = () => {
-        if(this.state.Diesel=== undefined){
-            alert("Please Enter a value in Diesel");
+        if(this.state.DieselRate === undefined || this.state.DieselQuantity === 0){
+            alert("Please Enter a value in Diesel Rate and Quantity");
             return;
         }
         else if(this.state.Toll === undefined){
@@ -133,10 +136,13 @@ export default class AddUltratechData extends Component {
             PaidOn: this.state.PaidOn,
             OurRate: this.state.OurRate,
             OurFreight: (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
+            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.DieselRate * this.state.DieselQuantity) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
 
              // IF ATTACHED
-             Diesel : (this.state.Diesel || 0 ),
+             Diesel : (this.state.DieselRate * this.state.DieselQuantity || 0 ),
+             DieselRate : (this.state.DieselRate || 0),
+             DieselQuantity : (this.state.DieselQuantity || 0),
+             PetrolPumpName : (this.state.PetrolPumpName || ""),
              Toll : (this.state.Toll || 0),
              Warai : (this.state.Warai || 0),
 
@@ -190,7 +196,7 @@ export default class AddUltratechData extends Component {
 
     handleOnSearchVehicleNo = (string) => {
         this.setState({
-            VehicleNo : string
+            VehicleNo : (string || "").toUpperCase()
         })
     }
 
@@ -203,43 +209,15 @@ export default class AddUltratechData extends Component {
         })
     }
 
-    // handleClass = (Classification) => {
-    //     if (this.state.Destination === "") {
-    //         alert("Destination not selected");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //         return;
-    //     }
-    //     let item;
-    //     for (let i of this.state.RateData) {
-    //         if (i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification) {
-    //             item = i;
-    //             break;
-    //         }
-    //     }
-    //     if (item === undefined) {
-    //         alert("Destination do not exist in list. Are you sure to continue?");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //     }
-    //     else {
-    //         // console.log(item);
-    //         this.setState({
-    //             Destination: item["Name of Destination"],
-    //             OurRate: parseFloat(item["ToT Freight (PMT)"]),
-    //             Classification: Classification
-    //         })
-    //     }
-    // }
-
     changeVehicleOwnership = (Ownership) => {
         if(Ownership === "Owned"){
             this.setState({
+                DieselRate: 0,
+                DieselQuantity: 0,
                 Diesel : 0,
                 Toll : 0,
                 Warai : 0,
+                PetrolPumpName: "",
             })
         }
         this.setState({
@@ -306,18 +284,6 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* VEHICLE NO. */}
-                                {/* <Col md={4}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="text"
-                                            onChange={(e) => this.setState({ VehicleNo: (e.target.value || "").toUpperCase() })}
-                                            value={this.state.VehicleNo}
-                                            required
-                                        />
-                                        <span>Vehicle No.</span>
-                                        <i></i>
-                                    </div>
-                                </Col> */}
                                 <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
                                         <div style={{ marginBottom: 0 }}>Vehicle No</div>
@@ -500,16 +466,40 @@ export default class AddUltratechData extends Component {
                                         EXTRA ATTACHED EXPENSES
                                     </Row>
                                     <Row>
-                                        {/* Diesel */}
+                                        
+                                        {/* Diesel Rate */}
                                         <Col>
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="number"
-                                                    onChange={(e) => this.calExpense("Diesel", e.target.value) }
-                                                    value={this.state.Diesel === 0 ? 0 : this.state.Diesel}
+                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value) }
+                                                    value={this.state.DieselRate === 0 ? 0 : this.state.DieselRate}
                                                     required
                                                 />
+                                                <span>Diesel Rate</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Diesel Quantity */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("DieselQuantity", e.target.value) }
+                                                    value={this.state.DieselQuantity === 0 ? 0 : this.state.DieselQuantity}
+                                                    required
+                                                />
+                                                <span>Diesel Quantity</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Diesel */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
                                                 <span>Diesel</span>
+                                                <p>{this.state.DieselRate * this.state.DieselQuantity || 0}</p>
                                                 <i></i>
                                             </div>
                                         </Col>
@@ -544,7 +534,23 @@ export default class AddUltratechData extends Component {
                                     </Row>
 
                                     <Row style={{display : "flex", justifyContent: 'center', marginTop: "20px"}}>
-                                        Total : {this.state.Diesel + this.state.Toll + this.state.Warai}
+                                        Total : {(this.state.DieselRate * this.state.DieselQuantity) + this.state.Toll + this.state.Warai}
+                                    </Row>
+
+                                    <Row>
+                                        {/* Petrol Pump Name */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="text"
+                                                    onChange={(e) => this.setState({ PetrolPumpName: (e.target.value || "").toUpperCase() })}
+                                                    value={this.state.PetrolPumpName}
+                                                    required
+                                                />
+                                                <span>Petrol Pump Name</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
                                     </Row>
                                 </div>
                                 :
@@ -788,7 +794,7 @@ export default class AddUltratechData extends Component {
                                 <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
+                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat((this.state.DieselRate * this.state.DieselQuantity) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                         <i></i>
                                     </div>
 
