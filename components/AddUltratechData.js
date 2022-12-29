@@ -98,7 +98,7 @@ export default class AddUltratechData extends Component {
     }
 
     addData = () => {
-        if(this.state.DieselRate === undefined || this.state.DieselQuantity === 0){
+        if(this.state.DieselRate === undefined || this.state.DieselQuantity === undefined){
             alert("Please Enter a value in Diesel Rate and Quantity");
             return;
         }
@@ -794,7 +794,7 @@ export default class AddUltratechData extends Component {
                                 <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat((this.state.DieselRate * this.state.DieselQuantity) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
+                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(((this.state.DieselRate || 0) * (this.state.DieselQuantity || 0)) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                         <i></i>
                                     </div>
 
