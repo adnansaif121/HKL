@@ -97,7 +97,7 @@ export default class UpdateData extends Component {
 
 
     addData = () => {
-        if (this.state.DieselRate === undefined || this.state.DieselQuantity === 0) {
+        if (this.state.DieselRate === undefined || this.state.DieselQuantity === undefined) {
             alert("Please Enter a value in Diesel Rate and Quantity");
             return;
         }
@@ -169,7 +169,7 @@ export default class UpdateData extends Component {
             kmsLead = RateItem["KMS LEAD"];
         }
         else {
-            OurRate = RateItem["NET FREIGHT"];
+            OurRate = RateItem.FREIGHT + RateItem.TOLL;
             kmsLead = 2 * RateItem["KMS LEAD"];
         }
 
@@ -232,7 +232,7 @@ export default class UpdateData extends Component {
                 kmsLead = RateItem["KMS LEAD"];
             }
             else {
-                OurRate = RateItem["NET FREIGHT"];
+                OurRate = RateItem.FREIGHT + RateItem.TOLL;
                 kmsLead = 2 * RateItem["KMS LEAD"];
             }
             console.log(OurRate, kmsLead, State);
@@ -651,7 +651,7 @@ export default class UpdateData extends Component {
                                     </div>
 
                                 </Col>
-                                <Col >
+                                {/* <Col >
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -663,10 +663,10 @@ export default class UpdateData extends Component {
                                         <i></i>
                                     </div>
 
-                                </Col>
+                                </Col> */}
 
                             </Row>
-                            <Row>
+                            {/* <Row>
                                 {
                                     (this.state.MktComission && this.state.MktComission > 0) ?
                                         <Col>
@@ -726,7 +726,8 @@ export default class UpdateData extends Component {
                                         <i></i>
                                     </div>
 
-                                </Col>
+                                </Col> */}
+                                <Row>
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input

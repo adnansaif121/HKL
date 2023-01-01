@@ -91,11 +91,15 @@ class ExcelReader extends Component {
         })
     }
 
-    findRate = (Destination, Classification) => {
+    findRate = (Destination, VehicleReturnState) => {
         let data = this.state.data
         for (let i of data) {
-            if (i["Name of Destination"] === Destination && i["Classification Name"] === Classification) {
-                return i["ToT Freight (PMT)"]
+            let Dest = `${i.DESTINATION} (${i.TONNAGE})`
+            if (Destination === Dest) {
+                if(VehicleReturnState === "Empty")
+                    return i.FREIGHT + i.TOLL;
+                else
+                    return i.FREIGHT;
             }
         }
         return -1;
@@ -108,11 +112,11 @@ class ExcelReader extends Component {
             let itemDate = new Date(db[item].InvoiceDate);
             let applyDate = new Date(this.state.applyDate);
             if (itemDate >= applyDate) {
-                let rate = parseFloat(this.findRate(db[item].Destination, db[item].Classification));
+                let rate = parseFloat(this.findRate(db[item].Destination, db[item].VehicleReturnState));
                 if(rate === -1)continue;
                 db[item].OurRate = rate;
                 db[item].OurFreight = (db[item].Weight * rate) - db[item].DiffPayable,
-                db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - ((db[item].Weight * db[item].Rate) + db[item].MExpense)) + parseFloat(db[item].Comission))
+                db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - ((db[item].Weight * db[item].Rate) + db[item].MExpense)) + parseFloat(db[item].Comission)) - (parseFloat(db[item].DieselRate * db[item].DieselQuantity) + parseFloat(db[item].Toll) + parseFloat(db[item].Warai))
             }
             console.log(db[item]);
         }

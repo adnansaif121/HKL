@@ -113,7 +113,7 @@ export default class AddUltratechData extends Component {
 
         let obj = {
             InvoiceDate: this.state.InvoiceDate,
-            VehicleNo: (this.state.VehicleNo || ""),
+            VehicleNo: (this.state.VehicleNo || "").toUpperCase(),
             PartyName: (this.state.PartyName || ""),
             Destination: (this.state.Destination || ""),
             Classification: this.state.VehicleOwnership,
@@ -169,7 +169,7 @@ export default class AddUltratechData extends Component {
             kmsLead = RateItem["KMS LEAD"];
         }
         else{
-            OurRate = RateItem["NET FREIGHT"];
+            OurRate = RateItem.FREIGHT + RateItem.TOLL;
             kmsLead = 2*RateItem["KMS LEAD"];
         }
 
@@ -235,7 +235,7 @@ export default class AddUltratechData extends Component {
                 kmsLead = RateItem["KMS LEAD"];
             }
             else{
-                OurRate = RateItem["NET FREIGHT"];
+                OurRate = RateItem.FREIGHT + RateItem.TOLL;
                 kmsLead = 2*RateItem["KMS LEAD"];
             }
             console.log(OurRate, kmsLead, State);
@@ -467,20 +467,6 @@ export default class AddUltratechData extends Component {
                                     </Row>
                                     <Row>
                                         
-                                        {/* Diesel Rate */}
-                                        <Col>
-                                            <div className={styles.inputBox}>
-                                                <input
-                                                    type="number"
-                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value) }
-                                                    value={this.state.DieselRate === 0 ? 0 : this.state.DieselRate}
-                                                    required
-                                                />
-                                                <span>Diesel Rate</span>
-                                                <i></i>
-                                            </div>
-                                        </Col>
-
                                         {/* Diesel Quantity */}
                                         <Col>
                                             <div className={styles.inputBox}>
@@ -491,6 +477,20 @@ export default class AddUltratechData extends Component {
                                                     required
                                                 />
                                                 <span>Diesel Quantity</span>
+                                                <i></i>
+                                            </div>
+                                        </Col>
+
+                                        {/* Diesel Rate */}
+                                        <Col>
+                                            <div className={styles.inputBox}>
+                                                <input
+                                                    type="number"
+                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value) }
+                                                    value={this.state.DieselRate === 0 ? 0 : this.state.DieselRate}
+                                                    required
+                                                />
+                                                <span>Diesel Rate</span>
                                                 <i></i>
                                             </div>
                                         </Col>
@@ -604,7 +604,7 @@ export default class AddUltratechData extends Component {
                             <Row>
 
                                 {/* WEIGHT */}
-                                <Col md={3}>
+                                <Col >
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -619,7 +619,7 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* RATE */}
-                                <Col md={3}>
+                                <Col >
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -632,7 +632,7 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* COMISSION */}
-                                <Col md={3}>
+                                <Col >
                                     <div className={styles.inputBox}>
                                         <input
                                             type="number"
@@ -644,86 +644,9 @@ export default class AddUltratechData extends Component {
                                     </div>
 
                                 </Col>
-
-                                {/* Mkt Comission */}
-                                <Col md={3}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ MktComission: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            required
-                                        />
-                                        <span>Mkt Comission</span>
-                                        <i></i>
-                                    </div>
-                                </Col>
-                                {
-                                    (this.state.MktComission && this.state.MktComission > 0) 
-                                    ?
-                                    // PAID TO
-                                        <Col>
-                                            <div className={styles.inputBox}>
-                                                <input
-                                                    type="text"
-                                                    onChange={(e) => this.setState({ PaidTo: (e.target.value || "").toUpperCase() })}
-                                                    value={this.state.PaidTo}
-                                                    required
-                                                />
-                                                <span>Mkt Comission Paid To</span>
-                                                <i></i>
-                                            </div>
-                                        </Col>
-                                    : 
-                                        null
-                                }
                             </Row>
-                            
+
                             <Row>
-                                {/* MISC EXPENSES */}
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            required
-                                        />
-                                        <span>Miscellaneous Expenses</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-
-                                {this.state.MExpense > 0 &&
-                                // REMARK
-                                    <Col>
-                                        <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
-                                                value={this.state.Remark}
-                                                required
-                                            />
-                                            <span>Remark</span>
-                                            <i></i>
-                                        </div>
-
-                                    </Col>
-                                }
-
-                                {/* DIFFERENCE PAYABLE */}
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ DiffPayable: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            required
-                                        />
-                                        <span>Difference Payable</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-
                                 {/* Paid On */}
                                 <Col>
                                     <div className={styles.inputBox}>

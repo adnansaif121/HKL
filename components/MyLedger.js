@@ -62,24 +62,31 @@ export default class MyLedger extends Component {
                                     <th>
                                         Comission
                                     </th>
-                                    <th>
-                                        Mkt Comission
-                                    </th>
-                                    <th>
-                                        Miscellaneous Expenses
-                                    </th>
-                                    <th>
-                                        Remark
-                                    </th>
+                                    {this.props.DB === "Orient" && 
+                                    <>
+                                        <th>
+                                            Mkt Comission
+                                        </th>
+                                        <th>
+                                            Miscellaneous Expenses
+                                        </th>
+                                        <th>
+                                            Remark
+                                        </th>
+                                    </>
+                                    }
                                     <th>
                                         Payable Freight
                                     </th>
                                     <th>
                                         Net Freight
                                     </th>
-                                    <th>
-                                        Difference Payable
-                                    </th>
+                                    {this.props.DB === "Orient" &&
+
+                                        <th>
+                                            Difference Payable
+                                        </th>
+                                    }
                                     <th>
                                         Paid On
                                     </th>
@@ -162,24 +169,30 @@ export default class MyLedger extends Component {
                                                 <td>
                                                     {item.Comission}
                                                 </td>
-                                                <td>
-                                                    {item.MktComission}
-                                                </td>
-                                                <td>
-                                                    {item.MExpense}
-                                                </td>
-                                                <td>
-                                                    {item.Remark}
-                                                </td>
+                                                {this.props.DB === "Orient" &&
+                                                    <>
+                                                    <td> 
+                                                        {item.MktComission}
+                                                    </td>
+                                                    <td>
+                                                        {item.MExpense}
+                                                    </td>
+                                                    <td>
+                                                        {item.Remark}
+                                                    </td>
+                                                </>
+                                                }
                                                 <td>
                                                     {item.PayableFreight}
                                                 </td>
                                                 <td>
                                                     {item.NetFreight}
                                                 </td>
-                                                <td>
-                                                    {item.DiffPayable}
-                                                </td>
+                                                {this.props.DB === "Orient" &&
+                                                    <td>
+                                                        {item.DiffPayable}
+                                                    </td>
+                                                }
                                                 <td>
                                                     {item.PaidOn}
                                                 </td>
