@@ -9,6 +9,9 @@ import {
 } from 'reactstrap'
 import styles from '../styles/AddData.module.css';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
+// Firebase
+import firebase from '../config/firebase';
+import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
 
 export default class UpdateData extends Component {
     constructor(props) {
@@ -55,22 +58,24 @@ export default class UpdateData extends Component {
 
             // PartyNameList 
             PartyNameList: [],
+
+            // RateDates(dates for different ledgeres, date index provides the ledgeres index in newUltratechRates)
+            RateDates : [],
         }
     }
 
     componentDidMount() {
-        console.log(this.props.RateData);
-        let rates = [];
-        for (let item of this.props.RateData) {
-            rates.push({
-                id: item.id,
-                displayName: `${item.DESTINATION} (${item.TONNAGE})`,
-            })
-        }
-        this.setState({
-            RateData: rates,
-        })
 
+         //firebase fetch UltratechRateDates
+         const db = getDatabase();
+         const Ref = ref(db, "/UltratechRateDates");
+         onValue(Ref, (snapshot) => {
+             const data = snapshot.val();
+             this.setState({
+                 RateDates : data,
+             })
+         });
+        
         // Party Name Cache List
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
@@ -78,8 +83,7 @@ export default class UpdateData extends Component {
         for (let item of entries) {
             set.add(item.PartyName);
         }
-        // for(let item of )
-        // console.log(set.entries());
+
         let setArr = [...set];
         let i = 0;
         for (let item of setArr) {
@@ -95,6 +99,21 @@ export default class UpdateData extends Component {
 
     }
 
+    defineRates = (rateData) => {
+        // RateData Filter
+        // console.log(this.props.RateData);
+        let rates = [];
+        for(let item of rateData){
+            rates.push({
+                id: item.id,
+                displayName : `${item.DESTINATION} (${item.TONNAGE}) - ${item["SALES OFFICE"]}`,
+            })
+        }
+        this.setState({
+            RateData : rates,
+            propsRateData: rateData,
+        })
+    }
 
     addData = () => {
         if (this.state.DieselRate === undefined || this.state.DieselQuantity === undefined) {
@@ -161,7 +180,7 @@ export default class UpdateData extends Component {
     handleOnSelect = (item) => {
         let ownedItem = item;
         let index = item.id - 1;
-        let RateItem = this.props.RateData[index];
+        let RateItem = this.state.propsRateData[index];
         let OurRate = "";
         let kmsLead = 0;
         if (this.state.VehicleReturnState === "Non-Empty") {
@@ -177,7 +196,7 @@ export default class UpdateData extends Component {
             Destination: `${RateItem["DESTINATION"]} (${RateItem["TONNAGE"]})`,
             OurRate: parseFloat(OurRate),
             kmsLead: kmsLead,
-            RateSelected: this.props.RateData[index],
+            RateSelected: this.state.propsRateData[index],
         })
         console.log(ownedItem);
     };
@@ -212,9 +231,12 @@ export default class UpdateData extends Component {
     changeVehicleOwnership = (Ownership) => {
         if (Ownership === "Owned") {
             this.setState({
+                DieselRate: 0,
+                DieselQuantity: 0,
                 Diesel: 0,
                 Toll: 0,
                 Warai: 0,
+                PetrolPumpName: "",
             })
         }
         this.setState({
@@ -250,9 +272,63 @@ export default class UpdateData extends Component {
     }
 
     calExpense = (ExpenseType, value) => {
+        if(value === null)return;
         this.setState({
             [ExpenseType]: parseFloat(value)
         })
+    }
+
+    handleInvoiceDate = (date) => {
+        // set invoice date
+        this.setState({ InvoiceDate: date });
+        // get ledger index
+        // initialise ledgerSelected to null
+        let ledgerSelected = null;
+        let queryDate = new Date(date);
+        // iterate over all ledgers dates
+        for(let i = this.state.RateDates.length - 1; i >= 0; i--){
+            console.log(this.state.RateDates[i].FROM);
+            let ledgerDate = new Date(this.state.RateDates[i].FROM);
+            // if query date is greater than or equal to ledger date select that ledger
+            if(queryDate >= ledgerDate){
+                ledgerSelected = i;
+                break;
+            }
+            console.log(queryDate, ledgerDate);
+        }
+        // if ledger is not selected
+        if(ledgerSelected === null){
+            // alert user
+            alert("frieght list before 11 Nov 2022 is Not available" );
+            return;
+        }
+        // When ledger is selected
+        else{
+            // find ledger selected in local storage
+            console.log(ledgerSelected);
+            let x = JSON.parse(localStorage.getItem(`newUltratechRate/${ledgerSelected}`));
+            // If selected ledger is not present in local storage
+            if(x == null){
+                // fetch ledger from server
+                const db = getDatabase();
+                const Ref = ref(db, "/newUltratechRate/" + ledgerSelected);
+                onValue(Ref, (snapshot) => {
+                    const data = snapshot.val();
+                    x = data.data;
+                    // store ledger in local storage
+                    localStorage.setItem(`newUltratechRate/${ledgerSelected}`, JSON.stringify(x));
+                    console.log(x);
+                    // DefineRates
+                    this.defineRates(x);
+                });
+            }
+            else{
+                // DefineRates
+                this.defineRates(x);
+                console.log(x, "localStorage");
+            }
+        }
+        
     }
 
     render() {
@@ -269,7 +345,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
-                                            onChange={(e) => this.setState({ InvoiceDate: e.target.value })}
+                                            onChange={(e) => this.handleInvoiceDate(e.target.value)}
                                             value={this.state.InvoiceDate}
                                         // required
                                         />

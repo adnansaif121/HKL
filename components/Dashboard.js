@@ -143,20 +143,7 @@ export default class Dashboard extends Component {
 
         // FETCHING RATEDATA
         const dbRef = ref(getDatabase());
-        if(this.props.DB === "Ultratech"){
-            get(child(dbRef, '/UltratechRate/data')).then((snapshot) => {
-                if (snapshot.exists()) {
-                    console.log(snapshot.val());
-                    this.setState({ RateData: snapshot.val() })
-                } else {
-                    console.log("No data available");
-                }
-            }
-            ).catch((error) => {
-                console.error(error);
-            });
-        }
-        else{
+        if(this.props.DB === "Orient"){
             get(child(dbRef, '/ourRate/data')).then((snapshot) => {
                 if (snapshot.exists()) {
                     console.log(snapshot.val());
@@ -539,7 +526,7 @@ export default class Dashboard extends Component {
                     // color="dark" 
 
                     >
-                        <NavbarBrand >
+                        <div >
                             <Button outline onClick={() => { this.setState({ toggleSidebar: !this.state.toggleSidebar }) }}>
                                 <Image
                                     style={{ width: "20px", height: "20px" }}
@@ -552,7 +539,7 @@ export default class Dashboard extends Component {
                             <Link href="/Options" style={{marginLeft: "5px"}}>
                                     <Button outline>Back</Button>
                                 </Link>
-                        </NavbarBrand>
+                        </div>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
                         {
@@ -735,7 +722,7 @@ export default class Dashboard extends Component {
                                 <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
                                     {
                                         this.props.DB === "Ultratech" ?
-                                        <AddUltratechData updateData={this.addData} RateData={this.state.RateData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
+                                        <AddUltratechData updateData={this.addData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
                                         :
                                         <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
 

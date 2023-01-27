@@ -21,11 +21,12 @@ class ExcelReader extends Component {
             isDataUploaded: false,
             applyDate: null,
             UltratechDb: null,
+            UltratechRateDates: [],
         }
         this.handleFile = this.handleFile.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
-
+// fetch ultratech data and UltratechRateDates
     componentDidMount() {
         const db = getDatabase();
         const starCountRef = ref(db, '/Ultratech');
@@ -38,13 +39,23 @@ class ExcelReader extends Component {
         }, {
             onlyOnce: true
         })
+
+        const Ref = ref(db, '/UltratechRateDates');
+        onValue(Ref, (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                UltratechRateDates: data,
+            })
+        })
     }
 
+    // handle file upload change
     handleChange(e) {
         const files = e.target.files;
         if (files && files[0]) this.setState({ file: files[0] });
     };
 
+    // convert excel to JSON
     handleFile() {
         /* Boilerplate to set up FileReader */
         const reader = new FileReader();
@@ -74,13 +85,15 @@ class ExcelReader extends Component {
         };
     }
 
+    // Upload the file 
     handleUpload = () => {
         const db = getDatabase();
         const data = this.state.data;
         for (let i = 0; i < data.length; i++) {
             data[i].id = i + 1;
         }
-        set(ref(db, '/UltratechRate'), {
+        const index = this.state.UltratechRateDates.length;
+        set(ref(db, `/newUltratechRate/${index}`), {
             data
         }).then(() => {
             this.setState({
@@ -138,7 +151,13 @@ class ExcelReader extends Component {
         const db = getDatabase();
         set(ref(db, '/Ultratech/'), {
             ...newUltratechDb
+        });
+
+        const index = this.state.UltratechRateDates.length;
+        set(ref(db, `/UltratechRateDates/${index}`), {
+            FROM : this.state.applyDate
         })
+
     }
 
     render() {
@@ -196,9 +215,9 @@ class ExcelReader extends Component {
 
                         <>
                             <div style={{ textAlign: "center", border: "1px solid black", margin: "20px", padding: "20px" }}>
-                                <h3>Do you want to update existing data with these new Rate ?</h3>
+                                <h3>Enter Date from which this new rates apply from. </h3>
                                 <div style={{ display: "flex", justifyContent: "center" }}>
-                                    <h4>Then enter the date you want to apply it from : </h4>
+                                    <h4>Enter Date : </h4>
                                     <Input onChange={(e) => this.setState({ applyDate: e.target.value })} style={{ width: "30%", color: "white", backgroundColor: "#1f5457" }} type="date" />
                                 </div>
                                 <Button onClick={this.updateRates} color='warning'>UPDATE</Button>
