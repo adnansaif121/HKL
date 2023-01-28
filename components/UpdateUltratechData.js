@@ -76,6 +76,9 @@ export default class UpdateData extends Component {
              })
          });
         
+        //  Call handleInvoice to defines Rates 
+        this.handleInvoice(this.props.data.InvoiceDate);
+        
         // Party Name Cache List
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
