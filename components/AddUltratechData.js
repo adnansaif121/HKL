@@ -39,31 +39,31 @@ export default class AddUltratechData extends Component {
             NetProfit: 0,
             RateData: [],
 
-            VehicleReturnState : "Empty",
-            VehicleOwnership : "Owned",
-            kmsLead : 0,
-            RateSelected : null,
+            VehicleReturnState: "Empty",
+            VehicleOwnership: "Owned",
+            kmsLead: 0,
+            RateSelected: null,
 
             // IF ATTACHED
-            Diesel : 0,
-            DieselRate : 0,
-            DieselQuantity : 0,
-            Toll : 0,
-            Warai : 0,
+            Diesel: 0,
+            DieselRate: 0,
+            DieselQuantity: 0,
+            Toll: 0,
+            Warai: 0,
             PetrolPumpName: "",
 
             // Vehicle Owner
-            VehicleOwnerName : "",
+            VehicleOwnerName: "",
 
             // PartyNameList
-            PartyNameList : [],
+            PartyNameList: [],
 
             // RateDates(dates for different ledgeres, date index provides the ledgeres index in newUltratechRates)
-            RateDates : [],
+            RateDates: [],
         }
     }
 
-    componentDidMount(){
+    componentDidMount() {
 
         //firebase fetch UltratechRateDates
         const db = getDatabase();
@@ -71,7 +71,25 @@ export default class AddUltratechData extends Component {
         onValue(Ref, (snapshot) => {
             const data = snapshot.val();
             this.setState({
-                RateDates : data,
+                RateDates: data,
+            }, ()=> {
+
+                // Auto select todays date in InvoiceDate
+                var d = new Date(),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+    
+                if (month.length < 2)
+                    month = '0' + month;
+                if (day.length < 2)
+                    day = '0' + day;
+    
+                let todayDate = [year, month, day].join('-');
+                console.log(todayDate)
+
+                //  Call handleInvoice to defines Rates 
+                this.handleInvoiceDate(todayDate);
             })
         });
 
@@ -79,16 +97,16 @@ export default class AddUltratechData extends Component {
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
         let set = new Set();
-        for(let item of entries){
+        for (let item of entries) {
             set.add(item.PartyName);
         }
-        
+
         let setArr = [...set];
         let i = 0;
-        for(let item of setArr){
+        for (let item of setArr) {
             PartyNameList.push({
-                Name : item,
-                id : i
+                Name: item,
+                id: i
             })
             i++;
         }
@@ -96,34 +114,36 @@ export default class AddUltratechData extends Component {
             PartyNameList,
         })
 
+
+
     }
 
     defineRates = (rateData) => {
         // RateData Filter
         // console.log(this.props.RateData);
         let rates = [];
-        for(let item of rateData){
+        for (let item of rateData) {
             rates.push({
                 id: item.id,
-                displayName : `${item.DESTINATION} (${item.TONNAGE}) - ${item["SALES OFFICE"]}`,
+                displayName: `${item.DESTINATION} (${item.TONNAGE}) - ${item["SALES OFFICE"]}`,
             })
         }
         this.setState({
-            RateData : rates,
+            RateData: rates,
             propsRateData: rateData,
         })
     }
 
     addData = () => {
-        if(this.state.DieselRate === undefined || this.state.DieselQuantity === undefined){
+        if (this.state.DieselRate === undefined || this.state.DieselQuantity === undefined) {
             alert("Please Enter a value in Diesel Rate and Quantity");
             return;
         }
-        else if(this.state.Toll === undefined){
+        else if (this.state.Toll === undefined) {
             alert("Please Enter a value in Toll");
             return;
         }
-        else if(this.state.Warai === undefined){
+        else if (this.state.Warai === undefined) {
             alert("Please Enter a value in Warai");
             return;
         }
@@ -134,10 +154,10 @@ export default class AddUltratechData extends Component {
             PartyName: (this.state.PartyName || ""),
             Destination: (this.state.Destination || ""),
             Classification: this.state.VehicleOwnership,
-            VehicleReturnState : this.state.VehicleReturnState,
+            VehicleReturnState: this.state.VehicleReturnState,
             // VehicleOwnership : this.state.VehicleOwnership,
-            VehicleOwnerName : (this.state.VehicleOwnerName || ""),
-            kmsLead : this.state.kmsLead,
+            VehicleOwnerName: (this.state.VehicleOwnerName || ""),
+            kmsLead: this.state.kmsLead,
 
             UnloadedAt: (this.state.UnloadedAt || ""),
             Weight: this.state.Weight,
@@ -148,20 +168,20 @@ export default class AddUltratechData extends Component {
             MExpense: this.state.MExpense,
             Remark: this.state.Remark,
             PayableFreight: (this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission,
-            NetFreight: (this.state.Weight*this.state.Rate) + this.state.MExpense,
+            NetFreight: (this.state.Weight * this.state.Rate) + this.state.MExpense,
             DiffPayable: this.state.DiffPayable,
             PaidOn: this.state.PaidOn,
             OurRate: this.state.OurRate,
             OurFreight: (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.DieselRate * this.state.DieselQuantity) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
+            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.DieselRate * this.state.DieselQuantity) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)),
 
-             // IF ATTACHED
-             Diesel : (this.state.DieselRate * this.state.DieselQuantity || 0 ),
-             DieselRate : (this.state.DieselRate || 0),
-             DieselQuantity : (this.state.DieselQuantity || 0),
-             PetrolPumpName : (this.state.PetrolPumpName || ""),
-             Toll : (this.state.Toll || 0),
-             Warai : (this.state.Warai || 0),
+            // IF ATTACHED
+            Diesel: (this.state.DieselRate * this.state.DieselQuantity || 0),
+            DieselRate: (this.state.DieselRate || 0),
+            DieselQuantity: (this.state.DieselQuantity || 0),
+            PetrolPumpName: (this.state.PetrolPumpName || ""),
+            Toll: (this.state.Toll || 0),
+            Warai: (this.state.Warai || 0),
 
         }
         // console.log(obj)
@@ -171,7 +191,7 @@ export default class AddUltratechData extends Component {
     handleOnSearch = (string, results) => {
         // console.log(string, results);
         this.setState({
-            Destination : string,
+            Destination: string,
         })
     };
 
@@ -185,60 +205,60 @@ export default class AddUltratechData extends Component {
             OurRate = RateItem.FREIGHT;
             kmsLead = RateItem["KMS LEAD"];
         }
-        else{
+        else {
             OurRate = RateItem.FREIGHT + RateItem.TOLL;
-            kmsLead = 2*RateItem["KMS LEAD"];
+            kmsLead = 2 * RateItem["KMS LEAD"];
         }
 
         this.setState({
             Destination: `${RateItem["DESTINATION"]} (${RateItem["TONNAGE"]})`,
             OurRate: parseFloat(OurRate),
-            kmsLead : kmsLead,
-            RateSelected : this.state.propsRateData[index],
+            kmsLead: kmsLead,
+            RateSelected: this.state.propsRateData[index],
         })
         console.log(ownedItem);
     };
 
     handleOnSearchPartyName = (string) => {
         this.setState({
-            PartyName : string
+            PartyName: string
         })
     }
 
     handleOnSelectPartyName = (item) => {
         this.setState({
-            PartyName : item.Name,
+            PartyName: item.Name,
         })
     }
 
     handleOnSearchVehicleNo = (string) => {
         this.setState({
-            VehicleNo : (string || "").toUpperCase()
+            VehicleNo: (string || "").toUpperCase()
         })
     }
 
     handleOnSelectVehicleNo = (item) => {
         this.setState({
-            VehicleNo : item.vehicleNo,
-            VehicleOwnerName : item.vehicleOwner,
-            Weight : item.weight,
-            VehicleOwnership : "Attached",
+            VehicleNo: item.vehicleNo,
+            VehicleOwnerName: item.vehicleOwner,
+            Weight: item.weight,
+            VehicleOwnership: "Attached",
         })
     }
 
     changeVehicleOwnership = (Ownership) => {
-        if(Ownership === "Owned"){
+        if (Ownership === "Owned") {
             this.setState({
                 DieselRate: 0,
                 DieselQuantity: 0,
-                Diesel : 0,
-                Toll : 0,
-                Warai : 0,
+                Diesel: 0,
+                Toll: 0,
+                Warai: 0,
                 PetrolPumpName: "",
             })
         }
         this.setState({
-            VehicleOwnership : Ownership,
+            VehicleOwnership: Ownership,
         })
     }
 
@@ -246,35 +266,35 @@ export default class AddUltratechData extends Component {
         let OurRate = 0;
         let kmsLead = 0;
         let RateItem = this.state.RateSelected;
-        if(this.state.RateSelected !== null){
+        if (this.state.RateSelected !== null) {
             if (State === "Non-Empty") {
                 OurRate = RateItem.FREIGHT;
                 kmsLead = RateItem["KMS LEAD"];
             }
-            else{
+            else {
                 OurRate = RateItem.FREIGHT + RateItem.TOLL;
-                kmsLead = 2*RateItem["KMS LEAD"];
+                kmsLead = 2 * RateItem["KMS LEAD"];
             }
             console.log(OurRate, kmsLead, State);
             this.setState({
-                OurRate : OurRate,
+                OurRate: OurRate,
                 kmsLead: kmsLead,
-                VehicleReturnState : State,
+                VehicleReturnState: State,
             })
         }
-        else{
+        else {
             this.setState({
-                VehicleReturnState : State,
+                VehicleReturnState: State,
             })
         }
     }
 
     calExpense = (ExpenseType, value) => {
-        if(value === null){
+        if (value === null) {
             return;
         }
         this.setState({
-            [ExpenseType] : parseFloat(value),
+            [ExpenseType]: parseFloat(value),
         })
     }
 
@@ -286,29 +306,30 @@ export default class AddUltratechData extends Component {
         let ledgerSelected = null;
         let queryDate = new Date(date);
         // iterate over all ledgers dates
-        for(let i = this.state.RateDates.length - 1; i >= 0; i--){
+        console.log(this.state.RateDates);
+        for (let i = this.state.RateDates.length - 1; i >= 0; i--) {
             console.log(this.state.RateDates[i].FROM);
             let ledgerDate = new Date(this.state.RateDates[i].FROM);
             // if query date is greater than or equal to ledger date select that ledger
-            if(queryDate >= ledgerDate){
+            if (queryDate >= ledgerDate) {
                 ledgerSelected = i;
                 break;
             }
             console.log(queryDate, ledgerDate);
         }
         // if ledger is not selected
-        if(ledgerSelected === null){
+        if (ledgerSelected === null) {
             // alert user
-            alert("frieght list before 11 Nov 2022 is Not available" );
+            alert("frieght list before 11 Nov 2022 is Not available");
             return;
         }
         // When ledger is selected
-        else{
+        else {
             // find ledger selected in local storage
             console.log(ledgerSelected);
             let x = JSON.parse(localStorage.getItem(`newUltratechRate/${ledgerSelected}`));
             // If selected ledger is not present in local storage
-            if(x == null){
+            if (x == null) {
                 // fetch ledger from server
                 const db = getDatabase();
                 const Ref = ref(db, "/newUltratechRate/" + ledgerSelected);
@@ -322,13 +343,13 @@ export default class AddUltratechData extends Component {
                     this.defineRates(x);
                 });
             }
-            else{
+            else {
                 // DefineRates
                 this.defineRates(x);
                 console.log(x, "localStorage");
             }
         }
-        
+
     }
 
     render() {
@@ -346,6 +367,7 @@ export default class AddUltratechData extends Component {
                                         <input
                                             type="date"
                                             onChange={(e) => this.handleInvoiceDate(e.target.value)}
+                                            value={this.state.InvoiceDate}
                                         // required
                                         />
                                         <span>Invoice Date</span>
@@ -427,7 +449,7 @@ export default class AddUltratechData extends Component {
 
                             </Row>
 
-                            <Row style={{ paddingBottom:"30px"}}>
+                            <Row style={{ paddingBottom: "30px" }}>
                                 {/* DESTINATION */}
                                 <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
@@ -457,58 +479,58 @@ export default class AddUltratechData extends Component {
                                         />
                                     </div>
                                 </Col>
-                                
+
                                 <Col>
-                                    <div style={{display: "flex", justifyContent: "space-between", padding: "0px 30px 0px 30px"}}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", padding: "0px 30px 0px 30px" }}>
 
                                         {/* Empty/NonEmpty */}
-                                            <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%" }}>
-                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
-                                                    {this.state.VehicleReturnState}
-                                                </Button>
-                                                <div className={styles.dropdownContent} style={{width: "200px"}}>
-                                                    {
-                                                        this.state.VehicleReturnState === "Non-Empty"
+                                        <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%" }}>
+                                            <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                                {this.state.VehicleReturnState}
+                                            </Button>
+                                            <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                                {
+                                                    this.state.VehicleReturnState === "Non-Empty"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Non-Empty</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleReturnState("Non-Empty")}>Non-Empty</div>
-                                                    }
-                                                    {
-                                                        this.state.VehicleReturnState === "Empty"
+                                                }
+                                                {
+                                                    this.state.VehicleReturnState === "Empty"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }} >Empty</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleReturnState("Empty")}>Empty</div>
-                                                    }
-                                                        
-                                                </div>
+                                                }
+
                                             </div>
-                                        
+                                        </div>
+
                                         {/* Owned/Attached */}
-                                            <div className={styles.dropdown} style={{ marginTop: "30px" }}>
-                                                <Button outline className={styles.dropbtn} style={{width: "200px"}}>
-                                                    {this.state.VehicleOwnership}
-                                                </Button>
-                                                <div className={styles.dropdownContent} style={{width:"200px"}}>
-                                                    {
-                                                        this.state.VehicleOwnership === "Owned"
+                                        <div className={styles.dropdown} style={{ marginTop: "30px" }}>
+                                            <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                                {this.state.VehicleOwnership}
+                                            </Button>
+                                            <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                                {
+                                                    this.state.VehicleOwnership === "Owned"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Owned</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleOwnership("Owned")}>Owned</div>
-                                                    }
-                                                    {
-                                                        this.state.VehicleOwnership === "Attached"
+                                                }
+                                                {
+                                                    this.state.VehicleOwnership === "Attached"
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }}>Attached</div>
                                                         :
                                                         <div onClick={() => this.changeVehicleOwnership("Attached")}>Attached</div>
-                                                    }
-                                                        
-                                                </div>
+                                                }
+
                                             </div>
-                                        
+                                        </div>
+
                                     </div>
                                 </Col>
 
@@ -517,32 +539,32 @@ export default class AddUltratechData extends Component {
 
                             {this.state.VehicleOwnership === "Attached"
                                 ?
-                                <div style={{border: "1px solid black", padding: "30px"}}>
-                                    <Row style={{marginBottom : "20px"}}>
+                                <div style={{ border: "1px solid black", padding: "30px" }}>
+                                    <Row style={{ marginBottom: "20px" }}>
                                         <Col>
                                             <div className={styles.inputBox}>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => this.setState({ VehicleOwnerName: (e.target.value || "").toUpperCase() })}
-                                                        value={this.state.VehicleOwnerName}
-                                                        required
-                                                    />
-                                                    <span>Vehicle Owner Name</span>
-                                                    <i></i>
-                                                </div>
+                                                <input
+                                                    type="text"
+                                                    onChange={(e) => this.setState({ VehicleOwnerName: (e.target.value || "").toUpperCase() })}
+                                                    value={this.state.VehicleOwnerName}
+                                                    required
+                                                />
+                                                <span>Vehicle Owner Name</span>
+                                                <i></i>
+                                            </div>
                                         </Col>
                                     </Row>
                                     <Row>
                                         EXTRA ATTACHED EXPENSES
                                     </Row>
                                     <Row>
-                                        
+
                                         {/* Diesel Quantity */}
                                         <Col>
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="number"
-                                                    onChange={(e) => this.calExpense("DieselQuantity", e.target.value) }
+                                                    onChange={(e) => this.calExpense("DieselQuantity", e.target.value)}
                                                     value={this.state.DieselQuantity === 0 ? 0 : this.state.DieselQuantity}
                                                     required
                                                 />
@@ -556,7 +578,7 @@ export default class AddUltratechData extends Component {
                                             <div className={styles.inputBox}>
                                                 <input
                                                     type="number"
-                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value) }
+                                                    onChange={(e) => this.calExpense("DieselRate", e.target.value)}
                                                     value={this.state.DieselRate === 0 ? 0 : this.state.DieselRate}
                                                     required
                                                 />
@@ -571,7 +593,7 @@ export default class AddUltratechData extends Component {
                                                 <input
                                                     type="number"
                                                     onChange={(e) => this.calExpense("Toll", e.target.value)}
-                                                    value={this.state.Toll === undefined ? 0 : this.state.Toll }
+                                                    value={this.state.Toll === undefined ? 0 : this.state.Toll}
                                                     required
                                                 />
                                                 <span>Toll</span>
@@ -594,7 +616,7 @@ export default class AddUltratechData extends Component {
                                         </Col>
                                     </Row>
 
-                                    <Row style={{display : "flex", justifyContent: 'center', marginTop: "20px"}}>
+                                    <Row style={{ display: "flex", justifyContent: 'center', marginTop: "20px" }}>
                                         {/* Diesel */}
                                         <Col>
                                             Diesel : {this.state.DieselRate * this.state.DieselQuantity || 0}
@@ -641,10 +663,10 @@ export default class AddUltratechData extends Component {
                                     </div>
 
                                 </Col> */}
-                                 
+
                                 {/* KMS Lead */}
                                 <Col md={2}>
-                                <div className={styles.inputBox}>
+                                    <div className={styles.inputBox}>
                                         <input
                                             type="number"
                                             onChange={(e) => this.setState({ OurRate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
@@ -731,8 +753,8 @@ export default class AddUltratechData extends Component {
 
                                 </Col>
                             </Row>
-                            
-                            <Row style={{display: "flex", justifyContent: "center"}}>
+
+                            <Row style={{ display: "flex", justifyContent: "center" }}>
                                 {/* OUR RATE */}
                                 <Col md={6}>
                                     <div className={styles.inputBox}>
@@ -763,7 +785,7 @@ export default class AddUltratechData extends Component {
                                 <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Freight : </span>
-                                        {(this.state.Weight*this.state.Rate) + this.state.MExpense}
+                                        {(this.state.Weight * this.state.Rate) + this.state.MExpense}
                                         <i></i>
                                     </div>
 
@@ -784,13 +806,13 @@ export default class AddUltratechData extends Component {
                                 <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(((this.state.DieselRate || 0) * (this.state.DieselQuantity || 0)) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
+                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(((this.state.DieselRate || 0) * (this.state.DieselQuantity || 0)) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                         <i></i>
                                     </div>
 
                                 </Col>
                             </Row>
-                            
+
                             <button onClick={this.addData} className={styles.button}><span>Add</span></button>
                         </div>
                     </div>

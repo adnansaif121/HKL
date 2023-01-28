@@ -73,12 +73,12 @@ export default class UpdateData extends Component {
              const data = snapshot.val();
              this.setState({
                  RateDates : data,
+             }, () => {
+                 //  Call handleInvoice to defines Rates 
+                this.handleInvoiceDate(this.props.data.InvoiceDate);
              })
          });
-        
-        //  Call handleInvoice to defines Rates 
-        this.handleInvoice(this.props.data.InvoiceDate);
-        
+
         // Party Name Cache List
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
