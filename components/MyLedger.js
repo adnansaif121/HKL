@@ -7,7 +7,7 @@ import deleteIcon from '../public/delete.png'
 import edit from '../public/edit.png'
 import transfer from '../public/transfer.png'
 import Image from 'next/image'
-import NoData from './NoData'; 
+import NoData from './NoData';
 
 export default class MyLedger extends Component {
     constructor(props) {
@@ -19,12 +19,12 @@ export default class MyLedger extends Component {
             month = '' + (d.getMonth() + 1),
             day = '' + d.getDate(),
             year = d.getFullYear();
-    
-        if (month.length < 2) 
+
+        if (month.length < 2)
             month = '0' + month;
-        if (day.length < 2) 
+        if (day.length < 2)
             day = '0' + day;
-    
+
         return [day, month, year].join('-');
     }
     render() {
@@ -42,7 +42,7 @@ export default class MyLedger extends Component {
                         <Table striped bordered >
 
                             <thead>
-                                <tr style={{position: "sticky", top: "0", backgroundColor: "#59C1BD",  color: "black"}}>
+                                <tr style={{ position: "sticky", top: "0", backgroundColor: "#59C1BD", color: "black" }}>
                                     <th >
                                         <div style={{ marginRight: "90px" }}>
                                             #
@@ -69,40 +69,58 @@ export default class MyLedger extends Component {
                                     <th>
                                         Weight (MT)
                                     </th>
-                                    <th>
-                                        Rate (₹)
-                                    </th>
-                                    <th>
-                                        Comission
-                                    </th>
-                                    {this.props.DB === "Orient" && 
-                                    <>
-                                        <th>
-                                            Mkt Comission
-                                        </th>
-                                        <th>
-                                            Miscellaneous Expenses
-                                        </th>
-                                        <th>
-                                            Remark
-                                        </th>
-                                    </>
-                                    }
-                                    <th>
-                                        Payable Freight
-                                    </th>
-                                    <th>
-                                        Net Freight
-                                    </th>
                                     {this.props.DB === "Orient" &&
+                                        <>
+                                            <th>
+                                                Rate (₹)
+                                            </th>
+                                            <th>
+                                                Comission
+                                            </th>
+                                            <th>
+                                                Mkt Comission
+                                            </th>
+                                            <th>
+                                                Miscellaneous Expenses
+                                            </th>
+                                            <th>
+                                                Remark
+                                            </th>
 
-                                        <th>
-                                            Difference Payable
-                                        </th>
+
+                                            <th>
+                                                Payable Freight
+                                            </th>
+                                            <th>
+                                                Net Freight
+                                            </th>
+
+
+                                            <th>
+                                                Difference Payable
+                                            </th>
+                                            <th>
+                                                Paid On
+                                            </th>
+                                        </>
                                     }
-                                    <th>
-                                        Paid On
-                                    </th>
+                                    {this.props.DB === "Ultratech" &&
+                                        <>
+                                            <th>
+                                                Diesel Quantity
+                                            </th>
+                                            <th>
+                                                Diesel Rate
+                                            </th>
+                                            <th>
+                                                Toll
+                                            </th>
+                                            <th>
+                                                Warai
+                                            </th>
+                                        </>
+
+                                    }
                                     <th>
                                         Our Rate
                                     </th>
@@ -123,68 +141,68 @@ export default class MyLedger extends Component {
                             <tbody>
                                 {this.props.displayData && this.props.displayData.map((item, i) => {
                                     return (
-                                        
-                                            <tr key={i} >
 
-                                                <th scope="row">
-                                                    <details>
-                                                        <summary>{i + 1}</summary>
-                                                        <div style={{display: "flex"}}>
-                                                            <button onClick={() => this.props.handleDelete(item.id)} style={{border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px"}}>
-                                                                <Image
-                                                                    style={{ width: "25px", height: "25px"}}
-                                                                    src={deleteIcon}
-                                                                    alt="Picture of the author"
-                                                                />
-                                                            </button>
-                                                            <button onClick={() => this.props.onEditClick(item)} style={{border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px"}}> 
-                                                                <Image
-                                                                    style={{ width: "25px", height: "25px" }}
-                                                                    src={edit}
-                                                                    alt="Picture of the author"
-                                                                />
-                                                            </button>
-                                                            <button onClick={() => this.props.onTransferClick(item)} style={{border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px"}}> 
-                                                                <Image
-                                                                    style={{ width: "25px", height: "25px" }}
-                                                                    src={transfer}
-                                                                    alt="Picture of the author"
-                                                                />
-                                                            </button>
-                                                        </div>
-                                                    </details>
-                                                </th>
+                                        <tr key={i} >
 
-                                                <td >
-                                                    {this.formatDate(item.InvoiceDate)}
-                                                </td>
-                                                <td>
-                                                    {item.VehicleNo}
-                                                </td>
-                                                <td>
-                                                    {item.PartyName}
-                                                </td>
-                                                <td>
-                                                    {`${item.Destination} (${item.Classification})`} {item.kmsLead || null}
-                                                </td>
-                                                <td>
-                                                    {item.UnloadedAt}
-                                                </td>
-                                                <td>
-                                                    {item.VehicleOwnerName || "Not Available"}
-                                                </td>
-                                                <td>
-                                                    {item.Weight}
-                                                </td>
-                                                <td>
-                                                    {item.Rate}
-                                                </td>
-                                                <td>
-                                                    {item.Comission}
-                                                </td>
-                                                {this.props.DB === "Orient" &&
-                                                    <>
-                                                    <td> 
+                                            <th scope="row">
+                                                <details>
+                                                    <summary>{i + 1}</summary>
+                                                    <div style={{ display: "flex" }}>
+                                                        <button onClick={() => this.props.handleDelete(item.id)} style={{ border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px" }}>
+                                                            <Image
+                                                                style={{ width: "25px", height: "25px" }}
+                                                                src={deleteIcon}
+                                                                alt="Picture of the author"
+                                                            />
+                                                        </button>
+                                                        <button onClick={() => this.props.onEditClick(item)} style={{ border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px" }}>
+                                                            <Image
+                                                                style={{ width: "25px", height: "25px" }}
+                                                                src={edit}
+                                                                alt="Picture of the author"
+                                                            />
+                                                        </button>
+                                                        <button onClick={() => this.props.onTransferClick(item)} style={{ border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px" }}>
+                                                            <Image
+                                                                style={{ width: "25px", height: "25px" }}
+                                                                src={transfer}
+                                                                alt="Picture of the author"
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </details>
+                                            </th>
+
+                                            <td >
+                                                {this.formatDate(item.InvoiceDate)}
+                                            </td>
+                                            <td>
+                                                {item.VehicleNo}
+                                            </td>
+                                            <td>
+                                                {item.PartyName}
+                                            </td>
+                                            <td>
+                                                {`${item.Destination} (${item.Classification})`} {item.kmsLead || null}
+                                            </td>
+                                            <td>
+                                                {item.UnloadedAt}
+                                            </td>
+                                            <td>
+                                                {item.VehicleOwnerName || "Not Available"}
+                                            </td>
+                                            <td>
+                                                {item.Weight}
+                                            </td>
+                                            {this.props.DB === "Orient" &&
+                                                <>
+                                                    <td>
+                                                        {item.Rate}
+                                                    </td>
+                                                    <td>
+                                                        {item.Comission}
+                                                    </td>
+                                                    <td>
                                                         {item.MktComission}
                                                     </td>
                                                     <td>
@@ -193,35 +211,52 @@ export default class MyLedger extends Component {
                                                     <td>
                                                         {item.Remark}
                                                     </td>
-                                                </>
-                                                }
-                                                <td>
-                                                    {item.PayableFreight}
-                                                </td>
-                                                <td>
-                                                    {item.NetFreight}
-                                                </td>
-                                                {this.props.DB === "Orient" &&
+                                                    <td>
+                                                        {item.PayableFreight}
+                                                    </td>
+                                                    <td>
+                                                        {item.NetFreight}
+                                                    </td>
+
                                                     <td>
                                                         {item.DiffPayable}
                                                     </td>
-                                                }
-                                                <td>
-                                                    {item.PaidOn}
-                                                </td>
-                                                <td>
-                                                    {item.OurRate}
-                                                </td>
-                                                <td>
-                                                    {item.OurFreight}
-                                                </td>
-                                                <td>
-                                                    {item.NetProfit}
-                                                </td>
 
-                                            </tr>
+                                                    <td>
+                                                        {item.PaidOn}
+                                                    </td>
+                                                </>
+                                            }
+                                            {this.props.DB === "Ultratech" &&
+                                                <>
+                                                    <td>
+                                                        {item.DieselQuantity}
+                                                    </td>
+                                                    <td>
+                                                        {item.DieselRate}
+                                                    </td>
+                                                    <td>
+                                                        {item.Toll}
+                                                    </td>
+                                                    <td>
+                                                        {item.Warai}
+                                                    </td>
+                                                </>
 
-                                        
+                                            }
+                                            <td>
+                                                {item.OurRate}
+                                            </td>
+                                            <td>
+                                                {item.OurFreight}
+                                            </td>
+                                            <td>
+                                                {item.NetProfit.toFixed(2)}
+                                            </td>
+
+                                        </tr>
+
+
                                     )
                                 })}
 
@@ -234,7 +269,7 @@ export default class MyLedger extends Component {
                     this.props.displayData && this.props.displayData.length === 0 &&
                     <NoData filter={this.props.filter}></NoData>
                 }
-           
+
             </>
         )
     }

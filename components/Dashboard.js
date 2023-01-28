@@ -738,6 +738,7 @@ export default class Dashboard extends Component {
                                             onEditClick={this.onEditClick}
                                             onTransferClick={this.onTransferClick}
                                             filter={this.state.filter}
+                                            DB = {this.props.DB}
                                         ></MyLedger>
                                     }
                                     {
