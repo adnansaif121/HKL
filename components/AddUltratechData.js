@@ -60,6 +60,9 @@ export default class AddUltratechData extends Component {
 
             // RateDates(dates for different ledgeres, date index provides the ledgeres index in newUltratechRates)
             RateDates: [],
+
+            // Customer State
+            CustomerState: "Trade",
         }
     }
 
@@ -72,19 +75,19 @@ export default class AddUltratechData extends Component {
             const data = snapshot.val();
             this.setState({
                 RateDates: data,
-            }, ()=> {
+            }, () => {
 
                 // Auto select todays date in InvoiceDate
                 var d = new Date(),
                     month = '' + (d.getMonth() + 1),
                     day = '' + d.getDate(),
                     year = d.getFullYear();
-    
+
                 if (month.length < 2)
                     month = '0' + month;
                 if (day.length < 2)
                     day = '0' + day;
-    
+
                 let todayDate = [year, month, day].join('-');
                 console.log(todayDate)
 
@@ -288,6 +291,13 @@ export default class AddUltratechData extends Component {
             })
         }
     }
+
+    changeCustomerState = (State) => {
+        this.setState({
+            CustomerState: State,
+        })
+    }
+
 
     calExpense = (ExpenseType, value) => {
         if (value === null) {
@@ -679,7 +689,7 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* Unloaded At */}
-                                <Col md={10}>
+                                <Col md={6}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -691,6 +701,8 @@ export default class AddUltratechData extends Component {
                                         <i></i>
                                     </div>
                                 </Col>
+
+                                
 
                             </Row>
                             <Row>
@@ -739,8 +751,41 @@ export default class AddUltratechData extends Component {
                             </Row>
 
                             <Row>
-                                {/* Paid On */}
-                                <Col>
+                               
+
+                                <Col md={4}>
+                                    <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%", zIndex:"20" }}>
+                                        <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                            {this.state.CustomerState}
+                                        </Button>
+                                        <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                            {
+                                                this.state.CustomerState === "Trade"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }}>Trade</div>
+                                                    :
+                                                    <div onClick={() => this.changeCustomerState("Trade")}>Trade</div>
+                                            }
+                                            {
+                                                this.state.CustomerState === "Non-Trade"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }} >Non-Trade</div>
+                                                    :
+                                                    <div onClick={() => this.changeCustomerState("Non-Trade")}>Non-Trade</div>
+                                            }
+                                            {
+                                                this.state.CustomerState === "Key-Customer"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }} >Key Customer</div>
+                                                    :
+                                                    <div onClick={() => this.changeCustomerState("Key-Customer")}>Key Customer</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </Col>
+
+                                 {/* Paid On */}
+                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
