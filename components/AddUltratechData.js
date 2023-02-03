@@ -62,7 +62,7 @@ export default class AddUltratechData extends Component {
             RateDates: [],
 
             // Customer State
-            CustomerState: "Trade",
+            Segment: "Trade",
         }
     }
 
@@ -97,6 +97,7 @@ export default class AddUltratechData extends Component {
         });
 
         // Party Name Cache List
+    
         let entries = Object.values(this.props.AllData)
         let PartyNameList = [];
         let set = new Set();
@@ -292,9 +293,9 @@ export default class AddUltratechData extends Component {
         }
     }
 
-    changeCustomerState = (State) => {
+    changeSegment = (State) => {
         this.setState({
-            CustomerState: State,
+            Segment: State,
         })
     }
 
@@ -689,7 +690,7 @@ export default class AddUltratechData extends Component {
                                 </Col>
 
                                 {/* Unloaded At */}
-                                <Col md={6}>
+                                <Col md={10} >
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
@@ -751,34 +752,66 @@ export default class AddUltratechData extends Component {
                             </Row>
 
                             <Row>
-                               
+                                 {/* MISC EXPENSES */}
+                                 <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            required
+                                        />
+                                        <span>Miscellaneous Expenses</span>
+                                        <i></i>
+                                    </div>
 
+                                </Col>
+
+                                
+                                {/* REMARK */}
+                                    <Col>
+                                        <div className={styles.inputBox}>
+                                            <input
+                                                type="text"
+                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
+                                                value={this.state.Remark}
+                                                required
+                                            />
+                                            <span>Remark</span>
+                                            <i></i>
+                                        </div>
+
+                                    </Col>
+                                
+                            </Row>
+                            <Row>
+                               
+                                {/* Segment */}
                                 <Col md={4}>
                                     <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%", zIndex:"20" }}>
                                         <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
-                                            {this.state.CustomerState}
+                                            {this.state.Segment}
                                         </Button>
                                         <div className={styles.dropdownContent} style={{ width: "200px" }}>
                                             {
-                                                this.state.CustomerState === "Trade"
+                                                this.state.Segment === "Trade"
                                                     ?
                                                     <div style={{ backgroundColor: "#1f5457", color: "white" }}>Trade</div>
                                                     :
-                                                    <div onClick={() => this.changeCustomerState("Trade")}>Trade</div>
+                                                    <div onClick={() => this.changeSegment("Trade")}>Trade</div>
                                             }
                                             {
-                                                this.state.CustomerState === "Non-Trade"
+                                                this.state.Segment === "Non-Trade"
                                                     ?
                                                     <div style={{ backgroundColor: "#1f5457", color: "white" }} >Non-Trade</div>
                                                     :
-                                                    <div onClick={() => this.changeCustomerState("Non-Trade")}>Non-Trade</div>
+                                                    <div onClick={() => this.changeSegment("Non-Trade")}>Non-Trade</div>
                                             }
                                             {
-                                                this.state.CustomerState === "Key-Customer"
+                                                this.state.Segment === "Key-Customer"
                                                     ?
                                                     <div style={{ backgroundColor: "#1f5457", color: "white" }} >Key Customer</div>
                                                     :
-                                                    <div onClick={() => this.changeCustomerState("Key-Customer")}>Key Customer</div>
+                                                    <div onClick={() => this.changeSegment("Key-Customer")}>Key Customer</div>
                                             }
                                         </div>
                                     </div>
@@ -818,23 +851,23 @@ export default class AddUltratechData extends Component {
 
                             <Row>
                                 {/* Payable Freight */}
-                                <Col >
+                                {/* <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         {(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
                                     </div>
 
-                                </Col>
+                                </Col> */}
 
                                 {/* Net Freight */}
-                                <Col >
+                                {/* <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Freight : </span>
                                         {(this.state.Weight * this.state.Rate) + this.state.MExpense}
                                         <i></i>
                                     </div>
 
-                                </Col>
+                                </Col> */}
 
                                 {/* Our Freight */}
                                 <Col >

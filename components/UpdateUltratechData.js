@@ -61,6 +61,9 @@ export default class UpdateData extends Component {
 
             // RateDates(dates for different ledgeres, date index provides the ledgeres index in newUltratechRates)
             RateDates : [],
+
+            // Segment
+            Segment : (this.props.data.Segment || "Trade"),
         }
     }
 
@@ -745,6 +748,36 @@ export default class UpdateData extends Component {
                                 </Col> */}
 
                             </Row>
+                            <Row>
+                                <Col >
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.MExpense}
+                                            required
+                                        />
+                                        <span>Miscellaneous Expenses</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                                
+                                    <Col >
+                                        <div className={styles.inputBox}>
+                                            <input
+                                                type="text"
+                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
+                                                value={this.state.Remark}
+                                                required
+                                            />
+                                            <span>Remark</span>
+                                            <i></i>
+                                        </div>
+
+                                    </Col>
+                                
+                            </Row>
                             {/* <Row>
                                 {
                                     (this.state.MktComission && this.state.MktComission > 0) ?
@@ -765,34 +798,7 @@ export default class UpdateData extends Component {
                                 }
                             </Row>
                             <Row>
-                                <Col >
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            value={this.state.MExpense}
-                                            required
-                                        />
-                                        <span>Miscellaneous Expenses</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-                                {this.state.MExpense > 0 &&
-                                    <Col >
-                                        <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
-                                                value={this.state.Remark}
-                                                required
-                                            />
-                                            <span>Remark</span>
-                                            <i></i>
-                                        </div>
-
-                                    </Col>
-                                }
+                                
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
@@ -807,6 +813,38 @@ export default class UpdateData extends Component {
 
                                 </Col> */}
                                 <Row>
+                                    {/* Segment */}
+                                <Col md={4}>
+                                    <div className={styles.dropdown} style={{ marginTop: "30px", width: "50%", zIndex:"20" }}>
+                                        <Button outline className={styles.dropbtn} style={{ width: "200px" }}>
+                                            {this.state.Segment}
+                                        </Button>
+                                        <div className={styles.dropdownContent} style={{ width: "200px" }}>
+                                            {
+                                                this.state.Segment === "Trade"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }}>Trade</div>
+                                                    :
+                                                    <div onClick={() => this.changeSegment("Trade")}>Trade</div>
+                                            }
+                                            {
+                                                this.state.Segment === "Non-Trade"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }} >Non-Trade</div>
+                                                    :
+                                                    <div onClick={() => this.changeSegment("Non-Trade")}>Non-Trade</div>
+                                            }
+                                            {
+                                                this.state.Segment === "Key-Customer"
+                                                    ?
+                                                    <div style={{ backgroundColor: "#1f5457", color: "white" }} >Key Customer</div>
+                                                    :
+                                                    <div onClick={() => this.changeSegment("Key-Customer")}>Key Customer</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </Col>
+
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
@@ -839,7 +877,7 @@ export default class UpdateData extends Component {
                                 </Col>
                             </Row>
                             <Row>
-                                <Col >
+                                {/* <Col >
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Payable Freight : </span>
                                         {(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
@@ -853,7 +891,7 @@ export default class UpdateData extends Component {
 
                                     </div>
 
-                                </Col>
+                                </Col> */}
                                 <Col>
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Our Freight : </span>
@@ -865,7 +903,7 @@ export default class UpdateData extends Component {
                                 <Col>
                                     <div className={styles.disabledInput}>
                                         <span style={{ color: "#1f5457" }}>Net Profit : </span>
-                                        {(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai)) - (parseFloat(this.state.Diesel) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
+                                        {(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)) - (parseFloat(this.state.DieselRate * this.state.DieselQuantity) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                     </div>
 
                                 </Col>

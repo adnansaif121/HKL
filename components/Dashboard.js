@@ -250,7 +250,8 @@ export default class Dashboard extends Component {
                     (item.Destination && item.Destination.toUpperCase().includes(query)) ||
                     (item.UnloadedAt && item.UnloadedAt.toUpperCase().includes(query)) ||
                     (item.PetrolPumpName && item.PetrolPumpName.toUpperCase().includes(query)) ||
-                    (item.VehicleOwnerName && item.VehicleOwnerName.toUpperCase().includes(query)) 
+                    (item.VehicleOwnerName && item.VehicleOwnerName.toUpperCase().includes(query)) ||
+                    (item.Segment && item.Segment.toUpperCase().includes(query))
                     // item.Weight.includes(query)
                 ) {
                     result.push(item);

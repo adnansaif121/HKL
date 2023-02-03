@@ -63,8 +63,11 @@ export default class MyLedger extends Component {
                                     <th>
                                         Unloaded At
                                     </th>
-                                    <th>
+                                    {/* <th>
                                         Vehicle Owner
+                                    </th> */}
+                                    <th>
+                                        Segment
                                     </th>
                                     <th>
                                         Weight (MT)
@@ -188,8 +191,11 @@ export default class MyLedger extends Component {
                                             <td>
                                                 {item.UnloadedAt}
                                             </td>
-                                            <td>
+                                            {/* <td>
                                                 {item.VehicleOwnerName || "Not Available"}
+                                            </td> */}
+                                            <td>
+                                                {item.Segment || "None"}
                                             </td>
                                             <td>
                                                 {item.Weight}
