@@ -171,6 +171,9 @@ export default class UpdateData extends Component {
             PetrolPumpName: (this.state.PetrolPumpName || ""),
             Toll: (this.state.Toll || 0),
             Warai: (this.state.Warai || 0),
+
+            // Segment
+            Segment : this.state.Segment,
         }
         // console.log(obj)
         this.props.updateData(obj, this.props.data.id);

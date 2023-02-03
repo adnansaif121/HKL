@@ -187,6 +187,9 @@ export default class AddUltratechData extends Component {
             Toll: (this.state.Toll || 0),
             Warai: (this.state.Warai || 0),
 
+            // Segment
+            Segment: this.state.Segment,
+
         }
         // console.log(obj)
         this.props.updateData(obj);
