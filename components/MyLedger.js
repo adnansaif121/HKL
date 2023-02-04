@@ -257,7 +257,7 @@ export default class MyLedger extends Component {
                                                 {item.OurFreight}
                                             </td>
                                             <td>
-                                                {item.NetProfit.toFixed(2)}
+                                                {(item.NetProfit || 0).toFixed(2)}
                                             </td>
 
                                         </tr>
