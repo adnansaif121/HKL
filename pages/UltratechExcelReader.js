@@ -26,7 +26,7 @@ class ExcelReader extends Component {
         this.handleFile = this.handleFile.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
-// fetch ultratech data and UltratechRateDates
+    // fetch ultratech data and UltratechRateDates
     componentDidMount() {
         const db = getDatabase();
         const starCountRef = ref(db, '/Ultratech');
@@ -34,7 +34,7 @@ class ExcelReader extends Component {
             const data = snapshot.val();
             console.log(data);
             this.setState({
-                UltratechDb: data !==undefined ? data : [],
+                UltratechDb: data !== undefined ? data : [],
             })
         }, {
             onlyOnce: true
@@ -55,6 +55,28 @@ class ExcelReader extends Component {
         if (files && files[0]) this.setState({ file: files[0] });
     };
 
+    addKmsLead = (data) => {
+        let newData = data;
+        let oldData = JSON.parse(localStorage.getItem(`newUltratechRate/1`));
+        let table = [];
+        newData.forEach((newItem, index) => {
+            const oldItem = oldData.find((oldItem) => oldItem.DESTINATION === newItem.DESTINATION)
+            // if(oldItem === undefined){
+            //     console.log(newItem.DESTINATION);
+            // }
+            if (oldItem && oldItem["KMS LEAD"] !== undefined) {
+                newItem["KMS LEAD"] = oldItem["KMS LEAD"]
+            }
+            else {
+                newItem["KMS LEAD"] = 0;
+            }
+            table.push(newItem);
+            // console.log(oldItem);
+        }
+        )
+        return table;
+    }
+
     // convert excel to JSON
     handleFile() {
         /* Boilerplate to set up FileReader */
@@ -69,14 +91,24 @@ class ExcelReader extends Component {
             const wsname = wb.SheetNames[0];
             const ws = wb.Sheets[wsname];
             /* Convert array of arrays */
-            const data = XLSX.utils.sheet_to_json(ws);
+            let data = XLSX.utils.sheet_to_json(ws);
+
+            if (data[0]["KMS LEAD"] === undefined) {
+                data = this.addKmsLead(data);
+
+            }
+
             /* Update state */
             this.setState({ data: data, cols: make_cols(ws['!ref']), toggle: true }, () => {
                 console.log(JSON.stringify(this.state.data, null, 2));
                 console.log(this.state.data);
             });
 
+
+
         };
+
+
 
         if (rABS) {
             reader.readAsBinaryString(this.state.file);
@@ -84,6 +116,7 @@ class ExcelReader extends Component {
             reader.readAsArrayBuffer(this.state.file);
         };
     }
+
 
     // Upload the file 
     handleUpload = () => {
@@ -109,7 +142,7 @@ class ExcelReader extends Component {
         for (let i of data) {
             let Dest = `${i.DESTINATION} (${i.TONNAGE})`
             if (Destination === Dest) {
-                if(VehicleReturnState === "Empty")
+                if (VehicleReturnState === "Empty")
                     return i.FREIGHT + i.TOLL;
                 else
                     return i.FREIGHT;
@@ -126,10 +159,10 @@ class ExcelReader extends Component {
             let applyDate = new Date(this.state.applyDate);
             if (itemDate >= applyDate) {
                 let rate = parseFloat(this.findRate(db[item].Destination, db[item].VehicleReturnState));
-                if(rate === -1)continue;
+                if (rate === -1) continue;
                 db[item].OurRate = rate;
                 db[item].OurFreight = (db[item].Weight * rate) - db[item].DiffPayable,
-                db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - ((db[item].Weight * db[item].Rate) + db[item].MExpense)) + parseFloat(db[item].Comission)) - (parseFloat(db[item].DieselRate * db[item].DieselQuantity) + parseFloat(db[item].Toll) + parseFloat(db[item].Warai))
+                    db[item].NetProfit = (parseFloat(((db[item].Weight * rate) - db[item].DiffPayable) - ((db[item].Weight * db[item].Rate) + db[item].MExpense)) + parseFloat(db[item].Comission)) - (parseFloat(db[item].DieselRate * db[item].DieselQuantity) + parseFloat(db[item].Toll) + parseFloat(db[item].Warai))
             }
             console.log(db[item]);
         }
@@ -155,7 +188,7 @@ class ExcelReader extends Component {
 
         const index = this.state.UltratechRateDates.length;
         set(ref(db, `/UltratechRateDates/${index}`), {
-            FROM : this.state.applyDate
+            FROM: this.state.applyDate
         })
 
     }
@@ -167,18 +200,18 @@ class ExcelReader extends Component {
                     className="my-2"
                 >
                     {/* <NavbarBrand> */}
-                        <Link href="/dashboard?db=Ultratech">
-                            <Button outline>
-                                Back
-                            </Button>
-                        </Link>
-                        <Image
-                            style={{ width: "2.5rem", height: "2.5rem", marginLeft: "0.5rem", borderRadius: "10%" }}
-                            src={logo}
-                            alt="Picture of the author"
-                            width="10px"
-                            height="10px"
-                        />
+                    <Link href="/dashboard?db=Ultratech">
+                        <Button outline>
+                            Back
+                        </Button>
+                    </Link>
+                    <Image
+                        style={{ width: "2.5rem", height: "2.5rem", marginLeft: "0.5rem", borderRadius: "10%" }}
+                        src={logo}
+                        alt="Picture of the author"
+                        width="10px"
+                        height="10px"
+                    />
                     {/* </NavbarBrand> */}
                 </Navbar>
 

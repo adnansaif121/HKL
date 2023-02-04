@@ -69,7 +69,7 @@ export default class Dashboard extends Component {
         let myLedger = data ? [...Object.values(data)] : [];
         let Transporter = [];
         let Company = [];
-        let OwnerLedger = [];
+        // let OwnerLedger = [];
         let PetrolLedger = [];
 
         for (let item of myLedger) {
@@ -100,18 +100,40 @@ export default class Dashboard extends Component {
 
             if(this.props.DB === "Ultratech" && item.Classification === "Attached" && item.Classification !== null ){
                 
-                OwnerLedger.push(item);
+                // OwnerLedger.push(item);
 
                 PetrolLedger.push(item);
             }
 
         }
 
+        // Fetching Owner Ledger
+        const db = getDatabase();
+        const Ref = ref(db, '/OwnerLedger/');
+        onValue(Ref, (snapshot) => {
+            const data = snapshot.val();
+            console.log(data);
+            let x = [...Object.values(data || {})];
+            console.log(x);
+            this.setState({
+                OwnerLedger: x,
+            })
+        })
+
+        // get(child(db, '/OwnerLedger')).then((snapshot) => {
+        //     if(snapshot.exists()){
+        //         console.log(snapshot.val());
+        //         this.setState({ OwnerLedger : [...Object.values(snapshot.val())] })
+        //     } else {
+        //         console.log("Owner Ledger not available");
+        //     }
+        // })
+
         this.setState({
             myLedger,
             Transporter,
             Company,
-            OwnerLedger,
+            // OwnerLedger,
             PetrolLedger,
         })
 
@@ -170,6 +192,8 @@ export default class Dashboard extends Component {
         ).catch((error) => {
             console.error(error);
         });
+
+        
     }
 
     addData = (obj) => {
@@ -761,8 +785,9 @@ export default class Dashboard extends Component {
                                         <OwnerLedger
                                             displayData={this.state.displayData}
                                             filter={this.state.filter}
-                                            handleConfirm = {this.handleConfirm}
-                                            handlePaid = {this.handlePaid}
+                                            // handleConfirm = {this.handleConfirm}
+                                            // handlePaid = {this.handlePaid}
+                                            attachedVehicleData={this.state.attachedVehicleData}
                                         ></OwnerLedger>    
                                     }
                                     {

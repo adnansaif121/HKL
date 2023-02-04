@@ -8,6 +8,9 @@ import {
 } from 'reactstrap'
 import styles from '../styles/AddData.module.css';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
+// Firebase
+import firebase from '../config/firebase';
+import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
 
 export default class UpdateData extends Component {
     constructor(props) {
@@ -34,8 +37,46 @@ export default class UpdateData extends Component {
             OurFreight: this.props.data.OurFreight !== undefined ? this.props.data.OurFreight : 0,
             NetProfit: this.props.data.NetProfit !== undefined ? this.props.data.NetProfit : 0,
             id: this.props.data.id,
-            RateData: this.props.RateData
+            // RateData: this.props.RateData
+
+            RateData: [],
+            // RateDates(dates for different ledgeres, date index provides the ledgeres index in newOrientRates)
+            RateDates : [],
+            RateSelected : null,
         }
+    }
+
+    componentDidMount() {
+
+        //firebase fetch OrientRateDates
+        const db = getDatabase();
+        const Ref = ref(db, "/OrientRateDates/");
+        onValue(Ref, (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                RateDates: data,
+            }, () => {
+
+                //  Call handleInvoice to defines Rates 
+                this.handleInvoiceDate(this.props.data.InvoiceDate);
+            })
+        });
+    }
+
+    defineRates = (rateData) => {
+        // RateData Filter
+        // console.log(this.props.RateData);
+        let rates = [];
+        for (let item of rateData) {
+            rates.push({
+                id: item.id,
+                displayName: `${item["Name of Destination"]} - ${item["Classification Name"]} (${item["Sales Office Name"]})`,
+            })
+        }
+        this.setState({
+            RateData: rates,
+            propsRateData: rateData,
+        })
     }
 
     addData = () => {
@@ -75,51 +116,110 @@ export default class UpdateData extends Component {
 
     handleOnSelect = (item) => {
         let ownedItem = item;
-        if (item["Classification Name"] !== this.state.Classification) {
-            for (let i of this.state.RateData) {
-                if (i["Name of Destination"] === item["Name of Destination"] && i["Classification Name"] === this.state.Classification) {
-                    ownedItem = i;
-                    break;
-                }
-            }
-        }
+        let index = item.id - 1;
+        let RateItem = this.state.propsRateData[index];
+        // if (item["Classification Name"] !== this.state.Classification) {
+        //     for (let i of this.state.RateData) {
+        //         if (i["Name of Destination"] === item["Name of Destination"] && i["Classification Name"] === this.state.Classification) {
+        //             ownedItem = i;
+        //             break;
+        //         }
+        //     }
+        // }
         this.setState({
-            Destination: item["Name of Destination"],
-            OurRate: parseFloat(ownedItem["ToT Freight (PMT)"])
+            Destination: `${RateItem["Name of Destination"]} (${RateItem["Classification Name"]})`,
+            OurRate: parseFloat(RateItem["ToT Freight (PMT)"])
         })
         console.log(ownedItem);
     };
 
-    handleClass = (Classification) => {
-        if (this.state.Destination === "") {
-            alert("Destination not selected");
-            this.setState({
-                Classification: Classification
-            })
-            return;
-        }
-        let item;
-        for (let i of this.state.RateData) {
-            if (i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification) {
-                item = i;
+    // handleClass = (Classification) => {
+    //     if (this.state.Destination === "") {
+    //         alert("Destination not selected");
+    //         this.setState({
+    //             Classification: Classification
+    //         })
+    //         return;
+    //     }
+    //     let item;
+    //     for (let i of this.state.RateData) {
+    //         if (i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification) {
+    //             item = i;
+    //             break;
+    //         }
+    //     }
+    //     if (item === undefined) {
+    //         alert("Destination do not exist in list. Are you sure to continue?");
+    //         this.setState({
+    //             Classification: Classification
+    //         })
+    //     }
+    //     else {
+    //         // console.log(item);
+    //         this.setState({
+    //             Destination: item["Name of Destination"],
+    //             OurRate: parseFloat(item["ToT Freight (PMT)"]),
+    //             Classification: Classification
+    //         })
+    //     }
+    // }
+
+    handleInvoiceDate = (date) => {
+        // set invoice date
+        this.setState({ InvoiceDate: date });
+
+        // get ledger index
+
+        // initialise ledgerSelected to null
+        let ledgerSelected = null;
+        let queryDate = new Date(date);
+        // iterate over all ledgers dates
+        console.log(this.state.RateDates);
+        for (let i = this.state.RateDates.length - 1; i >= 0; i--) {
+            console.log(this.state.RateDates[i].FROM);
+            let ledgerDate = new Date(this.state.RateDates[i].FROM);
+            // if query date is greater than or equal to ledger date select that ledger
+            if (queryDate >= ledgerDate) {
+                ledgerSelected = i;
                 break;
             }
+            console.log(queryDate, ledgerDate);
         }
-        if (item === undefined) {
-            alert("Destination do not exist in list. Are you sure to continue?");
-            this.setState({
-                Classification: Classification
-            })
+        // if ledger is not selected
+        if (ledgerSelected === null) {
+            // alert user
+            alert("frieght list before 11 Nov 2022 is Not available");
+            return;
         }
+        // When ledger is selected
         else {
-            // console.log(item);
-            this.setState({
-                Destination: item["Name of Destination"],
-                OurRate: parseFloat(item["ToT Freight (PMT)"]),
-                Classification: Classification
-            })
+            // find ledger selected in local storage
+            console.log(ledgerSelected);
+            let x = JSON.parse(localStorage.getItem(`newOrientRate/${ledgerSelected}`));
+            // If selected ledger is not present in local storage
+            if (x == null) {
+                // fetch ledger from server
+                const db = getDatabase();
+                const Ref = ref(db, "/newOrientRate/" + ledgerSelected);
+                onValue(Ref, (snapshot) => {
+                    const data = snapshot.val();
+                    x = data.data;
+                    // store ledger in local storage
+                    localStorage.setItem(`newOrientRate/${ledgerSelected}`, JSON.stringify(x));
+                    console.log(x);
+                    // DefineRates
+                    this.defineRates(x);
+                });
+            }
+            else {
+                // DefineRates
+                this.defineRates(x);
+                console.log(x, "localStorage");
+            }
         }
+
     }
+
 
     render() {
         return (
@@ -133,7 +233,7 @@ export default class UpdateData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
-                                            onChange={(e) => this.setState({ InvoiceDate: e.target.value })}
+                                            onChange={(e) => this.handleInvoiceDate(e.target.value)}
                                             value={this.state.InvoiceDate}
                                         // required
                                         />
@@ -173,19 +273,14 @@ export default class UpdateData extends Component {
                                         <div style={{ marginBottom: 0 }}>Destination</div>
                                         <ReactSearchAutocomplete
                                             items={this.state.RateData}
-                                            fuseOptions={{ keys: ["id", "Name of Destination", "Classification Name"] }} // Search on both fields
-                                            resultStringKeyName="Name of Destination" // String to display in the results
+                                            fuseOptions={{ keys: ["id", "displayName"] }} // Search on both fields
+                                            resultStringKeyName="displayName" // String to display in the results
                                             onSearch={this.handleOnSearch}
-                                            // onHover={this.handleOnHover}
                                             onSelect={this.handleOnSelect}
                                             placeholder={this.state.Destination}
-                                            // onFocus={this.handleOnFocus}
-                                            // onClear={this.handleOnClear}
                                             showIcon={false}
                                             styling={{
                                                 height: "34px",
-                                                // heightFocus: "34px",
-                                                // border: "1px solid darkgreen",
                                                 borderRadius: "4px",
                                                 backgroundColor: "#1f5457",
                                                 boxShadow: "none",
@@ -193,7 +288,6 @@ export default class UpdateData extends Component {
                                                 color: "white",
                                                 fontSize: "1em",
                                                 letterSpacing: "0.05px",
-                                                // fontFamily: "Courier",
                                                 iconColor: "white",
                                                 lineColor: "white",
                                                 placeholderColor: "white",
@@ -205,7 +299,7 @@ export default class UpdateData extends Component {
                                     </div>
                                 </Col>
 
-                                <Col style={{ marginTop: "30px" }}>
+                                {/* <Col style={{ marginTop: "30px" }}>
                                     <h5 style={{ display: "flex", justifyContent: "center", color: "#1f5457" }}>
                                         {this.state.Classification}
                                     </h5>
@@ -233,7 +327,7 @@ export default class UpdateData extends Component {
                                     </div>
 
                                 </Col>
-
+ */}
 
                                 <Col>
                                     <div className={styles.inputBox}>
@@ -336,7 +430,7 @@ export default class UpdateData extends Component {
                                     </div>
 
                                 </Col>
-                                {this.state.MExpense > 0 &&
+                                
                                     <Col >
                                         <div className={styles.inputBox}>
                                             <input
@@ -350,7 +444,7 @@ export default class UpdateData extends Component {
                                         </div>
 
                                     </Col>
-                                }
+                                
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input

@@ -5,6 +5,10 @@ import {
 } from 'reactstrap'
 import styles from '../styles/AddData.module.css';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
+// Firebase
+import firebase from '../config/firebase';
+import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
+
 
 export default class AddData extends Component {
     constructor(props) {
@@ -31,22 +35,58 @@ export default class AddData extends Component {
             OurFreight: 0,
             NetProfit: 0,
 
+
             RateData: [],
+            // RateDates(dates for different ledgeres, date index provides the ledgeres index in newOrientRates)
+            RateDates : [],
             RateSelected : null,
         }
     }
 
     componentDidMount() {
-        // console.log(t)
+
+        //firebase fetch OrientRateDates
+        const db = getDatabase();
+        const Ref = ref(db, "/OrientRateDates/");
+        onValue(Ref, (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                RateDates: data,
+            }, () => {
+
+                // Auto select todays date in InvoiceDate
+                var d = new Date(),
+                    month = '' + (d.getMonth() + 1),
+                    day = '' + d.getDate(),
+                    year = d.getFullYear();
+
+                if (month.length < 2)
+                    month = '0' + month;
+                if (day.length < 2)
+                    day = '0' + day;
+
+                let todayDate = [year, month, day].join('-');
+                console.log(todayDate)
+
+                //  Call handleInvoice to defines Rates 
+                this.handleInvoiceDate(todayDate);
+            })
+        });
+    }
+
+    defineRates = (rateData) => {
+        // RateData Filter
+        // console.log(this.props.RateData);
         let rates = [];
-        for(let item of this.props.RateData){
+        for (let item of rateData) {
             rates.push({
-                id : item.id,
-                displayName: `${item["Name of Destination"]} (${item["Classification Name"]})`,
+                id: item.id,
+                displayName: `${item["Name of Destination"]} - ${item["Classification Name"]} (${item["Sales Office Name"]})`,
             })
         }
         this.setState({
-            RateData : rates,
+            RateData: rates,
+            propsRateData: rateData,
         })
     }
 
@@ -88,7 +128,7 @@ export default class AddData extends Component {
         console.log(item.id);
         let ownedItem = item;
         let index = item.id - 1;
-        let RateItem = this.props.RateData[index];
+        let RateItem = this.state.propsRateData[index];
         let OurRate = "";
         // if (item["Classification Name"] !== this.state.Classification) {
         //     for (let i of this.state.RateData) {
@@ -138,6 +178,62 @@ export default class AddData extends Component {
     //     }
     // }
 
+    handleInvoiceDate = (date) => {
+        // set invoice date
+        this.setState({ InvoiceDate: date });
+
+        // get ledger index
+
+        // initialise ledgerSelected to null
+        let ledgerSelected = null;
+        let queryDate = new Date(date);
+        // iterate over all ledgers dates
+        console.log(this.state.RateDates);
+        for (let i = this.state.RateDates.length - 1; i >= 0; i--) {
+            console.log(this.state.RateDates[i].FROM);
+            let ledgerDate = new Date(this.state.RateDates[i].FROM);
+            // if query date is greater than or equal to ledger date select that ledger
+            if (queryDate >= ledgerDate) {
+                ledgerSelected = i;
+                break;
+            }
+            console.log(queryDate, ledgerDate);
+        }
+        // if ledger is not selected
+        if (ledgerSelected === null) {
+            // alert user
+            alert("frieght list before 11 Nov 2022 is Not available");
+            return;
+        }
+        // When ledger is selected
+        else {
+            // find ledger selected in local storage
+            console.log(ledgerSelected);
+            let x = JSON.parse(localStorage.getItem(`newOrientRate/${ledgerSelected}`));
+            // If selected ledger is not present in local storage
+            if (x == null) {
+                // fetch ledger from server
+                const db = getDatabase();
+                const Ref = ref(db, "/newOrientRate/" + ledgerSelected);
+                onValue(Ref, (snapshot) => {
+                    const data = snapshot.val();
+                    x = data.data;
+                    // store ledger in local storage
+                    localStorage.setItem(`newOrientRate/${ledgerSelected}`, JSON.stringify(x));
+                    console.log(x);
+                    // DefineRates
+                    this.defineRates(x);
+                });
+            }
+            else {
+                // DefineRates
+                this.defineRates(x);
+                console.log(x, "localStorage");
+            }
+        }
+
+    }
+
     render() {
         return (
             <>
@@ -151,7 +247,8 @@ export default class AddData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
-                                            onChange={(e) => this.setState({ InvoiceDate: e.target.value })}
+                                            onChange={(e) => this.handleInvoiceDate(e.target.value)}
+                                            value={this.state.InvoiceDate}
                                         // required
                                         />
                                         <span>Invoice Date</span>
@@ -340,8 +437,8 @@ export default class AddData extends Component {
 
                                 </Col>
 
-                                {this.state.MExpense > 0 &&
-                                // REMARK
+                                
+                                {/* REMARK */}
                                     <Col>
                                         <div className={styles.inputBox}>
                                             <input
@@ -355,7 +452,7 @@ export default class AddData extends Component {
                                         </div>
 
                                     </Col>
-                                }
+                                
 
                                 {/* DIFFERENCE PAYABLE */}
                                 <Col>
