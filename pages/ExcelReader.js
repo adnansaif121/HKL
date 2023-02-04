@@ -20,11 +20,12 @@ class ExcelReader extends Component {
             toggle: false,
             isDataUploaded: false,
             applyDate: null,
-            OrientDb: null
+            OrientDb: null,
+            OrientRateDates: [],
         }
         this.handleFile = this.handleFile.bind(this);
         this.handleChange = this.handleChange.bind(this);
-    }
+    } 
 
     componentDidMount() {
         const db = getDatabase();
@@ -37,6 +38,14 @@ class ExcelReader extends Component {
             })
         }, {
             onlyOnce: true
+        })
+
+        const Ref = ref(db, '/OrientRateDates');
+        onValue(Ref, (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                OrientRateDates: data,
+            })
         })
     }
 
@@ -80,7 +89,8 @@ class ExcelReader extends Component {
         for (let i = 0; i < data.length; i++) {
             data[i].id = i + 1;
         }
-        set(ref(db, '/ourRate'), {
+        const index = this.state.OrientRateDates.length;
+        set(ref(db, `/newOrientRate/${index}`), {
             data
         }).then(() => {
             this.setState({
@@ -141,6 +151,10 @@ class ExcelReader extends Component {
                 alert("Data Updated Successfully !!")
             })
         
+        const index = this.state.OrientRateDates.length;
+        set(ref(db, `/OrientRateDates/${index}`), {
+            FROM: this.state.applyDate
+        })
     }
 
     render() {
