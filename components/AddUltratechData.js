@@ -97,8 +97,8 @@ export default class AddUltratechData extends Component {
         });
 
         // Party Name Cache List
-    
-        let entries = Object.values(this.props.AllData)
+        console.log(this.props.AllData || {});
+        let entries = Object.values(this.props.AllData || {})
         let PartyNameList = [];
         let set = new Set();
         for (let item of entries) {

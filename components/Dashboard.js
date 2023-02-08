@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import styles from '../styles/LoginPage.module.css'
-import { Table, Button, Navbar, NavbarBrand, FormGroup, Form, Input, Label, Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Nav, NavItem, NavLink, UncontrolledDropdown, InputGroup, InputGroupText } from 'reactstrap';
+import { Table, Button, Navbar, NavbarBrand, FormGroup, Form, Input, Label, Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Nav, NavItem, NavLink, UncontrolledDropdown, InputGroup, InputGroupText, Spinner } from 'reactstrap';
 import AddData from './AddData';
 import AddUltratechData from './AddUltratechData';
 import UpdateData from './UpdateData';
@@ -58,7 +58,7 @@ export default class Dashboard extends Component {
             OwnerLedger: [],
             PetrolLedger: [],
 
-            filterChangeTo : "Last7",
+            filterChangeTo: "Last7",
             // isOrient : true,
 
             attachedVehicleData: [],
@@ -98,8 +98,8 @@ export default class Dashboard extends Component {
                 Company.push(obj);
             }
 
-            if(this.props.DB === "Ultratech" && item.Classification === "Attached" && item.Classification !== null ){
-                
+            if (this.props.DB === "Ultratech" && item.Classification === "Attached" && item.Classification !== null) {
+
                 // OwnerLedger.push(item);
 
                 PetrolLedger.push(item);
@@ -138,13 +138,13 @@ export default class Dashboard extends Component {
         })
 
     }
-    
+
     componentDidMount() {
         const db = getDatabase();
 
         // FETCHING DATA
-        const Ref = ref(db, '/'+this.props.DB);
-        console.log(this.props.DB); 
+        const Ref = ref(db, '/' + this.props.DB);
+        console.log(this.props.DB);
         onValue(Ref, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
@@ -165,7 +165,7 @@ export default class Dashboard extends Component {
 
         // FETCHING RATEDATA
         const dbRef = ref(getDatabase());
-        if(this.props.DB === "Orient"){
+        if (this.props.DB === "Orient") {
             get(child(dbRef, '/ourRate/data')).then((snapshot) => {
                 if (snapshot.exists()) {
                     console.log(snapshot.val());
@@ -193,7 +193,7 @@ export default class Dashboard extends Component {
             console.error(error);
         });
 
-        
+
     }
 
     addData = (obj) => {
@@ -216,11 +216,11 @@ export default class Dashboard extends Component {
 
     handleDelete = (id) => {
         let toDelete = confirm("Are you sure you want to delete this field?");
-        if(toDelete){
+        if (toDelete) {
             const db = getDatabase();
             set(ref(db, '/' + this.state.db + '/' + id), {});
         }
-        
+
     }
 
     onTransferClick = (item) => {
@@ -248,7 +248,7 @@ export default class Dashboard extends Component {
             this.setState({
                 toggleUpdateBox: false
             })
-        })  
+        })
     }
 
     sortOnSearch = (e) => {
@@ -259,7 +259,7 @@ export default class Dashboard extends Component {
                 if (
                     (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
-                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query)) 
+                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query))
                 ) {
                     result.push(item);
                 }
@@ -338,7 +338,7 @@ export default class Dashboard extends Component {
                 },
             ]
         }
-        else if(this.state.Ledger === "Transporter"){
+        else if (this.state.Ledger === "Transporter") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -356,7 +356,7 @@ export default class Dashboard extends Component {
                 },
             ]
         }
-        else if(this.state.Ledger === "PetrolLedger"){
+        else if (this.state.Ledger === "PetrolLedger") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -373,7 +373,7 @@ export default class Dashboard extends Component {
                 }
             ]
         }
-        else if(this.state.Ledger === "OwnerLedger"){
+        else if (this.state.Ledger === "OwnerLedger") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -402,7 +402,7 @@ export default class Dashboard extends Component {
 
     // NO ISSUE HERE
     handleApply = (data) => {
-        let x = data;   
+        let x = data;
         let today = new Date();
         let monthPriorDate = new Date(new Date().setDate(today.getDate() - 30));
         let weekPriorDate = new Date(new Date().setDate(today.getDate() - 7));
@@ -471,7 +471,7 @@ export default class Dashboard extends Component {
             displayData: x,
             data: data,
             toggleSidebar: false,
-            filter : this.state.filterChangeTo,
+            filter: this.state.filterChangeTo,
         })
         // console.log(today,monthPriorDate, weekPriorDate);
     }
@@ -484,13 +484,13 @@ export default class Dashboard extends Component {
         else if (newLedger === "Company") {
             this.handleApply(this.state.Company);
         }
-        else if(newLedger === "Transporter"){
+        else if (newLedger === "Transporter") {
             this.handleApply(this.state.Transporter);
         }
-        else if(newLedger === "OwnerLedger"){
+        else if (newLedger === "OwnerLedger") {
             this.handleApply(this.state.OwnerLedger);
         }
-        else if(newLedger === "PetrolLedger"){
+        else if (newLedger === "PetrolLedger") {
             this.handleApply(this.state.PetrolLedger);
         }
 
@@ -504,7 +504,7 @@ export default class Dashboard extends Component {
         // seting data
         let obj = item;
         obj.isVehicleRentPaid = isPaid;
-       
+
         const db = getDatabase();
         set(ref(db, '/' + this.state.db + '/' + item.id), {
             ...obj
@@ -517,7 +517,7 @@ export default class Dashboard extends Component {
         // seting data
         let obj = item;
         obj.VehicleRent = amount;
-        
+
         const db = getDatabase();
         set(ref(db, '/' + this.state.db + '/' + item.id), {
             ...obj
@@ -561,9 +561,9 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
-                            <Link href="/Options" style={{marginLeft: "5px"}}>
-                                    <Button outline>Back</Button>
-                                </Link>
+                            <Link href="/Options" style={{ marginLeft: "5px" }}>
+                                <Button outline>Back</Button>
+                            </Link>
                         </div>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -622,7 +622,7 @@ export default class Dashboard extends Component {
                                                         ?
                                                         <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
                                                         :
-                                                        this.props.DB === "Ultratech" 
+                                                        this.props.DB === "Ultratech"
                                                             ?
                                                             <div onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
                                                             :
@@ -638,15 +638,15 @@ export default class Dashboard extends Component {
                                                             <div onClick={() => this.changeLedger("PetrolLedger")}>Petrol Ledger</div>
                                                             :
                                                             null
-                                                        
+
                                                 }
                                             </div>
                                         </div>
-                                        
+
                                         <Link href="/attachedVehiclesTable">
                                             <Button outline
-                                                style={{marginRight: "10px"}}
-                                                // onClick={this.ExportData}
+                                                style={{ marginRight: "10px" }}
+                                            // onClick={this.ExportData}
                                             >
                                                 <Image
                                                     style={{ width: "20px", height: "20px" }}
@@ -670,32 +670,32 @@ export default class Dashboard extends Component {
                                                 height="10px"
                                             />
                                         </Button>
-                                        
+
                                         {
                                             this.props.DB === "Ultratech" ?
-                                            <Link href="/UltratechExcelReader">
-                                                <Button outline style={{ marginLeft: "8px" }} >
-                                                    <Image
-                                                        style={{ width: "25px", height: "25px" }}
-                                                        src={upload}
-                                                        alt="Picture of the author"
-                                                        width="10px"
-                                                        height="10px"
-                                                    />
-                                                </Button>
-                                            </Link>
-                                            :
-                                            <Link href="/ExcelReader">
-                                                <Button outline style={{ marginLeft: "8px" }} >
-                                                    <Image
-                                                        style={{ width: "25px", height: "25px" }}
-                                                        src={upload}
-                                                        alt="Picture of the author"
-                                                        width="10px"
-                                                        height="10px"
-                                                    />
-                                                </Button>
-                                            </Link>
+                                                <Link href="/UltratechExcelReader">
+                                                    <Button outline style={{ marginLeft: "8px" }} >
+                                                        <Image
+                                                            style={{ width: "25px", height: "25px" }}
+                                                            src={upload}
+                                                            alt="Picture of the author"
+                                                            width="10px"
+                                                            height="10px"
+                                                        />
+                                                    </Button>
+                                                </Link>
+                                                :
+                                                <Link href="/ExcelReader">
+                                                    <Button outline style={{ marginLeft: "8px" }} >
+                                                        <Image
+                                                            style={{ width: "25px", height: "25px" }}
+                                                            src={upload}
+                                                            alt="Picture of the author"
+                                                            width="10px"
+                                                            height="10px"
+                                                        />
+                                                    </Button>
+                                                </Link>
                                         }
                                     </div>
                                 </>
@@ -706,11 +706,11 @@ export default class Dashboard extends Component {
 
                     {this.state.toggleUpdateBox ?
 
-                        
-                            this.props.DB === "Ultratech" ?
-                        
-                            <UpdateUltratechData  updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></UpdateUltratechData>
-                            
+
+                        this.props.DB === "Ultratech" ?
+
+                            <UpdateUltratechData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></UpdateUltratechData>
+
                             :
 
                             <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
@@ -719,18 +719,24 @@ export default class Dashboard extends Component {
 
                         <>
                             {/* Heading above table */}
-                            <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex" , justifyContent: "space-between"}}>
+                            <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex", justifyContent: "space-between" }}>
                                 <h3>{this.props.DB}</h3>
                                 <div>
 
                                     {this.state.toggle === false ?
-                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                            <Image
+                                        (this.state.AllData === null ?
+                                            <Spinner>
+                                                Loading...
+                                            </Spinner>
+                                            :
+                                            <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                                <Image
                                                     style={{ width: "20px", height: "20px" }}
                                                     src={plus}
-                                                    alt="Picture of the author"     
-                                            />
-                                        </Button>
+                                                    alt="Picture of the author"
+                                                />
+                                            </Button>
+                                        )
                                         :
                                         <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
                                             <Image
@@ -744,66 +750,74 @@ export default class Dashboard extends Component {
                             </div>
                             {
                                 this.state.toggle === true ?
-                                <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
-                                    {
-                                        this.props.DB === "Ultratech" ?
-                                        <AddUltratechData updateData={this.addData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
+                                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
+                                        {
+                                            this.props.DB === "Ultratech" ?
+                                                <AddUltratechData updateData={this.addData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
+                                                :
+                                                <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
+
+                                        }
+                                    </div>
+                                    :
+                                    (this.state.AllData === null?
+                                        <div style={{display:"flex", justifyContent: "center", marginTop: "30vh"}}>
+                                            <Spinner >
+                                                Loading...
+                                            </Spinner>
+                                        </div>
                                         :
-                                        <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
+                                        
+                                        <div>
+                                            {
+                                                this.state.Ledger === "MyLedger" &&
+                                                <MyLedger
+                                                    displayData={this.state.displayData}
+                                                    handleDelete={this.handleDelete}
+                                                    onEditClick={this.onEditClick}
+                                                    onTransferClick={this.onTransferClick}
+                                                    filter={this.state.filter}
+                                                    DB={this.props.DB}
+                                                ></MyLedger>
+                                            }
+                                            {
+                                                this.state.Ledger === "Company" &&
+                                                <Company
+                                                    displayData={this.state.displayData}
+                                                    filter={this.state.filter}
+                                                ></Company>
+                                            }
+                                            {
+                                                this.state.Ledger === "Transporter" &&
+                                                <Transporter
+                                                    displayData={this.state.displayData}
+                                                    filter={this.state.filter}
+                                                ></Transporter>
+                                            }
+                                            {
+                                                this.state.Ledger === "OwnerLedger" &&
+                                                <OwnerLedger
+                                                    displayData={this.state.displayData}
+                                                    filter={this.state.filter}
+                                                    // handleConfirm = {this.handleConfirm}
+                                                    // handlePaid = {this.handlePaid}
+                                                    attachedVehicleData={this.state.attachedVehicleData}
+                                                ></OwnerLedger>
+                                            }
+                                            {
+                                                this.state.Ledger === "PetrolLedger" &&
+                                                <PetrolLedger
+                                                    displayData={this.state.displayData}
+                                                    filter={this.state.filter}
+                                                    handleDieselPaid={this.handleDieselPaid}
+                                                ></PetrolLedger>
+                                            }
 
-                                    }
-                                </div>
-                                :
-                                <div>
-                                    {
-                                        this.state.Ledger === "MyLedger" &&
-                                        <MyLedger
-                                            displayData={this.state.displayData}
-                                            handleDelete={this.handleDelete}
-                                            onEditClick={this.onEditClick}
-                                            onTransferClick={this.onTransferClick}
-                                            filter={this.state.filter}
-                                            DB = {this.props.DB}
-                                        ></MyLedger>
-                                    }
-                                    {
-                                        this.state.Ledger === "Company" &&
-                                        <Company 
-                                            displayData={this.state.displayData}
-                                            filter={this.state.filter}
-                                        ></Company>
-                                    }
-                                    {
-                                        this.state.Ledger === "Transporter" &&
-                                        <Transporter 
-                                            displayData={this.state.displayData}
-                                            filter={this.state.filter}
-                                        ></Transporter>
-                                    }
-                                    {
-                                        this.state.Ledger === "OwnerLedger" &&
-                                        <OwnerLedger
-                                            displayData={this.state.displayData}
-                                            filter={this.state.filter}
-                                            // handleConfirm = {this.handleConfirm}
-                                            // handlePaid = {this.handlePaid}
-                                            attachedVehicleData={this.state.attachedVehicleData}
-                                        ></OwnerLedger>    
-                                    }
-                                    {
-                                        this.state.Ledger === "PetrolLedger" &&
-                                        <PetrolLedger
-                                            displayData={this.state.displayData}
-                                            filter={this.state.filter}
-                                            handleDieselPaid = {this.handleDieselPaid}
-                                        ></PetrolLedger>
-                                    }
+                                        </div>
+                                    )
 
-                                </div>
-    
-    
                             }
-                            
+
                         </>
 
                     }
