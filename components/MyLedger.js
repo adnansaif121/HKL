@@ -131,7 +131,7 @@ export default class MyLedger extends Component {
                                         Our Freight
                                     </th>
                                     <th>
-                                        Net Profit
+                                        Gross
                                     </th>
                                     {/* <th style={{ borderTop: "2px solid white", borderRight: "2px solid white" }}>
                                         Option

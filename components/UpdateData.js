@@ -515,7 +515,7 @@ export default class UpdateData extends Component {
                                 </Col>
                                 <Col>
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Profit : </span>
+                                        <span style={{ color: "#1f5457" }}>Gross : </span>
                                         {(parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission))}
                                         
                                     </div>

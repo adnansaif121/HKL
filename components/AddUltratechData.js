@@ -886,7 +886,7 @@ export default class AddUltratechData extends Component {
                                 {/* Net Profit */}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Profit : </span>
+                                        <span style={{ color: "#1f5457" }}>Gross : </span>
                                         {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight * this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission)) - (parseFloat(((this.state.DieselRate || 0) * (this.state.DieselQuantity || 0)) || 0) + parseFloat(this.state.Toll) + parseFloat(this.state.Warai))}
                                         <i></i>
                                     </div>

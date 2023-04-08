@@ -533,7 +533,7 @@ export default class AddData extends Component {
                                 {/* Net Profit */}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Profit : </span>
+                                        <span style={{ color: "#1f5457" }}>Gross : </span>
                                         {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission))}
                                         <i></i>
                                     </div>
