@@ -209,11 +209,14 @@ export default class AddUltratechData extends Component {
         let OurRate = "";
         let kmsLead = 0;
         if (this.state.VehicleReturnState === "Non-Empty") {
-            OurRate = RateItem.FREIGHT;
+            // NEW UPDATE 25/04/2023 that : Non-Empty will be charged same as empty. This change is applicable from 04/01/2023. Entries before this date will be FREIGHT only. Entries Now will be NET FREIGHT (!= (FREIGHT + TOLL) for many cases).
+            // OurRate = RateItem.FREIGHT + RateItem.TOLL;
+            OurRate = RateItem["NET FREIGHT"];
             kmsLead = RateItem["KMS LEAD"];
         }
         else {
-            OurRate = RateItem.FREIGHT + RateItem.TOLL;
+            // OurRate = RateItem.FREIGHT + RateItem.TOLL;
+            OurRate = RateItem["NET FREIGHT"];
             kmsLead = 2 * RateItem["KMS LEAD"];
         }
 
@@ -275,11 +278,14 @@ export default class AddUltratechData extends Component {
         let RateItem = this.state.RateSelected;
         if (this.state.RateSelected !== null) {
             if (State === "Non-Empty") {
-                OurRate = RateItem.FREIGHT;
+                // NEW UPDATE 25/04/2023 that : Non-Empty will be charged same as empty. This change is applicable from 04/01/2023. Entries before this date will be FREIGHT only. Entries Now will be NET FREIGHT (!= (FREIGHT + TOLL) for many cases).
+                // OurRate = RateItem.FREIGHT;
+                OurRate = RateItem["NET FREIGHT"];
                 kmsLead = RateItem["KMS LEAD"];
             }
             else {
-                OurRate = RateItem.FREIGHT + RateItem.TOLL;
+                // OurRate = RateItem.FREIGHT + RateItem.TOLL;
+                OurRate = RateItem["NET FREIGHT"];
                 kmsLead = 2 * RateItem["KMS LEAD"];
             }
             console.log(OurRate, kmsLead, State);

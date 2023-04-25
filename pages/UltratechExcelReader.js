@@ -142,10 +142,12 @@ class ExcelReader extends Component {
         for (let i of data) {
             let Dest = `${i.DESTINATION} (${i.TONNAGE})`
             if (Destination === Dest) {
-                if (VehicleReturnState === "Empty")
-                    return i.FREIGHT + i.TOLL;
-                else
-                    return i.FREIGHT;
+                // NEW UPDATE 25/04/2023 that : Non-Empty will be charged same as empty. This change is applicable from 04/01/2023. Entries before this date will be FREIGHT only. Entries Now will be NET FREIGHT (!= (FREIGHT + TOLL) for many cases).
+                return i["NET FREIGHT"];
+                // if (VehicleReturnState === "Empty")
+                    // return i.FREIGHT + i.TOLL;
+                // else
+                    // return i.FREIGHT;
             }
         }
         return -1;
@@ -184,11 +186,15 @@ class ExcelReader extends Component {
         const db = getDatabase();
         set(ref(db, '/Ultratech/'), {
             ...newUltratechDb
+        }).then(() => {
+            alert("Data Updated Sucessfully !!!");
         });
 
         const index = this.state.UltratechRateDates.length;
         set(ref(db, `/UltratechRateDates/${index}`), {
             FROM: this.state.applyDate
+        }).then(() => {
+            alert("From date Updated Sucessfully !!!");
         })
 
     }

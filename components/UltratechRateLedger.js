@@ -77,7 +77,7 @@ export default class UltratechRateLedger extends Component {
                                     {item["TOLL"]}
                                 </td>
                                 <td>
-                                    {item["FREIGHT"] + item["TOLL"]}
+                                    {item["NET FREIGHT"]}
                                 </td>
                             </tr>
                         )
