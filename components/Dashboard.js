@@ -296,8 +296,9 @@ export default class Dashboard extends Component {
     }
 
     ExportData = () => {
+        console.log(this.state.displayData);
         let data;
-        if (this.state.Ledger === "MyLedger") {
+        if (this.state.Ledger === "MyLedger" && this.state.db !== "Ultratech") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -318,6 +319,29 @@ export default class Dashboard extends Component {
                         { label: "OurRate", value: "OurRate" },
                         { label: "OurFreight", value: "OurFreight" },
                         { label: "NetProfit", value: "NetProfit" }
+                    ],
+                    content: Object.values(this.state.displayData),
+                },
+            ]
+        }
+        else if (this.state.Ledger === "MyLedger"){
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "PartyName", value: "PartyName" }, // Run functions
+                        { label: "Destination", value: "Destination" },
+                        { label: "UnloadedAt", value: "UnloadedAt" },
+                        { label: "Weight", value: "Weight" },
+                        { label: "Diesel Quantity", value: "DieselQuantity" },
+                        { label: "Diesel Rate", value: "DieselRate" },
+                        { label: "Toll", value: "Toll" },
+                        { label: "Warai", value: "Warai" },
+                        { label: "OurRate", value: "OurRate" },
+                        { label: "OurFreight", value: "OurFreight" },
+                        { label: "Gross", value: "NetProfit" }
                     ],
                     content: Object.values(this.state.displayData),
                 },
