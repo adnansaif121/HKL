@@ -65,135 +65,26 @@ export default class Dashboard extends Component {
         }
     }
 
-    UpdateLedger = (data) => {
-        let myLedger = data ? [...Object.values(data)] : [];
-        let Transporter = [];
-        let Company = [];
-        // let OwnerLedger = [];
-        let PetrolLedger = [];
-
-        for (let item of myLedger) {
-            if (item.MktComission != undefined && item.MktComission != null && item.MktComission != 0) {
-                let obj = {
-                    InvoiceDate: item.InvoiceDate,
-                    VehicleNo: item.VehicleNo,
-                    MktComission: item.MktComission,
-                    PaidTo: item.PaidTo,
-                    PaidOn: item.PaidOn
-                };
-                Transporter.push(obj);
-            }
-
-            if (item.DiffPayable != undefined && item.DiffPayable != null && item.DiffPayable != 0) {
-                let obj = {
-                    InvoiceDate: item.InvoiceDate,
-                    VehicleNo: item.VehicleNo,
-                    Weight: item.Weight,
-                    Destination: item.Destination,
-                    UnloadedAt: item.UnloadedAt,
-                    PaidOn: item.PaidOn,
-                    DiffPayable: item.DiffPayable,
-                    PartyName: item.PartyName,
-                };
-                Company.push(obj);
-            }
-
-            if (this.props.DB === "Ultratech" && item.Classification === "Attached" && item.Classification !== null) {
-
-                // OwnerLedger.push(item);
-
-                PetrolLedger.push(item);
-            }
-
-        }
-
-        // Fetching Owner Ledger
-        const db = getDatabase();
-        const Ref = ref(db, '/OwnerLedger/');
-        onValue(Ref, (snapshot) => {
-            const data = snapshot.val();
-            console.log(data);
-            let x = [...Object.values(data || {})];
-            console.log(x);
-            this.setState({
-                OwnerLedger: x,
-            })
-        })
-
-        // get(child(db, '/OwnerLedger')).then((snapshot) => {
-        //     if(snapshot.exists()){
-        //         console.log(snapshot.val());
-        //         this.setState({ OwnerLedger : [...Object.values(snapshot.val())] })
-        //     } else {
-        //         console.log("Owner Ledger not available");
-        //     }
-        // })
-
-        this.setState({
-            myLedger,
-            Transporter,
-            Company,
-            // OwnerLedger,
-            PetrolLedger,
-        })
-
-    }
 
     componentDidMount() {
         const db = getDatabase();
 
         // FETCHING DATA
-        const Ref = ref(db, '/' + this.props.DB);
-        console.log(this.props.DB);
+        const Ref = ref(db, '/transportDetails/');
         onValue(Ref, (snapshot) => {
             const data = snapshot.val();
             console.log(data);
-            // console.log(data.ourRate.data);
-            this.UpdateLedger(data);
-            // let x = (data !== undefined) ? [...Object.values(data)] : [];
             let x = [...Object.values(data || {})];
 
             this.setState({
                 AllData: data,
                 data: x,
-                // displayData: x,
-                // RateData: data.ourRate.data,//abhi hatayo
             }, () => {
                 this.handleApply(x);
             })
         })
 
-        // FETCHING RATEDATA
-        const dbRef = ref(getDatabase());
-        if (this.props.DB === "Orient") {
-            get(child(dbRef, '/ourRate/data')).then((snapshot) => {
-                if (snapshot.exists()) {
-                    console.log(snapshot.val());
-                    this.setState({ RateData: snapshot.val() })
-                } else {
-                    console.log("No data available");
-                }
-            }
-            ).catch((error) => {
-                console.error(error);
-            });
-        }
-
-        // FETCHNG attachedVehicleData
-        const dbRef2 = ref(getDatabase());
-        get(child(dbRef2, '/attachedVehicleData')).then((snapshot) => {
-            if (snapshot.exists()) {
-                console.log(snapshot.val());
-                this.setState({ attachedVehicleData: snapshot.val() })
-            } else {
-                console.log("No data available");
-            }
-        }
-        ).catch((error) => {
-            console.error(error);
-        });
-
-
+       
     }
 
     addData = (obj) => {
@@ -614,74 +505,6 @@ export default class Dashboard extends Component {
 
                                     <div>
 
-                                        <div className={styles.dropdown} style={{ marginRight: "8px" }}>
-                                            <Button outline className={styles.dropbtn}>
-                                                {this.state.Ledger}
-                                            </Button>
-                                            <div className={styles.dropdownContent}>
-                                                {
-                                                    this.state.Ledger === "MyLedger"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("MyLedger")}>MyLedger</div>
-                                                        :
-                                                        <div onClick={() => this.changeLedger("MyLedger")}>MyLedger</div>
-                                                }
-                                                {
-                                                    this.state.Ledger === "Company"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("Company")}>Company Ledger</div>
-                                                        :
-                                                        <div onClick={() => this.changeLedger("Company")}>Company Ledger</div>
-                                                }
-                                                {
-                                                    this.state.Ledger === "Transporter"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("Transporter")}>Transporter</div>
-                                                        :
-                                                        <div onClick={() => this.changeLedger("Transporter")}>Transporter</div>
-                                                }
-
-                                                {
-                                                    this.props.DB === "Ultratech" && this.state.Ledger === "OwnerLedger"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
-                                                        :
-                                                        this.props.DB === "Ultratech"
-                                                            ?
-                                                            <div onClick={() => this.changeLedger("OwnerLedger")}>Owner Ledger</div>
-                                                            :
-                                                            null
-                                                }
-                                                {
-                                                    this.props.DB === "Ultratech" && this.state.Ledger === "PetrolLedger"
-                                                        ?
-                                                        <div style={{ backgroundColor: "#1f5457", color: "white" }} onClick={() => this.changeLedger("PetrolLedger")}>Petrol Ledger</div>
-                                                        :
-                                                        this.props.DB === "Ultratech"
-                                                            ?
-                                                            <div onClick={() => this.changeLedger("PetrolLedger")}>Petrol Ledger</div>
-                                                            :
-                                                            null
-
-                                                }
-                                            </div>
-                                        </div>
-
-                                        <Link href="/attachedVehiclesTable">
-                                            <Button outline
-                                                style={{ marginRight: "10px" }}
-                                            // onClick={this.ExportData}
-                                            >
-                                                <Image
-                                                    style={{ width: "20px", height: "20px" }}
-                                                    src={cells}
-                                                    alt="Picture of the author"
-                                                    width="10px"
-                                                    height="10px"
-                                                />
-                                            </Button>
-                                        </Link>
-
                                         <Button outline
                                             // style={{ }}
                                             onClick={this.ExportData}
@@ -695,32 +518,6 @@ export default class Dashboard extends Component {
                                             />
                                         </Button>
 
-                                        {
-                                            this.props.DB === "Ultratech" ?
-                                                <Link href="/UltratechExcelReader">
-                                                    <Button outline style={{ marginLeft: "8px" }} >
-                                                        <Image
-                                                            style={{ width: "25px", height: "25px" }}
-                                                            src={upload}
-                                                            alt="Picture of the author"
-                                                            width="10px"
-                                                            height="10px"
-                                                        />
-                                                    </Button>
-                                                </Link>
-                                                :
-                                                <Link href="/ExcelReader">
-                                                    <Button outline style={{ marginLeft: "8px" }} >
-                                                        <Image
-                                                            style={{ width: "25px", height: "25px" }}
-                                                            src={upload}
-                                                            alt="Picture of the author"
-                                                            width="10px"
-                                                            height="10px"
-                                                        />
-                                                    </Button>
-                                                </Link>
-                                        }
                                     </div>
                                 </>
                         }
@@ -730,28 +527,23 @@ export default class Dashboard extends Component {
 
                     {this.state.toggleUpdateBox ?
 
-
-                        this.props.DB === "Ultratech" ?
-
-                            <UpdateUltratechData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></UpdateUltratechData>
-
-                            :
-
-                            <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
+                        <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
 
                         :
 
                         <>
                             {/* Heading above table */}
                             <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex", justifyContent: "space-between" }}>
-                                <h3>{this.props.DB}</h3>
+                                <h3>HKL</h3>
                                 <div>
 
                                     {this.state.toggle === false ?
                                         (this.state.AllData === null ?
-                                            <Spinner>
-                                                Loading...
-                                            </Spinner>
+                                            // <Spinner>
+                                            //     Loading...
+                                            // </Spinner>
+                                            <div>NO DATA</div>
+
                                             :
                                             <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
                                                 <Image
@@ -774,21 +566,16 @@ export default class Dashboard extends Component {
                             </div>
                             {
                                 this.state.toggle === true ?
-                                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
-                                        {
-                                            this.props.DB === "Ultratech" ?
-                                                <AddUltratechData updateData={this.addData} AllData={this.state.AllData} attachedVehicleData={this.state.attachedVehicleData}></AddUltratechData>
-                                                :
-                                                <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
-
-                                        }
+                                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>                                       
+                                        <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
                                     </div>
                                     :
                                     (this.state.AllData === null?
                                         <div style={{display:"flex", justifyContent: "center", marginTop: "30vh"}}>
-                                            <Spinner >
+                                            {/* <Spinner >
                                                 Loading...
-                                            </Spinner>
+                                            </Spinner> */}
+                                            <div>NO DATA</div>
                                         </div>
                                         :
                                         
@@ -804,39 +591,6 @@ export default class Dashboard extends Component {
                                                     DB={this.props.DB}
                                                 ></MyLedger>
                                             }
-                                            {
-                                                this.state.Ledger === "Company" &&
-                                                <Company
-                                                    displayData={this.state.displayData}
-                                                    filter={this.state.filter}
-                                                ></Company>
-                                            }
-                                            {
-                                                this.state.Ledger === "Transporter" &&
-                                                <Transporter
-                                                    displayData={this.state.displayData}
-                                                    filter={this.state.filter}
-                                                ></Transporter>
-                                            }
-                                            {
-                                                this.state.Ledger === "OwnerLedger" &&
-                                                <OwnerLedger
-                                                    displayData={this.state.displayData}
-                                                    filter={this.state.filter}
-                                                    // handleConfirm = {this.handleConfirm}
-                                                    // handlePaid = {this.handlePaid}
-                                                    attachedVehicleData={this.state.attachedVehicleData}
-                                                ></OwnerLedger>
-                                            }
-                                            {
-                                                this.state.Ledger === "PetrolLedger" &&
-                                                <PetrolLedger
-                                                    displayData={this.state.displayData}
-                                                    filter={this.state.filter}
-                                                    handleDieselPaid={this.handleDieselPaid}
-                                                ></PetrolLedger>
-                                            }
-
                                         </div>
                                     )
 

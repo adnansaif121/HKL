@@ -1,10 +1,7 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
-// import LoginPage from './components/LoginPage'
-import LoginPage from '../components/LoginPage';
 
-import Options from './Options';
+import styles from '../styles/Home.module.css'
+import LoginPage from '../components/LoginPage';
+import DBoard from '../components/Dashboard'
 import {useState} from 'react';
 
 export default function Home() {
@@ -18,8 +15,7 @@ export default function Home() {
     <>
       {
         openDashboard ?
-        // <Dashboard></Dashboard>
-        <Options></Options>
+        <DBoard DB="Ultratech"></DBoard>
         :
         <div className={styles.container} >
           <LoginPage allow={allow}></LoginPage>
