@@ -5,6 +5,7 @@ import AddData from './AddData';
 import UpdateData from './UpdateData';
 // Different Ledgers
 import MyLedger from './MyLedger';
+import AgentLedger from './AgentLedger';
 
 // Firebase
 import firebase from '../config/firebase';
@@ -32,7 +33,7 @@ export default class Dashboard extends Component {
         this.state = {
             AllData: null,
             data: [],
-            
+
             displayData: [],
             toggle: false,
             toUpdate: null,
@@ -128,7 +129,7 @@ export default class Dashboard extends Component {
 
     updateData = (obj, id) => {
         const db = getDatabase();
-        console.log("DASHBOARD UpdateData",obj, id);
+        console.log("DASHBOARD UpdateData", obj, id);
         set(ref(db, '/transportDetails/' + id), {
             ...obj
         }).then(() => {
@@ -141,12 +142,16 @@ export default class Dashboard extends Component {
     sortOnSearch = (e) => {
         let query = (e.target.value || "").toUpperCase();
         let result = [];
-        if (this.state.Ledger === "Transporter") {
+        if (this.state.Ledger === "Agent") {
             for (let item of this.state.data) {
                 if (
                     (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
-                    (item.PaidTo && item.PaidTo.toUpperCase().includes(query))
+                    (item.FromLocation && item.FromLocation.toUpperCase().includes(query)) ||
+                    (item.ToLocation && item.ToLocation.toUpperCase().includes(query)) ||
+                    (item.Agent && item.Agent.toUpperCase().includes(query)) ||
+                    (item.AgentPaymentStatus && item.AgentPaymentStatus.toUpperCase().includes(query))
+
                 ) {
                     result.push(item);
                 }
@@ -158,11 +163,13 @@ export default class Dashboard extends Component {
                     (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
                     (item.PartyName && item.PartyName.toUpperCase().includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
-                    (item.Destination && item.Destination.toUpperCase().includes(query)) ||
-                    (item.UnloadedAt && item.UnloadedAt.toUpperCase().includes(query)) ||
-                    (item.PetrolPumpName && item.PetrolPumpName.toUpperCase().includes(query)) ||
-                    (item.VehicleOwnerName && item.VehicleOwnerName.toUpperCase().includes(query)) ||
-                    (item.Segment && item.Segment.toUpperCase().includes(query))
+                    (item.FromLocation && item.FromLocation.toUpperCase().includes(query)) ||
+                    (item.ToLocation && item.ToLocation.toUpperCase().includes(query)) ||
+                    (item.Agent && item.Agent.toUpperCase().includes(query)) ||
+                    (item.PaymentMode && item.PaymentMode.toUpperCase().includes(query)) ||
+                    (item.LabourStatus && item.LabourStatus.toUpperCase().includes(query))
+
+
                     // item.Weight.includes(query)
                 ) {
                     result.push(item);
@@ -185,7 +192,7 @@ export default class Dashboard extends Component {
     ExportData = () => {
         console.log(this.state.displayData);
         let data;
-        if (this.state.Ledger === "MyLedger" && this.state.db !== "Ultratech") {
+        if (this.state.Ledger === "MyLedger") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -193,112 +200,53 @@ export default class Dashboard extends Component {
                         { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
                         { label: "Vehicle No", value: "VehicleNo" }, // Custom format
                         { label: "PartyName", value: "PartyName" }, // Run functions
-                        { label: "Destination", value: "Destination" },
-                        { label: "UnloadedAt", value: "UnloadedAt" },
-                        { label: "Weight", value: "Weight" },
+                        { label: "MT(Location)", value: "MT_Location" },
+                        { label: "MT(Factory Name)", value: "MT_FN" },
+                        { label: "From(Location)", value: "From_Location" },
+                        { label: "From(Factory Name)", value: "From_FN" },
+                        { label: "To(Location)", value: "ToLocation" },
+                        { label: "To(Factory Name)", value: "ToFN" },
                         { label: "Rate", value: "Rate" },
+                        { label: "Weight", value: "Weight" },
+                        { label: "Product", value: "Product" },
+                        { label: "Payment Status", value: "PaymentStatus" },
+                        { label: "Payment Mode", value: "PaymentMode" },
+                        { label: "Contact Number", value: "ContactNumber" },
+                        { label: "Remarks", value: "Remark" },
+                        { label: "Paid On", value: "PaidOn" },
+                        { label: "Agent", value: "Agent" },
+                        { label: "Commission", value: "Commission" },
+                        { label: "Agent Payment Status", value: "AgentPaymentStatus" },
+                        { label: "Labour Amount", value: "LabourAmount" },
+                        { label: "Labour Payment Status", value: "LabourPaymentStatus" },
+                        { label: "Shortage", value: "Shortage" },
+                        { label: "Poch Amount", value: "PochAmount" },
+                        { label: "Poch Payment Status", value: "PochPaymentStatus" },
+                        { label: "Poch Send Date", value: "PochSendDate" },
+                        { label: "Net Amount", value: "NetAmount" },
+                    ],
+                    content: Object.values(this.state.displayData),
+                },
+            ]
+        }
+        else if (this.state.Ledger === "Agent") {
+            data = [
+                {
+                    sheet: "MySpreadsheet",
+                    columns: [
+                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
+                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
+                        { label: "From(Location)", value: "FromLocation" }, // Run functions
+                        { label: "To(Location)", value: "ToLocation" },
+                        { label: "Agent", value: "Agent" },
                         { label: "Comission", value: "Comission" },
-                        { label: "MktComission", value: "MktComission" },
-                        { label: "PayableFreight", value: "PayableFreight" },
-                        { label: "NetFreight", value: "NetFreight" },
-                        { label: "DiffPayable", value: "DiffPayable" },
-                        { label: "PaidOn", value: "PaidOn" },
-                        { label: "OurRate", value: "OurRate" },
-                        { label: "OurFreight", value: "OurFreight" },
-                        { label: "NetProfit", value: "NetProfit" }
+                        { label: "Payment Status", value: "AgentPaymentStatus" },
                     ],
                     content: Object.values(this.state.displayData),
                 },
             ]
         }
-        else if (this.state.Ledger === "MyLedger") {
-            data = [
-                {
-                    sheet: "MySpreadsheet",
-                    columns: [
-                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                        { label: "PartyName", value: "PartyName" }, // Run functions
-                        { label: "Destination", value: "Destination" },
-                        { label: "UnloadedAt", value: "UnloadedAt" },
-                        { label: "Weight", value: "Weight" },
-                        { label: "Diesel Quantity", value: "DieselQuantity" },
-                        { label: "Diesel Rate", value: "DieselRate" },
-                        { label: "Toll", value: "Toll" },
-                        { label: "Warai", value: "Warai" },
-                        { label: "OurRate", value: "OurRate" },
-                        { label: "OurFreight", value: "OurFreight" },
-                        { label: "Gross", value: "NetProfit" }
-                    ],
-                    content: Object.values(this.state.displayData),
-                },
-            ]
-        }
-        else if (this.state.Ledger === "Company") {
-            data = [
-                {
-                    sheet: "MySpreadsheet",
-                    columns: [
-                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                        { label: "MktComission", value: "MktComission" },
-                        { label: "Paid To", value: "PaidTo" },
-                        { label: "PaidOn", value: "PaidOn" },
-                    ],
-                    content: Object.values(this.state.displayData),
-                },
-            ]
-        }
-        else if (this.state.Ledger === "Transporter") {
-            data = [
-                {
-                    sheet: "MySpreadsheet",
-                    columns: [
-                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                        { label: "PartyName", value: "PartyName" }, // Run functions
-                        { label: "Destination", value: "Destination" },
-                        { label: "UnloadedAt", value: "UnloadedAt" },
-                        { label: "Weight", value: "Weight" },
-                        { label: "DiffPayable", value: "DiffPayable" },
-                        { label: "PaidOn", value: "PaidOn" },
-                    ],
-                    content: Object.values(this.state.displayData),
-                },
-            ]
-        }
-        else if (this.state.Ledger === "PetrolLedger") {
-            data = [
-                {
-                    sheet: "MySpreadsheet",
-                    columns: [
-                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                        { label: "PetrolPumpName", value: "PetrolPumpName" }, // Run functions
-                        { lebel: "Diesel", value: "Diesel" },
-                        { label: "DieselRate", value: "DieselRate" },
-                        { label: "DieselQuantity", value: "DieselQuantity" },
-                        { label: "isDieselAmountPaid", value: "isDieselAmountPaid" },
-                    ],
-                    content: Object.values(this.state.displayData),
-                }
-            ]
-        }
-        else if (this.state.Ledger === "OwnerLedger") {
-            data = [
-                {
-                    sheet: "MySpreadsheet",
-                    columns: [
-                        { label: "Invoice Date", value: "InvoiceDate" }, // Top level data
-                        { label: "Vehicle No", value: "VehicleNo" }, // Custom format
-                        { label: "VehicleOwnerName", value: "VehicleOwnerName" }, // Run functions
-                        { lebel: "VehicleRent", value: "VehicleRent" },
-                        { label: "isPaid", value: "isVehicleRentPaid" },
-                    ],
-                    content: Object.values(this.state.displayData),
-                }
-            ]
-        }
+
 
         console.log(Object.values(this.state.displayData));
         let settings = {
@@ -390,19 +338,11 @@ export default class Dashboard extends Component {
     changeLedger = (newLedger) => {
 
         if (newLedger === "MyLedger") {
-            this.handleApply(this.state.myLedger);
+            this.handleApply(this.state.data);
+            this.setState({AgentPaymentStatus: "ALL"});
         }
-        else if (newLedger === "Company") {
-            this.handleApply(this.state.Company);
-        }
-        else if (newLedger === "Transporter") {
-            this.handleApply(this.state.Transporter);
-        }
-        else if (newLedger === "OwnerLedger") {
-            this.handleApply(this.state.OwnerLedger);
-        }
-        else if (newLedger === "PetrolLedger") {
-            this.handleApply(this.state.PetrolLedger);
+        else if (newLedger === "Agent") {
+            this.handleApply(this.state.data);
         }
 
         this.setState({
@@ -410,44 +350,6 @@ export default class Dashboard extends Component {
         })
     }
 
-    // TO change the status of Vehicle Rent Paid or Not from Owner Ledger
-    handlePaid = (item, isPaid) => {
-        // seting data
-        let obj = item;
-        obj.isVehicleRentPaid = isPaid;
-
-        const db = getDatabase();
-        set(ref(db, '/' + this.state.db + '/' + item.id), {
-            ...obj
-        })
-        console.log(obj);
-    }
-
-    // TO confirm the amount of Vehicle Rent from Owner Ledger
-    handleConfirm = (item, amount) => {
-        // seting data
-        let obj = item;
-        obj.VehicleRent = amount;
-
-        const db = getDatabase();
-        set(ref(db, '/' + this.state.db + '/' + item.id), {
-            ...obj
-        })
-        console.log(obj);
-    }
-
-    // To change the status of Petrol Paid or Not from Petrol Ledger
-    handleDieselPaid = (item, isPaid) => {
-        // seting data
-        let obj = item;
-        obj.isDieselAmountPaid = isPaid;
-
-        const db = getDatabase();
-        set(ref(db, '/' + this.state.db + '/' + item.id), {
-            ...obj
-        })
-        console.log(obj);
-    }
 
     render() {
         // let HEIGHT = window.innerHeight;
@@ -472,9 +374,7 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
-                            <Link href="/Options" style={{ marginLeft: "5px" }}>
-                                <Button outline>Back</Button>
-                            </Link>
+                            
                         </div>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -500,7 +400,17 @@ export default class Dashboard extends Component {
                                     </div>
 
                                     <div>
+                                        {this.state.Ledger === "MyLedger" &&
+                                            <Button outline onClick={() => this.changeLedger("Agent")} style={{ marginRight: "4px" }}>
+                                                Agent Ledger
+                                            </Button>
 
+                                        }
+                                        {this.state.Ledger === "Agent" &&
+                                            <Button outline onClick={() => this.changeLedger("MyLedger")} style={{ marginRight: "4px" }}>
+                                                My Ledger
+                                            </Button>
+                                        }
                                         <Button outline
                                             // style={{ }}
                                             onClick={this.ExportData}
@@ -531,26 +441,30 @@ export default class Dashboard extends Component {
                             {/* Heading above table */}
                             <div style={{ width: "90vw", margin: "auto", color: "#1f5457", display: "flex", justifyContent: "space-between" }}>
                                 <h3>HKL</h3>
+
                                 <div>
+                                    {
+                                       
+                                        this.state.toggle === false ?
+    
+                                            <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                                <Image
+                                                    style={{ width: "20px", height: "20px" }}
+                                                    src={plus}
+                                                    alt="Picture of the author"
+                                                />
+                                            </Button>
+    
+                                            :
+                                            <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                                <Image
+                                                    style={{ width: "20px", height: "20px" }}
+                                                    src={reject}
+                                                    alt="Picture of the author"
+                                                />
+                                            </Button>
+                                        
 
-                                    {this.state.toggle === false ?
-
-                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                            <Image
-                                                style={{ width: "20px", height: "20px" }}
-                                                src={plus}
-                                                alt="Picture of the author"
-                                            />
-                                        </Button>
-
-                                        :
-                                        <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                            <Image
-                                                style={{ width: "20px", height: "20px" }}
-                                                src={reject}
-                                                alt="Picture of the author"
-                                            />
-                                        </Button>
                                     }
                                 </div>
                             </div>
@@ -580,6 +494,14 @@ export default class Dashboard extends Component {
                                                     filter={this.state.filter}
                                                 // DB={this.props.DB}
                                                 ></MyLedger>
+                                            }
+                                            {
+                                                this.state.Ledger === "Agent" &&
+                                                <AgentLedger
+                                                    displayData={this.state.displayData}
+                                                    filter={this.state.filter}
+                                                // DB={this.props.DB}
+                                                ></AgentLedger>
                                             }
                                         </div>
                                     )

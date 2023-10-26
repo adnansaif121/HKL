@@ -3,7 +3,7 @@ import {
     Table,
 } from 'reactstrap';
 
-export default class RateLedger extends Component {
+export default class AgentLedger extends Component {
     constructor(props) {
         super(props)
     }
@@ -28,21 +28,28 @@ export default class RateLedger extends Component {
                             #
                         </th>
                         <th>
-                            Classification Name
+                            Invoice Date
                         </th>
                         <th>
-                            Sales Office Name
+                            Vehicle No
                         </th>
                         <th>
-                            Destination Code
+                            From
                         </th>
                         <th>
-                            Name of Destination
+                            To
                         </th>
                         <th>
-                            ToT Freight (PMT)
+                            Agent
+                        </th>
+                        <th>
+                            Comission
+                        </th>
+                        <th>
+                            Payment Status
                         </th>
                     </tr>
+
                 </thead>
                 <tbody>
                     {this.props.displayData && this.props.displayData.map((item, i) => {
@@ -52,20 +59,26 @@ export default class RateLedger extends Component {
                                 <th scope="row">
                                     {i + 1}
                                 </th>
+                                <th>
+                                    {item.InvoiceDate}
+                                </th>
                                 <td>
-                                    {item["Classification Name"]}
+                                    {item.VehicleNo}
                                 </td>
                                 <td>
-                                    {item["Sales Office Name"]}
+                                    {item.FromLocation}
                                 </td>
                                 <td>
-                                    {item["Destination Code"]}
+                                    {item.ToLocation}
                                 </td>
                                 <td>
-                                    {item["Name of Destination"]}
+                                    {item.Agent}
                                 </td>
                                 <td>
-                                    {item["ToT Freight (PMT)"]}
+                                    {item.Comission}
+                                </td>
+                                <td>
+                                    {item.AgentPaymentStatus}
                                 </td>
                             </tr>
                         )

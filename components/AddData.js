@@ -638,7 +638,7 @@ export default class AddData extends Component {
                                                 lineColor: "white",
                                                 placeholderColor: "white",
                                                 clearIconMargin: "3px 8px 0 0",
-                                                zIndex: 20,
+                                                zIndex: 15,
                                             }}
                                         />
                                         {/* <div style={{ marginTop: 20 }}>This text will be covered!</div> */}

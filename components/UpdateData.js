@@ -38,7 +38,7 @@ export default class UpdateData extends Component {
             Agent: this.props.data.Agent || "",
             is_Agent_New: false,
             Comission: this.props.data.Comission || "",
-            AgentPaymentStatus: this.props.data.AgentPaymentStatus || "",
+            AgentPaymentStatus: this.props.data.AgentPaymentStatus || "PAID",
             LabourAmount: this.props.data.LabourAmount || "",
             LabourStatus: this.props.data.LabourStatus || "",
             Shortage: this.props.data.Shortage || "",
@@ -163,6 +163,7 @@ export default class UpdateData extends Component {
         this.checkAndAddVehicle();
         
         let obj = {
+            id: this.props.data.id,
             InvoiceDate: this.state.InvoiceDate,
             VehicleNo: (this.state.VehicleNo || ""),
             PartyName: (this.state.PartyName || ""),
@@ -650,7 +651,7 @@ export default class UpdateData extends Component {
                                                 lineColor: "white",
                                                 placeholderColor: "white",
                                                 clearIconMargin: "3px 8px 0 0",
-                                                zIndex: 20,
+                                                zIndex: 15,
                                             }}
                                         />
                                         {/* <div style={{ marginTop: 20 }}>This text will be covered!</div> */}
