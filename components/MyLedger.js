@@ -58,87 +58,75 @@ export default class MyLedger extends Component {
                                         Party Name
                                     </th>
                                     <th>
-                                        Destination
+                                        MT (location)
                                     </th>
                                     <th>
-                                        Unloaded At
-                                    </th>
-                                    {/* <th>
-                                        Vehicle Owner
-                                    </th> */}
-                                    <th>
-                                        Segment
+                                        MT (FN)
                                     </th>
                                     <th>
-                                        Weight (MT)
-                                    </th>
-                                    {this.props.DB === "Orient" &&
-                                        <>
-                                            <th>
-                                                Rate (₹)
-                                            </th>
-                                            <th>
-                                                Comission
-                                            </th>
-                                            <th>
-                                                Mkt Comission
-                                            </th>
-                                            <th>
-                                                Miscellaneous Expenses
-                                            </th>
-                                            <th>
-                                                Remark
-                                            </th>
-
-
-                                            <th>
-                                                Payable Freight
-                                            </th>
-                                            <th>
-                                                Net Freight
-                                            </th>
-
-
-                                            <th>
-                                                Difference Payable
-                                            </th>
-                                            <th>
-                                                Paid On
-                                            </th>
-                                        </>
-                                    }
-                                    {this.props.DB === "Ultratech" &&
-                                        <>
-                                            <th>
-                                                Diesel Quantity
-                                            </th>
-                                            <th>
-                                                Diesel Rate
-                                            </th>
-                                            <th>
-                                                Toll
-                                            </th>
-                                            <th>
-                                                Warai
-                                            </th>
-                                        </>
-
-                                    }
-                                    <th>
-                                        Our Rate
+                                        From (location)
                                     </th>
                                     <th>
-                                        Our Freight
+                                        {/* FN : Factory Name */}
+                                        From (FN)
                                     </th>
                                     <th>
-                                        Gross
+                                        To (location)
                                     </th>
-                                    {/* <th style={{ borderTop: "2px solid white", borderRight: "2px solid white" }}>
-                                        Option
+                                    <th>
+                                        To (FN)
                                     </th>
-                                    <th style={{ borderTop: "2px solid white", borderRight: "2px solid white" }}>
-                                        Option
-                                    </th> */}
+                                    <th>
+                                        Rate
+                                    </th>
+                                    <th>
+                                        Weight
+                                    </th>
+                                    <th>
+                                        Product
+                                    </th>
+                                    <th>
+                                        Payment Status
+                                    </th>
+                                    <th>
+                                        Payment Mode
+                                    </th>
+                                    <th>
+                                        Remarks
+                                    </th>
+                                    <th>
+                                        Paid On
+                                    </th>
+                                    <th>
+                                        Agent
+                                    </th>
+                                    <th>
+                                        Agent Commission
+                                    </th>
+                                    <th>
+                                        Agent Payment Status
+                                    </th>
+                                    <th>
+                                        Labour Amount
+                                    </th>
+                                    <th>
+                                        Labour Status
+                                    </th>
+                                    <th>
+                                        Shortage
+                                    </th>
+                                    <th>
+                                        Poch Amount
+                                    </th>
+                                    <th>
+                                        Poch Payment Status
+                                    </th>
+                                    <th>
+                                        Poch Send Date
+                                    </th>
+                                    <th>
+                                        Net Amount
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,78 +174,79 @@ export default class MyLedger extends Component {
                                                 {item.PartyName}
                                             </td>
                                             <td>
-                                                {`${item.Destination} (${item.Classification})`} {item.kmsLead || null}
+                                                {item.MT_Location}
                                             </td>
                                             <td>
-                                                {item.UnloadedAt}
+                                                {item.MT_FN}
                                             </td>
-                                            {/* <td>
-                                                {item.VehicleOwnerName || "Not Available"}
-                                            </td> */}
                                             <td>
-                                                {item.Segment || "None"}
+                                                {item.FromLocation}
+                                            </td>
+                                            <td>
+                                                {/* FN : Factory Name */}
+                                                {item.FromFN}
+                                            </td>
+                                            <td>
+                                                {item.ToLocation}
+                                            </td>
+                                            <td>
+                                                {item.ToFN}
+                                            </td>
+
+                                            <td>
+                                                {item.Rate}
                                             </td>
                                             <td>
                                                 {item.Weight}
                                             </td>
-                                            {this.props.DB === "Orient" &&
-                                                <>
-                                                    <td>
-                                                        {item.Rate}
-                                                    </td>
-                                                    <td>
-                                                        {item.Comission}
-                                                    </td>
-                                                    <td>
-                                                        {item.MktComission}
-                                                    </td>
-                                                    <td>
-                                                        {item.MExpense}
-                                                    </td>
-                                                    <td>
-                                                        {item.Remark}
-                                                    </td>
-                                                    <td>
-                                                        {item.PayableFreight}
-                                                    </td>
-                                                    <td>
-                                                        {item.NetFreight}
-                                                    </td>
-
-                                                    <td>
-                                                        {item.DiffPayable}
-                                                    </td>
-
-                                                    <td>
-                                                        {item.PaidOn}
-                                                    </td>
-                                                </>
-                                            }
-                                            {this.props.DB === "Ultratech" &&
-                                                <>
-                                                    <td>
-                                                        {item.DieselQuantity}
-                                                    </td>
-                                                    <td>
-                                                        {item.DieselRate}
-                                                    </td>
-                                                    <td>
-                                                        {item.Toll}
-                                                    </td>
-                                                    <td>
-                                                        {item.Warai}
-                                                    </td>
-                                                </>
-
-                                            }
                                             <td>
-                                                {item.OurRate}
+                                                {item.Product}
                                             </td>
                                             <td>
-                                                {item.OurFreight}
+                                                {item.PaymentStatus}
                                             </td>
                                             <td>
-                                                {(item.NetProfit || 0).toFixed(2)}
+                                                {item.PaymentMode}
+                                                {item.PaymentMode === "Online" && <span style={{ color: "green" }}>{item.ContactNumber}</span>}
+                                            </td>
+                                            <td>
+                                                {item.Remark}
+                                            </td>
+                                            <td>
+                                                {item.PaidOn}
+                                            </td>
+                                            <td>
+                                                {item.Agent}
+                                            </td>
+                                            <td>
+                                                {item.Comission}
+                                            </td>
+                                            <td>
+                                                {item.AgentPaymentStatus}
+                                            </td>
+                                            <td>
+                                                {item.LabourAmount}
+                                            </td>
+                                            <td>
+                                                {item.LabourStatus}
+                                            </td>
+                                            <td>
+                                                {item.Shortage}
+                                            </td>
+                                            <td>
+                                                {item.PochAmount}
+                                            </td>
+
+                                            <td>
+                                                {item.PochPaymentStatus}
+                                            </td>
+
+
+                                            <td>
+                                                {this.formatDate(item.PochSendDate)}
+                                            </td>
+                                            <td>
+                                                {item.NetAmount}
                                             </td>
 
                                         </tr>

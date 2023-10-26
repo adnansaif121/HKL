@@ -16,102 +16,181 @@ export default class AddData extends Component {
         this.state = {
             InvoiceDate: "",
             VehicleNo: "",
+            is_VehicleNo_new: false,
             PartyName: "",
-            Destination: "",
-            Classification: "MARKET",
-            UnloadedAt: "",
-            Weight: 0,
+            MT_Location: "",
+            is_MT_Location_New: false,
+            MT_FN: "",
+            FromLocation: "",
+            is_From_Location_New: false,
+            FromFN: "",
+            ToLocation: "",
+            is_To_Location_New: false,
+            ToFN: "",
             Rate: 0,
-            Comission: 0,
-            MktComission: 0,
-            PaidTo: "",
-            MExpense: 0,
+            Weight: 0,
+            Product: "",
+            PaymentStatus: "PAID",
+            PaymentMode: "Cash",
+            ContactNumber: "",
             Remark: "",
-            PayableFreight: 0,
-            NetFreight: 0,
-            DiffPayable: 0,
             PaidOn: "",
-            OurRate: 0,
-            OurFreight: 0,
-            NetProfit: 0,
+            Agent: "",
+            AgentPaymentStatus: "PAID",
+            is_Agent_New: false,
+            Comission: 0,
+            LabourAmount: 0,
+            LabourStatus: "ByDriver",
+            Shortage: 0,
+            PochAmount: 0,
+            PochPaymentStatus: "PAID",
+            PochSendDate: "",
+            NetAmount: 0,
+            
+            Location: [],
+            AgentList: [],
+            Vehicles: [],
 
-
-            RateData: [],
-            // RateDates(dates for different ledgeres, date index provides the ledgeres index in newOrientRates)
-            RateDates : [],
-            RateSelected : null,
         }
     }
 
     componentDidMount() {
 
-        //firebase fetch OrientRateDates
+        //firebase fetch 
         const db = getDatabase();
-        const Ref = ref(db, "/OrientRateDates/");
-        onValue(Ref, (snapshot) => {
+        onValue(ref(db, "/Location/"), (snapshot) => {
             const data = snapshot.val();
             this.setState({
-                RateDates: data,
-            }, () => {
+                Location: (data || []),
+            })
+        });
 
-                // Auto select todays date in InvoiceDate
-                var d = new Date(),
-                    month = '' + (d.getMonth() + 1),
-                    day = '' + d.getDate(),
-                    year = d.getFullYear();
+        onValue(ref(db, "/AgentList/"), (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                AgentList: (data || []),
+            })
+        });
 
-                if (month.length < 2)
-                    month = '0' + month;
-                if (day.length < 2)
-                    day = '0' + day;
-
-                let todayDate = [year, month, day].join('-');
-                console.log(todayDate)
-
-                //  Call handleInvoice to defines Rates 
-                this.handleInvoiceDate(todayDate);
+        onValue(ref(db, "/Vehicles/"), (snapshot) => {
+            const data = snapshot.val();
+            this.setState({
+                Vehicles: (data || []),
             })
         });
     }
 
-    defineRates = (rateData) => {
-        // RateData Filter
-        // console.log(this.props.RateData);
-        let rates = [];
-        for (let item of rateData) {
-            rates.push({
-                id: item.id,
-                displayName: `${item["Name of Destination"]} - ${item["Classification Name"]} (${item["Sales Office Name"]})`,
-            })
+    checkAndAddLocation = () => {
+        const db = getDatabase();
+        let isLocationNew = false;
+        let location_List = this.state.Location;
+        if(this.state.is_MT_Location_New){
+            location_List.push({id: location_List.length, name: this.state.MT_Location});  
+            isLocationNew = true;
+        }
+        if(this.state.is_From_Location_New){
+            location_List.push({id: location_List.length, name: this.state.FromLocation});
+            isLocationNew = true;
+        }
+        if(this.state.is_To_Location_New){
+            location_List.push({id: location_List.length, name: this.state.ToLocation});
+            isLocationNew = true;
         }
         this.setState({
-            RateData: rates,
-            propsRateData: rateData,
+            Location: location_List,
         })
+        // Update Database
+        if(isLocationNew){
+            console.log("NEW LOCATION ADDED", location_List);
+            set(ref(db, "/Location/"), location_List);
+        }
+        else{
+            console.log("NO NEW LOCATION ADDED");
+        }
+    }
+
+    checkAndAddAgent = () => {
+        const db = getDatabase();
+        let isAgentNew = false;
+        let agent_List = this.state.AgentList;
+        if(this.state.is_Agent_New){
+            agent_List.push({id: this.state.AgentList.length, agentName: this.state.Agent});
+            this.setState({
+                AgentList: agent_List,
+                is_Agent_New: false,
+            })
+            isAgentNew = true;
+            console.log(agent_List);
+        }
+        // Update Database
+        if(isAgentNew){
+            console.log("NEW AGENT ADDED", agent_List);
+            set(ref(db, "/AgentList/"), agent_List);
+        }
+        else{
+            console.log("NO NEW AGENT ADDED");
+        }
+    }
+
+    checkAndAddVehicle = () => {
+        const db = getDatabase();
+        let isVehicleNew = false;
+        let vehicle_List = this.state.Vehicles;
+        if(this.state.is_VehicleNo_new){
+            vehicle_List.push({id: this.state.Vehicles.length, name: this.state.VehicleNo});
+            this.setState({
+                Vehicles: vehicle_List,
+                is_VehicleNo_new: false,
+            })
+            isVehicleNew = true;
+            console.log(vehicle_List);
+        }
+        // Update Database
+        if(isVehicleNew){
+            console.log("NEW VEHICLE ADDED", vehicle_List);
+            set(ref(db, "/Vehicles/"), vehicle_List);
+        }
+        else{
+            console.log("NO NEW VEHICLE ADDED");
+        }
     }
 
     addData = () => {
+
+        this.checkAndAddLocation();
+        this.checkAndAddAgent();
+        this.checkAndAddVehicle();
+        
         let obj = {
             InvoiceDate: this.state.InvoiceDate,
             VehicleNo: (this.state.VehicleNo || ""),
             PartyName: (this.state.PartyName || ""),
-            Destination: (this.state.Destination || ""),
-            Classification: this.state.Classification,
-            UnloadedAt: (this.state.UnloadedAt || ""),
-            Weight: this.state.Weight,
+            MT_Location: (this.state.MT_Location || ""),
+            MT_FN: (this.state.MT_FN || ""),
+            FromLocation: (this.state.FromLocation || ""),
+            FromFN: (this.state.FromFN || ""),
+            ToLocation: (this.state.ToLocation || ""),
+            ToFN: (this.state.ToFN || ""),
             Rate: this.state.Rate,
-            Comission: this.state.Comission,
-            MktComission: this.state.MktComission,
-            PaidTo: this.state.PaidTo,
-            MExpense: this.state.MExpense,
-            Remark: this.state.Remark,
-            PayableFreight: (this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission,
-            NetFreight: (this.state.Weight*this.state.Rate) + this.state.MExpense,
-            DiffPayable: this.state.DiffPayable,
+            Weight: this.state.Weight,
+            Product: (this.state.Product || ""),
+            PaymentStatus: this.state.PaymentStatus,
+            PaymentMode: this.state.PaymentMode,
+            ContactNumber: (this.state.ContactNumber || ""),
+            Remark: (this.state.Remark || ""),
             PaidOn: this.state.PaidOn,
-            OurRate: this.state.OurRate,
-            OurFreight: (this.state.Weight * this.state.OurRate) - this.state.DiffPayable,
-            NetProfit: (parseFloat(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseFloat(this.state.Comission)),
+            Agent: (this.state.Agent || ""),
+            Comission: this.state.Comission,
+            AgentPaymentStatus: this.state.AgentPaymentStatus,
+            LabourAmount: this.state.LabourAmount,
+            LabourStatus: this.state.LabourStatus,
+            Shortage: this.state.Shortage,
+            PochAmount: this.state.PochAmount,
+            PochPaymentStatus: this.state.PochPaymentStatus,
+            PochSendDate: this.state.PochSendDate,
+            NetAmount: (this.state.LabourStatus === "ByDriver") 
+                            ? this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage 
+                            : this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage - this.state.LabourAmount,
         }
         // console.log(obj)
         this.props.updateData(obj);
@@ -120,119 +199,15 @@ export default class AddData extends Component {
     handleOnSearch = (string, results) => {
         // console.log(string, results);
         this.setState({
-            Destination : string,
+            MT_Location: string,
         })
     };
- 
+
     handleOnSelect = (item) => {
         console.log(item.id);
         let ownedItem = item;
-        let index = item.id - 1;
-        let RateItem = this.state.propsRateData[index];
-        let OurRate = "";
-        // if (item["Classification Name"] !== this.state.Classification) {
-        //     for (let i of this.state.RateData) {
-        //         if (i["Name of Destination"] === item["Name of Destination"] && i["Classification Name"] === this.state.Classification) {
-        //             ownedItem = i;
-        //             break;
-        //         }
-        //     }
-        // }
-        this.setState({
-            // Destination: item["Name of Destination"],
-            Destination : `${RateItem["Name of Destination"]} (${RateItem["Classification Name"]})`,
-            // OurRate: parseFloat(ownedItem["ToT Freight (PMT)"])
-            OurRate : parseFloat(RateItem["ToT Freight (PMT)"])
-        })
         console.log(ownedItem);
     };
-
-    // handleClass = (Classification) => {
-    //     if (this.state.Destination === "") {
-    //         alert("Destination not selected");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //         return;
-    //     }
-    //     let item;
-    //     for (let i of this.state.RateData) {
-    //         if (i["Name of Destination"] == this.state.Destination && i["Classification Name"] == Classification) {
-    //             item = i;
-    //             break;
-    //         }
-    //     }
-    //     if (item === undefined) {
-    //         alert("Destination do not exist in list. Are you sure to continue?");
-    //         this.setState({
-    //             Classification: Classification
-    //         })
-    //     }
-    //     else {
-    //         // console.log(item);
-    //         this.setState({
-    //             Destination: item["Name of Destination"],
-    //             OurRate: parseFloat(item["ToT Freight (PMT)"]),
-    //             Classification: Classification
-    //         })
-    //     }
-    // }
-
-    handleInvoiceDate = (date) => {
-        // set invoice date
-        this.setState({ InvoiceDate: date });
-
-        // get ledger index
-
-        // initialise ledgerSelected to null
-        let ledgerSelected = null;
-        let queryDate = new Date(date);
-        // iterate over all ledgers dates
-        console.log(this.state.RateDates);
-        for (let i = this.state.RateDates.length - 1; i >= 0; i--) {
-            console.log(this.state.RateDates[i].FROM);
-            let ledgerDate = new Date(this.state.RateDates[i].FROM);
-            // if query date is greater than or equal to ledger date select that ledger
-            if (queryDate >= ledgerDate) {
-                ledgerSelected = i;
-                break;
-            }
-            console.log(queryDate, ledgerDate);
-        }
-        // if ledger is not selected
-        if (ledgerSelected === null) {
-            // alert user
-            alert("frieght list before 11 Nov 2022 is Not available");
-            return;
-        }
-        // When ledger is selected
-        else {
-            // find ledger selected in local storage
-            console.log(ledgerSelected);
-            let x = JSON.parse(localStorage.getItem(`newOrientRate/${ledgerSelected}`));
-            // If selected ledger is not present in local storage
-            if (x == null) {
-                // fetch ledger from server
-                const db = getDatabase();
-                const Ref = ref(db, "/newOrientRate/" + ledgerSelected);
-                onValue(Ref, (snapshot) => {
-                    const data = snapshot.val();
-                    x = data.data;
-                    // store ledger in local storage
-                    localStorage.setItem(`newOrientRate/${ledgerSelected}`, JSON.stringify(x));
-                    console.log(x);
-                    // DefineRates
-                    this.defineRates(x);
-                });
-            }
-            else {
-                // DefineRates
-                this.defineRates(x);
-                console.log(x, "localStorage");
-            }
-        }
-
-    }
 
     render() {
         return (
@@ -247,7 +222,7 @@ export default class AddData extends Component {
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
-                                            onChange={(e) => this.handleInvoiceDate(e.target.value)}
+                                            onChange={(e) => this.setState({ InvoiceDate: e.target.value })}
                                             value={this.state.InvoiceDate}
                                         // required
                                         />
@@ -257,18 +232,47 @@ export default class AddData extends Component {
                                 </Col>
 
                                 {/* VEHICLE NO. */}
-                                <Col md={4}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="text"
-                                            onChange={(e) => this.setState({ VehicleNo: (e.target.value || "").toUpperCase() })}
-                                            value={this.state.VehicleNo}
-                                            required
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        {/* <h2>My custom searchbox!</h2> */}
+                                        <div style={{ marginBottom: 0 }}>VehicleNo</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.Vehicles}
+                                            fuseOptions={{keys: ["id", "name"] }} 
+                                            // Search on both fields
+                                            resultStringKeyName="name" // String to display in the results
+                                            onSearch={(string, results) => {
+                                                this.setState({
+                                                    VehicleNo: string.toUpperCase(),
+                                                    is_VehicleNo_new: true,
+                                                })
+                                            }}
+                                            onSelect={(item) => 
+                                                this.setState({
+                                                    VehicleNo : item.name,
+                                                    is_VehicleNo_New: false,
+                                                })
+                                            }
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 60,
+                                            }}
                                         />
-                                        <span>Vehicle No.</span>
-                                        <i></i>
                                     </div>
                                 </Col>
+
 
                                 {/* PARTY NAME */}
                                 <Col md={4}>
@@ -284,18 +288,342 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
                             </Row>
+
                             <Row>
-                                {/* DESTINATION */}
+                                {/* MT Location */}
                                 <Col>
                                     <div style={{ width: "200", marginTop: "30px" }}>
                                         {/* <h2>My custom searchbox!</h2> */}
-                                        <div style={{ marginBottom: 0 }}>Destination</div>
+                                        <div style={{ marginBottom: 0 }}>MT (Location)</div>
                                         <ReactSearchAutocomplete
-                                            items={this.state.RateData}
-                                            fuseOptions={{ keys: ["id", "displayName"] }} // Search on both fields
-                                            resultStringKeyName="displayName" // String to display in the results
-                                            onSearch={this.handleOnSearch}
-                                            onSelect={this.handleOnSelect}
+                                            items={this.state.Location}
+                                            fuseOptions={{keys: ["id", "name"] }} 
+                                            // Search on both fields
+                                            resultStringKeyName="name" // String to display in the results
+                                            onSearch={(string, results) => {
+                                                this.setState({
+                                                    MT_Location: string.toUpperCase(),
+                                                    is_MT_Location_New: true,
+                                                })
+                                            }}
+                                            onSelect={(item) => 
+                                                this.setState({
+                                                    MT_Location : item.name,
+                                                    is_MT_Location_New: false,
+                                                })
+                                            }
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 50,
+                                            }}
+                                        />
+                                    </div>
+                                </Col>
+
+                                {/* MT Factory Name */}
+                                <Col md={4}>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ MT_FN: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.MT_FN}
+                                            required
+                                        />
+                                        <span>MT Factory Name</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                            </Row>
+
+                            <Row>
+                                {/* From Location */}
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        {/* <h2>My custom searchbox!</h2> */}
+                                        <div style={{ marginBottom: 0 }}>From (Location)</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.Location}
+                                            fuseOptions={{ keys: ["id", "name"] }} // Search on both fields
+                                            resultStringKeyName="name" // String to display in the results
+                                            onSearch={(string, results) => {
+                                                this.setState({
+                                                    FromLocation: string.toUpperCase(),
+                                                    is_From_Location_New: true,
+                                                })
+                                                }
+                                            }
+                                            onSelect={(item) =>
+                                                this.setState({
+                                                    FromLocation: item.name,
+                                                    is_From_Location_New: false,
+                                                })
+                                            }
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 30,
+                                            }}
+                                        />
+                                    </div>
+                                </Col>
+
+                                {/* From Factory Name */}
+                                <Col md={4}>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ FromFN: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.FromFN}
+                                            required
+                                        />
+                                        <span>From Factory Name</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                            </Row>
+
+                            <Row>
+                                {/* To Location */}
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        {/* <h2>My custom searchbox!</h2> */}
+                                        <div style={{ marginBottom: 0 }}>To (Location)</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.Location}
+                                            fuseOptions={{ keys: ["id", "name"] }} // Search on both fields
+                                            resultStringKeyName="name" // String to display in the results
+                                            onSearch={
+                                                (string, results) => {
+                                                    this.setState({
+                                                        ToLocation: string.toUpperCase(),
+                                                        is_To_Location_New: true,
+                                                    })
+                                                }
+                                            }
+                                            onSelect={
+                                                (item) => {
+                                                    this.setState({
+                                                        ToLocation: item.name,
+                                                        is_To_Location_New: false,
+                                                    })
+                                                }
+                                            }
+                                            showIcon={false}
+                                            styling={{
+                                                height: "34px",
+                                                borderRadius: "4px",
+                                                backgroundColor: "#1f5457",
+                                                boxShadow: "none",
+                                                hoverBackgroundColor: "lightgreen",
+                                                color: "white",
+                                                fontSize: "1em",
+                                                letterSpacing: "0.05px",
+                                                iconColor: "white",
+                                                lineColor: "white",
+                                                placeholderColor: "white",
+                                                clearIconMargin: "3px 8px 0 0",
+                                                zIndex: 20,
+                                            }}
+                                        />
+                                    </div>
+                                </Col>
+
+                                {/* To Factory Name */}
+                                <Col md={4}>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ ToFN: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.ToFN}
+                                            required
+                                        />
+                                        <span>To Factory Name</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+                            </Row>
+                            <Row>
+                                {/* RATE */}
+                                <Col >
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ Rate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            required
+                                        />
+                                        <span>Rate</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                                {/* WEIGHT */}
+                                <Col >
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="number"
+                                            onChange={(e) => this.setState({ Weight: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            required
+                                        />
+                                        <span>Weight (MT)</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+                                {/* Product */}
+                                <Col >
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ Product: e.target.value })}
+                                            required
+                                        />
+                                        <span>Product</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+
+                            </Row>
+
+                            <Row>
+                                {/* Payment Status */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        {/* <span>Payment Status</span> */}
+                                        Payment Status
+                                        <select
+                                            onChange={(e) => this.setState({ PaymentStatus: e.target.value })}
+                                            required
+                                            style={{ width: "100%", height: "34px" }}
+                                        >
+                                            <option value="PAID">PAID</option>
+                                            <option value="UNPAID">UNPAID</option>
+                                        </select>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+                                {/* Payment Mode */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        {/* <span>Payment Status</span> */}
+                                        Payment Mode
+                                        <select
+                                            onChange={(e) => this.setState({ PaymentMode: e.target.value })}
+                                            required
+                                            style={{ width: "100%", height: "34px" }}
+                                        >
+                                            <option value="Cash">Cash</option>
+                                            <option value="Online">Online</option>
+                                            <option value="Cheque">Cheque</option>
+                                        </select>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+
+                                {/* REMARK */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.Remark}
+                                            required
+                                        />
+                                        <span>Remark</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+                                {/* Paid On */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="date"
+                                            onChange={(e) => this.setState({ PaidOn: e.target.value })}
+                                        // required
+                                        />
+                                        <span>Paid On</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                            </Row>
+                            
+                            {this.state.PaymentMode === "Online" ? 
+                            <Row>
+                                {/* Contact Number */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ ContactNumber: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.ContactNumber}
+                                            required
+                                        />
+                                        <span>Contact Number</span>
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+                                </Row>
+                            :
+                            null
+                            }
+
+                            <Row>
+                                {/* Agent */}
+                                <Col>
+                                    <div style={{ width: "200", marginTop: "30px" }}>
+                                        <div style={{ marginBottom: 0 }}>Agent</div>
+                                        <ReactSearchAutocomplete
+                                            items={this.state.AgentList}
+                                            fuseOptions={{ keys: ["id", "agentName"] }} // Search on both fields
+                                            resultStringKeyName="agentName" // String to display in the results
+                                            onSearch={(string, results) => {
+                                                this.setState({
+                                                    Agent: string.toUpperCase(),
+                                                    is_Agent_New: true,
+                                                })
+                                            }}
+                                            onSelect={(item) => {
+                                                this.setState({
+                                                    Agent: item.agentName,
+                                                    is_Agent_New: false,
+                                                })
+                                            }
+                                            }
                                             showIcon={false}
                                             styling={{
                                                 height: "34px",
@@ -317,230 +645,147 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
 
-                                {/* OWNED/MARKET */}
-                                {/* <Col style={{ marginTop: "30px" }}>
-                                    <div style={{ display: "flex", justifyContent: "center" }}>
-                                        <FormGroup>
-                                            <Input onChange={() => this.handleClass("OWNED")} style={{ width: "30px", height: "30px" }} name='class' type="radio" />
-                                            {' '}
-                                            <Label style={{ marginTop: "8px" }}>Owned</Label>
-                                        </FormGroup>
-                                        <FormGroup style={{ marginLeft: "10%" }}>
-                                            <Input onChange={() => this.handleClass("MARKET")} defaultChecked style={{ width: "30px", height: "30px" }} name='class' type="radio" />
-                                            {' '}
-                                            <Label style={{ marginTop: "8px" }}>Market</Label>
-                                        </FormGroup>
-                                    </div>
-
-                                </Col> */}
-                                 
-                                {/* Unloaded At */}
+                                {/* Commission */}
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="text"
-                                            onChange={(e) => this.setState({ UnloadedAt: (e.target.value|| "").toUpperCase()})}
-                                            value={this.state.UnloadedAt}
-                                            required
-                                        />
-                                        <span>Unloaded At</span>
-                                        <i></i>
-                                    </div>
-                                </Col>
-                            </Row>
-                            <Row>
-                                {/* WEIGHT */}
-                                <Col md={3}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ Weight: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            required
-                                        />
-                                        <span>Weight (MT)</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-
-                                {/* RATE */}
-                                <Col md={3}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ Rate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            required
-                                        />
-                                        <span>Rate</span>
-                                        <i></i>
-                                    </div>
-                                </Col>
-
-                                {/* COMISSION */}
-                                <Col md={3}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
+                                            // type="number"
                                             onChange={(e) => this.setState({ Comission: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.Comission}
                                             required
                                         />
-                                        <span>Comission</span>
+                                        <span>Commission</span>
                                         <i></i>
                                     </div>
 
                                 </Col>
 
-                                {/* Mkt Comission */}
-                                <Col md={3}>
+                                {/* Agent Payment Status */}
+                                <Col>
                                     <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ MktComission: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                        Agent Payment Status
+                                        <select
+                                            onChange={(e) => this.setState({ AgentPaymentStatus: e.target.value })}
                                             required
-                                        />
-                                        <span>Mkt Comission</span>
+                                            style={{ width: "100%", height: "34px" }}
+                                        >
+                                            <option value="PAID">PAID</option>
+                                            <option value="UNPAID">UNPAID</option>
+                                        </select>
                                         <i></i>
                                     </div>
                                 </Col>
-                                {
-                                    (this.state.MktComission && this.state.MktComission > 0) ?
-                                    // PAID TO
-                                    <Col>
-                                        <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ PaidTo: (e.target.value || "").toUpperCase()})}
-                                                value={this.state.PaidTo}
-                                                required
-                                            />
-                                            <span>Mkt Comission Paid To</span>
-                                            <i></i>
-                                        </div>
-                                    </Col>
-                                    : 
-                                    null
-                                }
                             </Row>
-                            
                             <Row>
-                                {/* MISC EXPENSES */}
+                                {/* Labour Amount */}
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ MExpense: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            // type="number"
+                                            onChange={(e) => this.setState({ LabourAmount: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.LabourAmount}
                                             required
                                         />
-                                        <span>Miscellaneous Expenses</span>
+                                        <span>Labour Amount</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                                {/* Labour Status */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        Labour Status
+                                        <select
+                                            onChange={(e) => this.setState({ LabourStatus: e.target.value })}
+                                            required
+                                            style={{ width: "100%", height: "34px" }}
+                                        >
+                                            <option value="ByDriver">Paid By Driver</option>
+                                            <option value="InFreight">Less In Freight</option>
+                                        </select>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                                {/* Shortage */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            // type="number"
+                                            onChange={(e) => this.setState({ Shortage: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.Shortage}
+                                            required
+                                        />
+                                        <span>Shortage</span>
+                                        <i></i>
+                                    </div>
+                                </Col>
+                                
+                            </Row>
+                            <Row>
+                                {/* Poch Amount */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            // type="number"
+                                            onChange={(e) => this.setState({ PochAmount: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                            value={this.state.PochAmount}
+                                            required
+                                        />
+                                        <span>Poch Amount</span>
                                         <i></i>
                                     </div>
 
                                 </Col>
 
-                                
-                                {/* REMARK */}
-                                    <Col>
-                                        <div className={styles.inputBox}>
-                                            <input
-                                                type="text"
-                                                onChange={(e) => this.setState({ Remark: (e.target.value || "").toUpperCase() })}
-                                                value={this.state.Remark}
-                                                required
-                                            />
-                                            <span>Remark</span>
-                                            <i></i>
-                                        </div>
-
-                                    </Col>
-                                
-
-                                {/* DIFFERENCE PAYABLE */}
+                                {/* Poch Payment Status */}
                                 <Col>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ DiffPayable: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                <   div className={styles.inputBox}>
+                                        Poch Payment Status
+                                        <select
+                                            onChange={(e) => this.setState({ PochPaymentStatus: e.target.value })}
                                             required
-                                        />
-                                        <span>Difference Payable</span>
+                                            style={{ width: "100%", height: "34px" }}
+                                        >
+                                            <option value="PAID">PAID</option>
+                                            <option value="UNPAID">UNPAID</option>
+                                        </select>
                                         <i></i>
                                     </div>
-
                                 </Col>
 
-                                {/* Paid On */}
+                                {/* Poch Send Date */}
                                 <Col>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="date"
-                                            onChange={(e) => this.setState({ PaidOn: e.target.value })}
+                                            onChange={(e) => this.setState({ PochSendDate: e.target.value })}
                                         // required
                                         />
-                                        <span>Paid On</span>
+                                        <span>Poch Send Date</span>
                                         <i></i>
                                     </div>
-
-                                </Col>
-                            </Row>
-                            
-                            <Row style={{display: "flex", justifyContent: "center"}}>
-                                {/* OUR RATE */}
-                                <Col md={6}>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="number"
-                                            onChange={(e) => this.setState({ OurRate: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            value={this.state.OurRate}
-                                            required
-                                        />
-                                        <span>Our Rate</span>
-                                        <i></i>
-                                    </div>
-
                                 </Col>
                             </Row>
                             <Row>
-                                {/* Payable Freight */}
+
+                                {/* Net Amount */}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Payable Freight : </span>
-                                        {(this.state.Weight * this.state.Rate) - this.state.Comission - this.state.MktComission}
-                                    </div>
-
-                                </Col>
-
-                                {/* Net Freight */}
-                                <Col >
-                                    <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Freight : </span>
-                                        {(this.state.Weight*this.state.Rate) + this.state.MExpense}
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-
-                                {/* Our Freight */}
-                                <Col >
-                                    <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Our Freight : </span>
-                                        {(this.state.Weight * this.state.OurRate) - this.state.DiffPayable}
-                                        <i></i>
-
-                                    </div>
-
-                                </Col>
-
-                                {/* Net Profit */}
-                                <Col >
-                                    <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Gross : </span>
-                                        {(parseInt(((this.state.Weight * this.state.OurRate) - this.state.DiffPayable) - ((this.state.Weight*this.state.Rate) + this.state.MExpense)) + parseInt(this.state.Comission))}
+                                        <span style={{ color: "#1f5457" }}>Net Amount</span>
+                                        <input
+                                            type="number"
+                                            value={(this.state.LabourStatus === "ByDriver") 
+                                            ? this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage 
+                                            : this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage - this.state.LabourAmount}
+                                            disabled
+                                        />
                                         <i></i>
                                     </div>
 
                                 </Col>
                             </Row>
-                            
+
                             <button onClick={this.addData} className={styles.button}><span>Add</span></button>
                         </div>
                     </div>

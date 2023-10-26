@@ -2,15 +2,10 @@ import React, { Component } from 'react'
 import styles from '../styles/LoginPage.module.css'
 import { Table, Button, Navbar, NavbarBrand, FormGroup, Form, Input, Label, Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Nav, NavItem, NavLink, UncontrolledDropdown, InputGroup, InputGroupText, Spinner } from 'reactstrap';
 import AddData from './AddData';
-import AddUltratechData from './AddUltratechData';
 import UpdateData from './UpdateData';
-import UpdateUltratechData from './UpdateUltratechData';
 // Different Ledgers
 import MyLedger from './MyLedger';
-import Company from './Company';
-import Transporter from './Transporter';
-import OwnerLedger from './OwnerLedger';
-import PetrolLedger from './PetrolLedger';
+
 // Firebase
 import firebase from '../config/firebase';
 import { getDatabase, ref, set, onValue, get, child } from "firebase/database";
@@ -37,7 +32,7 @@ export default class Dashboard extends Component {
         this.state = {
             AllData: null,
             data: [],
-            RateData: [],
+            
             displayData: [],
             toggle: false,
             toUpdate: null,
@@ -84,14 +79,14 @@ export default class Dashboard extends Component {
             })
         })
 
-       
+
     }
 
     addData = (obj) => {
         const db = getDatabase();
         const id = new Date().getTime();
         obj.id = id;
-        set(ref(db, '/' + this.state.db + '/' + id), {
+        set(ref(db, '/transportDetails/' + id), {
             ...obj
         }).then(() => {
             this.setState({
@@ -102,6 +97,7 @@ export default class Dashboard extends Component {
     }
 
     onEditClick = (item) => {
+        console.log(item, "ON EDIT CLICK");
         this.setState({ toUpdate: item, toggleUpdateBox: true })
     }
 
@@ -132,8 +128,8 @@ export default class Dashboard extends Component {
 
     updateData = (obj, id) => {
         const db = getDatabase();
-        console.log(this.state.db);
-        set(ref(db, '/' + this.state.db + '/' + id), {
+        console.log("DASHBOARD UpdateData",obj, id);
+        set(ref(db, '/transportDetails/' + id), {
             ...obj
         }).then(() => {
             this.setState({
@@ -215,7 +211,7 @@ export default class Dashboard extends Component {
                 },
             ]
         }
-        else if (this.state.Ledger === "MyLedger"){
+        else if (this.state.Ledger === "MyLedger") {
             data = [
                 {
                     sheet: "MySpreadsheet",
@@ -527,7 +523,7 @@ export default class Dashboard extends Component {
 
                     {this.state.toggleUpdateBox ?
 
-                        <UpdateData updateData={this.updateData} RateData={this.state.RateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
+                        <UpdateData updateData={this.updateData} style={{ marginTop: "-3%" }} data={this.state.toUpdate}></UpdateData>
 
                         :
 
@@ -538,21 +534,15 @@ export default class Dashboard extends Component {
                                 <div>
 
                                     {this.state.toggle === false ?
-                                        (this.state.AllData === null ?
-                                            // <Spinner>
-                                            //     Loading...
-                                            // </Spinner>
-                                            <div>NO DATA</div>
 
-                                            :
-                                            <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                                <Image
-                                                    style={{ width: "20px", height: "20px" }}
-                                                    src={plus}
-                                                    alt="Picture of the author"
-                                                />
-                                            </Button>
-                                        )
+                                        <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                            <Image
+                                                style={{ width: "20px", height: "20px" }}
+                                                src={plus}
+                                                alt="Picture of the author"
+                                            />
+                                        </Button>
+
                                         :
                                         <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
                                             <Image
@@ -566,19 +556,19 @@ export default class Dashboard extends Component {
                             </div>
                             {
                                 this.state.toggle === true ?
-                                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>                                       
-                                        <AddData updateData={this.addData} RateData={this.state.RateData} ></AddData>
+                                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "30px" }}>
+                                        <AddData updateData={this.addData} ></AddData>
                                     </div>
                                     :
-                                    (this.state.AllData === null?
-                                        <div style={{display:"flex", justifyContent: "center", marginTop: "30vh"}}>
+                                    (this.state.AllData === null ?
+                                        <div style={{ display: "flex", justifyContent: "center", marginTop: "30vh" }}>
                                             {/* <Spinner >
                                                 Loading...
                                             </Spinner> */}
                                             <div>NO DATA</div>
                                         </div>
                                         :
-                                        
+
                                         <div>
                                             {
                                                 this.state.Ledger === "MyLedger" &&
@@ -588,7 +578,7 @@ export default class Dashboard extends Component {
                                                     onEditClick={this.onEditClick}
                                                     onTransferClick={this.onTransferClick}
                                                     filter={this.state.filter}
-                                                    DB={this.props.DB}
+                                                // DB={this.props.DB}
                                                 ></MyLedger>
                                             }
                                         </div>
