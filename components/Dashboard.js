@@ -189,6 +189,32 @@ export default class Dashboard extends Component {
         }
     }
 
+    AgentPaymentStatusChange = (e) => {
+        let query = e;
+        let result = [];
+        if (query != "ALL") {
+            for (let item of this.state.data) {
+                if (item.AgentPaymentStatus && item.AgentPaymentStatus.toUpperCase() === query) {
+                    result.push(item);
+                }
+            }
+        }
+        else{
+            result = this.state.data;
+        }
+        console.log(result)
+        if (result.length > 0) {
+            this.setState({
+                displayData: result,
+            })
+        }
+        else {
+            this.setState({
+                displayData: this.state.data,
+            })
+        }
+    }
+
     ExportData = () => {
         console.log(this.state.displayData);
         let data;
@@ -339,7 +365,7 @@ export default class Dashboard extends Component {
 
         if (newLedger === "MyLedger") {
             this.handleApply(this.state.data);
-            this.setState({AgentPaymentStatus: "ALL"});
+            // this.setState({ AgentPaymentStatus: "ALL" });
         }
         else if (newLedger === "Agent") {
             this.handleApply(this.state.data);
@@ -374,7 +400,7 @@ export default class Dashboard extends Component {
                                     height="10px"
                                 />
                             </Button>
-                            
+
                         </div>
 
                         {/* Update Box Close Button |||| Other Navigation bar buttons */}
@@ -444,26 +470,46 @@ export default class Dashboard extends Component {
 
                                 <div>
                                     {
-                                       
-                                        this.state.toggle === false ?
-    
-                                            <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                                <Image
-                                                    style={{ width: "20px", height: "20px" }}
-                                                    src={plus}
-                                                    alt="Picture of the author"
-                                                />
-                                            </Button>
-    
+                                        this.state.Ledger === "Agent" ?
+                                            <>
+                                                <   div className={styles.inputBox}>
+                                                    
+                                                    <select
+                                                        onChange={(e) => {
+                                                            // this.setState({ AgentPaymentStatus: e.target.value })
+                                                            this.AgentPaymentStatusChange(e.target.value);
+                                                        }}
+                                                        required
+                                                        style={{ width: "100%", height: "34px" }}
+                                                    >
+                                                        <option value="ALL">ALL</option>
+                                                        <option value="PAID">PAID</option>
+                                                        <option value="UNPAID">UNPAID</option>
+                                                    </select>
+                                                    <i></i>
+                                                </div>
+                                            </>
                                             :
-                                            <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
-                                                <Image
-                                                    style={{ width: "20px", height: "20px" }}
-                                                    src={reject}
-                                                    alt="Picture of the author"
-                                                />
-                                            </Button>
-                                        
+
+                                            this.state.toggle === false ?
+
+                                                <Button outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                                    <Image
+                                                        style={{ width: "20px", height: "20px" }}
+                                                        src={plus}
+                                                        alt="Picture of the author"
+                                                    />
+                                                </Button>
+
+                                                :
+                                                <Button color='danger' outline onClick={() => this.setState({ toggle: !this.state.toggle })}>
+                                                    <Image
+                                                        style={{ width: "20px", height: "20px" }}
+                                                        src={reject}
+                                                        alt="Picture of the author"
+                                                    />
+                                                </Button>
+
 
                                     }
                                 </div>
