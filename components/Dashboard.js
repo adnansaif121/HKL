@@ -58,6 +58,8 @@ export default class Dashboard extends Component {
             // isOrient : true,
 
             attachedVehicleData: [],
+
+            searchQuery: "",
         }
     }
 
@@ -141,16 +143,16 @@ export default class Dashboard extends Component {
 
     sortOnSearch = (e) => {
         let query = (e.target.value || "").toUpperCase();
+        this.setState({ searchQuery: query });
         let result = [];
         if (this.state.Ledger === "Agent") {
+            // this.AgentPaymentStatusChange(this.state.AgentPaymentStatus);
             for (let item of this.state.data) {
                 if (
-                    (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
-                    (item.FromLocation && item.FromLocation.toUpperCase().includes(query)) ||
-                    (item.ToLocation && item.ToLocation.toUpperCase().includes(query)) ||
-                    (item.Agent && item.Agent.toUpperCase().includes(query)) ||
-                    (item.AgentPaymentStatus && item.AgentPaymentStatus.toUpperCase().includes(query))
+                    (item.FromLocation && item.FromLocation.toUpperCase() == (query)) ||
+                    (item.ToLocation && item.ToLocation.toUpperCase() == (query)) ||
+                    (item.Agent && item.Agent.toUpperCase().includes(query)) 
 
                 ) {
                     result.push(item);
@@ -160,13 +162,12 @@ export default class Dashboard extends Component {
         else {
             for (let item of this.state.data) {
                 if (
-                    (item.InvoiceDate && item.InvoiceDate.includes(query)) ||
-                    (item.PartyName && item.PartyName.toUpperCase().includes(query)) ||
+                    (item.PartyName && item.PartyName.toUpperCase() == (query)) ||
                     (item.VehicleNo && item.VehicleNo.toUpperCase().includes(query)) ||
                     (item.FromLocation && item.FromLocation.toUpperCase().includes(query)) ||
                     (item.ToLocation && item.ToLocation.toUpperCase().includes(query)) ||
                     (item.Agent && item.Agent.toUpperCase().includes(query)) ||
-                    (item.PaymentMode && item.PaymentMode.toUpperCase().includes(query)) ||
+                    (item.PaymentMode && item.PaymentMode.toUpperCase() == (query)) ||
                     (item.LabourStatus && item.LabourStatus.toUpperCase().includes(query))
 
 
@@ -192,17 +193,26 @@ export default class Dashboard extends Component {
     AgentPaymentStatusChange = (e) => {
         let query = e;
         let result = [];
+        console.log("QUERY", this.state.searchQuery);
         if (query != "ALL") {
             for (let item of this.state.data) {
-                if (item.AgentPaymentStatus && item.AgentPaymentStatus.toUpperCase() === query) {
+                if (item.AgentPaymentStatus && item.AgentPaymentStatus.toUpperCase() === query &&
+                    item.Agent && item.Agent.toUpperCase().includes(this.state.searchQuery)
+                ) {
                     result.push(item);
                 }
             }
         }
         else{
-            result = this.state.data;
+            for (let item of this.state.data) {
+                if (
+                    item.Agent && item.Agent.toUpperCase().includes(this.state.searchQuery)
+                ) {
+                    result.push(item);
+                }
+            }
         }
-        console.log(result)
+        console.log("RESULT", result)
         if (result.length > 0) {
             this.setState({
                 displayData: result,
@@ -210,7 +220,7 @@ export default class Dashboard extends Component {
         }
         else {
             this.setState({
-                displayData: this.state.data,
+                displayData: [],
             })
         }
     }
@@ -227,19 +237,18 @@ export default class Dashboard extends Component {
                         { label: "Vehicle No", value: "VehicleNo" }, // Custom format
                         { label: "PartyName", value: "PartyName" }, // Run functions
                         { label: "MT(Location)", value: "MT_Location" },
-                        { label: "MT(Factory Name)", value: "MT_FN" },
                         { label: "From(Location)", value: "FromLocation" },
                         { label: "From(Factory Name)", value: "FromFN" },
                         { label: "To(Location)", value: "ToLocation" },
                         { label: "To(Factory Name)", value: "ToFN" },
                         { label: "Rate", value: "Rate" },
-                        { label: "Weight", value: "Weight" },
+                        { label: "Weight(cwt)", value: "Weight" },
                         { label: "Product", value: "Product" },
                         { label: "Payment Status", value: "PaymentStatus" },
                         { label: "Payment Mode", value: "PaymentMode" },
                         { label: "Contact Number", value: "ContactNumber" },
                         { label: "Remarks", value: "Remark" },
-                        { label: "Paid On", value: "PaidOn" },
+                        { label: "Received On", value: "PaidOn" },
                         { label: "Agent", value: "Agent" },
                         { label: "Commission", value: "Comission" },
                         { label: "Agent Payment Status", value: "AgentPaymentStatus" },
@@ -365,7 +374,7 @@ export default class Dashboard extends Component {
 
         if (newLedger === "MyLedger") {
             this.handleApply(this.state.data);
-            // this.setState({ AgentPaymentStatus: "ALL" });
+            this.setState({ AgentPaymentStatus: "ALL" });
         }
         else if (newLedger === "Agent") {
             this.handleApply(this.state.data);
@@ -476,7 +485,7 @@ export default class Dashboard extends Component {
                                                     
                                                     <select
                                                         onChange={(e) => {
-                                                            // this.setState({ AgentPaymentStatus: e.target.value })
+                                                            this.setState({ AgentPaymentStatus: e.target.value })
                                                             this.AgentPaymentStatusChange(e.target.value);
                                                         }}
                                                         required

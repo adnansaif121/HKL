@@ -19,8 +19,8 @@ export default class AddData extends Component {
             is_VehicleNo_new: false,
             PartyName: "",
             MT_Location: "",
+            LRNumber: "",
             is_MT_Location_New: false,
-            MT_FN: "",
             FromLocation: "",
             is_From_Location_New: false,
             FromFN: "",
@@ -30,6 +30,15 @@ export default class AddData extends Component {
             Rate: 0,
             Weight: 0,
             Product: "",
+            TotalAdvance: 0,
+            Cash: 0,
+            CashRemark: "",
+            Cheque: 0,
+            ChequeRemark: "",
+            Online: 0,
+            OnlineRemark: "",
+            AdvanceReceivedStatus: "Complete",
+            Remaining: 0,
             PaymentStatus: "PAID",
             PaymentMode: "Cash",
             ContactNumber: "",
@@ -39,14 +48,16 @@ export default class AddData extends Component {
             AgentPaymentStatus: "PAID",
             is_Agent_New: false,
             Comission: 0,
+            ComissionPaidDate: "",
             LabourAmount: 0,
             LabourStatus: "ByDriver",
             Shortage: 0,
             PochAmount: 0,
-            PochPaymentStatus: "PAID",
+            PochPaymentStatus: "NOT RECEIVED",
+            PochRemark: "",
             PochSendDate: "",
-            NetAmount: 0,
-            
+            NetAmountReceived: 0,
+
             Location: [],
             AgentList: [],
             Vehicles: [],
@@ -84,27 +95,27 @@ export default class AddData extends Component {
         const db = getDatabase();
         let isLocationNew = false;
         let location_List = this.state.Location;
-        if(this.state.is_MT_Location_New){
-            location_List.push({id: location_List.length, name: this.state.MT_Location});  
+        if (this.state.is_MT_Location_New) {
+            location_List.push({ id: location_List.length, name: this.state.MT_Location });
             isLocationNew = true;
         }
-        if(this.state.is_From_Location_New){
-            location_List.push({id: location_List.length, name: this.state.FromLocation});
+        if (this.state.is_From_Location_New) {
+            location_List.push({ id: location_List.length, name: this.state.FromLocation });
             isLocationNew = true;
         }
-        if(this.state.is_To_Location_New){
-            location_List.push({id: location_List.length, name: this.state.ToLocation});
+        if (this.state.is_To_Location_New) {
+            location_List.push({ id: location_List.length, name: this.state.ToLocation });
             isLocationNew = true;
         }
         this.setState({
             Location: location_List,
         })
         // Update Database
-        if(isLocationNew){
+        if (isLocationNew) {
             console.log("NEW LOCATION ADDED", location_List);
             set(ref(db, "/Location/"), location_List);
         }
-        else{
+        else {
             console.log("NO NEW LOCATION ADDED");
         }
     }
@@ -113,8 +124,8 @@ export default class AddData extends Component {
         const db = getDatabase();
         let isAgentNew = false;
         let agent_List = this.state.AgentList;
-        if(this.state.is_Agent_New){
-            agent_List.push({id: this.state.AgentList.length, agentName: this.state.Agent});
+        if (this.state.is_Agent_New) {
+            agent_List.push({ id: this.state.AgentList.length, agentName: this.state.Agent });
             this.setState({
                 AgentList: agent_List,
                 is_Agent_New: false,
@@ -123,11 +134,11 @@ export default class AddData extends Component {
             console.log(agent_List);
         }
         // Update Database
-        if(isAgentNew){
+        if (isAgentNew) {
             console.log("NEW AGENT ADDED", agent_List);
             set(ref(db, "/AgentList/"), agent_List);
         }
-        else{
+        else {
             console.log("NO NEW AGENT ADDED");
         }
     }
@@ -136,8 +147,8 @@ export default class AddData extends Component {
         const db = getDatabase();
         let isVehicleNew = false;
         let vehicle_List = this.state.Vehicles;
-        if(this.state.is_VehicleNo_new){
-            vehicle_List.push({id: this.state.Vehicles.length, name: this.state.VehicleNo});
+        if (this.state.is_VehicleNo_new) {
+            vehicle_List.push({ id: this.state.Vehicles.length, name: this.state.VehicleNo });
             this.setState({
                 Vehicles: vehicle_List,
                 is_VehicleNo_new: false,
@@ -146,11 +157,11 @@ export default class AddData extends Component {
             console.log(vehicle_List);
         }
         // Update Database
-        if(isVehicleNew){
+        if (isVehicleNew) {
             console.log("NEW VEHICLE ADDED", vehicle_List);
             set(ref(db, "/Vehicles/"), vehicle_List);
         }
-        else{
+        else {
             console.log("NO NEW VEHICLE ADDED");
         }
     }
@@ -160,13 +171,13 @@ export default class AddData extends Component {
         this.checkAndAddLocation();
         this.checkAndAddAgent();
         this.checkAndAddVehicle();
-        
+
         let obj = {
             InvoiceDate: this.state.InvoiceDate,
             VehicleNo: (this.state.VehicleNo || ""),
             PartyName: (this.state.PartyName || ""),
             MT_Location: (this.state.MT_Location || ""),
-            MT_FN: (this.state.MT_FN || ""),
+            LRNumber: (this.state.LRNumber|| ""),
             FromLocation: (this.state.FromLocation || ""),
             FromFN: (this.state.FromFN || ""),
             ToLocation: (this.state.ToLocation || ""),
@@ -174,6 +185,15 @@ export default class AddData extends Component {
             Rate: this.state.Rate,
             Weight: this.state.Weight,
             Product: (this.state.Product || ""),
+            TotalAdvance: this.state.Cash + this.state.Cheque + this.state.Online,
+            Cash: this.state.Cash,
+            CashRemark: (this.state.CashRemark || ""),
+            Cheque: this.state.Cheque,
+            ChequeRemark: (this.state.ChequeRemark || ""),
+            Online: this.state.Online,
+            OnlineRemark: (this.state.OnlineRemark || ""),
+            AdvanceReceivedStatus: this.state.AdvanceReceivedStatus,
+            Remaining: this.state.Remaining,
             PaymentStatus: this.state.PaymentStatus,
             PaymentMode: this.state.PaymentMode,
             ContactNumber: (this.state.ContactNumber || ""),
@@ -181,34 +201,28 @@ export default class AddData extends Component {
             PaidOn: this.state.PaidOn,
             Agent: (this.state.Agent || ""),
             Comission: this.state.Comission,
+            ComissionPaidDate: this.state.ComissionPaidDate,
             AgentPaymentStatus: this.state.AgentPaymentStatus,
             LabourAmount: this.state.LabourAmount,
             LabourStatus: this.state.LabourStatus,
             Shortage: this.state.Shortage,
-            PochAmount: this.state.PochAmount,
+
             PochPaymentStatus: this.state.PochPaymentStatus,
             PochSendDate: this.state.PochSendDate,
-            NetAmount: (this.state.LabourStatus === "ByDriver") 
-                            ? this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage 
-                            : this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage - this.state.LabourAmount,
+            PochAmount: (this.state.PochPaymentStatus === "RECEIVED")
+                ? 0
+                : (this.state.LabourStatus === "ByDriver")
+                    ? this.state.Rate * this.state.Weight - this.state.Shortage - (this.state.Cash + this.state.Cheque + this.state.Online)
+                    : this.state.Rate * this.state.Weight - this.state.Shortage - this.state.LabourAmount - (this.state.Cash + this.state.Cheque + this.state.Online),
+            NetAmountReceived: (this.state.PochPaymentStatus === "RECEIVED")
+                ? (this.state.LabourStatus === "ByDriver") ? this.state.Rate * this.state.Weight - this.state.Shortage : this.state.Rate * this.state.Weight - this.state.Shortage - this.state.LabourAmount
+                : (this.state.Cash + this.state.Cheque + this.state.Online)
         }
         // console.log(obj)
         this.props.updateData(obj);
     }
 
-    handleOnSearch = (string, results) => {
-        // console.log(string, results);
-        this.setState({
-            MT_Location: string,
-        })
-    };
-
-    handleOnSelect = (item) => {
-        console.log(item.id);
-        let ownedItem = item;
-        console.log(ownedItem);
-    };
-
+   
     render() {
         return (
             <>
@@ -238,7 +252,7 @@ export default class AddData extends Component {
                                         <div style={{ marginBottom: 0 }}>VehicleNo</div>
                                         <ReactSearchAutocomplete
                                             items={this.state.Vehicles}
-                                            fuseOptions={{keys: ["id", "name"] }} 
+                                            fuseOptions={{ keys: ["id", "name"] }}
                                             // Search on both fields
                                             resultStringKeyName="name" // String to display in the results
                                             onSearch={(string, results) => {
@@ -247,9 +261,9 @@ export default class AddData extends Component {
                                                     is_VehicleNo_new: true,
                                                 })
                                             }}
-                                            onSelect={(item) => 
+                                            onSelect={(item) =>
                                                 this.setState({
-                                                    VehicleNo : item.name,
+                                                    VehicleNo: item.name,
                                                     is_VehicleNo_New: false,
                                                 })
                                             }
@@ -297,7 +311,7 @@ export default class AddData extends Component {
                                         <div style={{ marginBottom: 0 }}>MT (Location)</div>
                                         <ReactSearchAutocomplete
                                             items={this.state.Location}
-                                            fuseOptions={{keys: ["id", "name"] }} 
+                                            fuseOptions={{ keys: ["id", "name"] }}
                                             // Search on both fields
                                             resultStringKeyName="name" // String to display in the results
                                             onSearch={(string, results) => {
@@ -306,9 +320,9 @@ export default class AddData extends Component {
                                                     is_MT_Location_New: true,
                                                 })
                                             }}
-                                            onSelect={(item) => 
+                                            onSelect={(item) =>
                                                 this.setState({
-                                                    MT_Location : item.name,
+                                                    MT_Location: item.name,
                                                     is_MT_Location_New: false,
                                                 })
                                             }
@@ -332,20 +346,19 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
 
-                                {/* MT Factory Name */}
+                                {/* LR Number */}
                                 <Col md={4}>
                                     <div className={styles.inputBox}>
                                         <input
                                             type="text"
-                                            onChange={(e) => this.setState({ MT_FN: (e.target.value || "").toUpperCase() })}
-                                            value={this.state.MT_FN}
+                                            onChange={(e) => this.setState({ LRNumber: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.LRNumber}
                                             required
                                         />
-                                        <span>MT Factory Name</span>
+                                        <span>LR Number</span>
                                         <i></i>
                                     </div>
                                 </Col>
-
                             </Row>
 
                             <Row>
@@ -363,7 +376,7 @@ export default class AddData extends Component {
                                                     FromLocation: string.toUpperCase(),
                                                     is_From_Location_New: true,
                                                 })
-                                                }
+                                            }
                                             }
                                             onSelect={(item) =>
                                                 this.setState({
@@ -390,6 +403,8 @@ export default class AddData extends Component {
                                         />
                                     </div>
                                 </Col>
+
+                                
 
                                 {/* From Factory Name */}
                                 <Col md={4}>
@@ -489,7 +504,7 @@ export default class AddData extends Component {
                                             onChange={(e) => this.setState({ Weight: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
                                             required
                                         />
-                                        <span>Weight (MT)</span>
+                                        <span>Weight (cwt)</span>
                                         <i></i>
                                     </div>
 
@@ -512,6 +527,152 @@ export default class AddData extends Component {
 
                             </Row>
 
+
+                            <Row>
+                                <Col>
+                                    <div style={{ padding: "40px", margin: "40px", border: "2px solid black" }}>
+                                        <h4>Advance Paid Details</h4>
+                                        <Row>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        // type="number"
+                                                        onChange={(e) => this.setState({ Cash: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                                        value={this.state.Cash}
+                                                        required
+                                                    />
+                                                    <span>Cash</span>
+                                                    <i></i>
+                                                </div>
+                                            </Col>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ CashRemark: (e.target.value || "").toUpperCase() })}
+                                                        value={this.state.CashRemark}
+                                                        required
+                                                    />
+                                                    <span>Cash Remark</span>
+                                                    <i></i>
+
+                                                </div>
+                                            </Col>
+
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ Cheque: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                                        value={this.state.Cheque}
+                                                        required
+                                                    />
+                                                    <span>Cheque</span>
+                                                    <i></i>
+                                                </div>
+                                            </Col>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ ChequeRemark: (e.target.value || "").toUpperCase() })}
+                                                        value={this.state.ChequeRemark}
+                                                        required
+                                                    />
+                                                    <span>Cheque Remark</span>
+                                                    <i></i>
+
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ Online: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                                        value={this.state.Online}
+                                                        required
+                                                    />
+                                                    <span>Online</span>
+                                                    <i></i>
+                                                </div>
+                                            </Col>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => this.setState({ OnlineRemark: (e.target.value || "").toUpperCase() })}
+                                                        value={this.state.OnlineRemark}
+                                                        required
+                                                    />
+                                                    <span>Online Remark</span>
+                                                    <i></i>
+
+                                                </div>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+
+                                            {/* Total Advance */}
+                                            <Col>
+                                                <div className={styles.disabledInput}>
+                                                    <span>Total Advance : </span>
+                                                    <input
+                                                        disabled
+                                                        type="text"
+                                                        value={this.state.Cash + this.state.Cheque + this.state.Online}
+                                                        required
+                                                    />
+
+                                                    <i></i>
+                                                </div>
+
+                                            </Col>
+                                        </Row>
+                                        
+                                        {/* Advance Received Status */}
+                                        <Row>
+                                            <Col>
+                                                <div className={styles.inputBox}>
+                                                    Advance Received Status
+                                                    <select
+                                                        onChange={(e) => this.setState({ AdvanceReceivedStatus: e.target.value })}
+                                                        required
+                                                        style={{ width: "100%", height: "34px" }}
+                                                    >
+                                                        <option value="Complete">Complete</option>
+                                                        <option value="Partial">Partial</option>
+                                                        <option value="None">None</option>
+                                                    </select>
+                                                    <i></i>
+                                                </div>
+                                            </Col>
+                                        </Row>
+
+                                        {
+                                            this.state.AdvanceReceivedStatus === "Partial" &&
+                                            <Row>
+                                                <Col>
+                                                    <div className={styles.inputBox}>
+                                                        <input
+                                                            type="text"
+                                                            onChange={(e) => this.setState({ Remaining: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
+                                                            value={this.state.Remaining}
+                                                            required
+                                                        />
+                                                        <span>Remaining</span>
+                                                        <i></i>
+
+                                                    </div>
+                                                </Col>
+                                            </Row>
+                                        }
+                                    </div>
+                                </Col>
+                            </Row>
                             <Row>
                                 {/* Payment Status */}
                                 <Col>
@@ -524,26 +685,7 @@ export default class AddData extends Component {
                                             style={{ width: "100%", height: "34px" }}
                                         >
                                             <option value="PAID">PAID</option>
-                                            <option value="UNPAID">UNPAID</option>
-                                        </select>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-
-                                {/* Payment Mode */}
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                        {/* <span>Payment Status</span> */}
-                                        Payment Mode
-                                        <select
-                                            onChange={(e) => this.setState({ PaymentMode: e.target.value })}
-                                            required
-                                            style={{ width: "100%", height: "34px" }}
-                                        >
-                                            <option value="Cash">Cash</option>
-                                            <option value="Online">Online</option>
-                                            <option value="Cheque">Cheque</option>
+                                            <option value="TO_PAY">TO PAY</option>
                                         </select>
                                         <i></i>
                                     </div>
@@ -574,33 +716,12 @@ export default class AddData extends Component {
                                             onChange={(e) => this.setState({ PaidOn: e.target.value })}
                                         // required
                                         />
-                                        <span>Paid On</span>
+                                        <span>Received On</span>
                                         <i></i>
                                     </div>
 
                                 </Col>
                             </Row>
-                            
-                            {this.state.PaymentMode === "Online" ? 
-                            <Row>
-                                {/* Contact Number */}
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            type="text"
-                                            onChange={(e) => this.setState({ ContactNumber: (e.target.value || "").toUpperCase() })}
-                                            value={this.state.ContactNumber}
-                                            required
-                                        />
-                                        <span>Contact Number</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
-                                </Row>
-                            :
-                            null
-                            }
 
                             <Row>
                                 {/* Agent */}
@@ -658,6 +779,19 @@ export default class AddData extends Component {
                                         <i></i>
                                     </div>
 
+                                </Col>
+
+                                {/* Commission Paid Date */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="date"
+                                            onChange={(e) => this.setState({ ComissionPaidDate: e.target.value })}
+                                        // required
+                                        />
+                                        <span>Commission Paid Date</span>
+                                        <i></i>
+                                    </div>
                                 </Col>
 
                                 {/* Agent Payment Status */}
@@ -720,36 +854,36 @@ export default class AddData extends Component {
                                         <i></i>
                                     </div>
                                 </Col>
-                                
+
                             </Row>
                             <Row>
-                                {/* Poch Amount */}
-                                <Col>
-                                    <div className={styles.inputBox}>
-                                        <input
-                                            // type="number"
-                                            onChange={(e) => this.setState({ PochAmount: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                            value={this.state.PochAmount}
-                                            required
-                                        />
-                                        <span>Poch Amount</span>
-                                        <i></i>
-                                    </div>
-
-                                </Col>
 
                                 {/* Poch Payment Status */}
                                 <Col>
-                                <   div className={styles.inputBox}>
+                                    <   div className={styles.inputBox}>
                                         Poch Payment Status
                                         <select
                                             onChange={(e) => this.setState({ PochPaymentStatus: e.target.value })}
                                             required
                                             style={{ width: "100%", height: "34px" }}
                                         >
-                                            <option value="PAID">PAID</option>
-                                            <option value="UNPAID">UNPAID</option>
+                                            <option value="NOT RECEIVED">NOT RECEIVED</option>
+                                            <option value="RECEIVED">RECEIVED</option>
                                         </select>
+                                        <i></i>
+                                    </div>
+                                </Col>
+
+                                {/* Poch Remark */}
+                                <Col>
+                                    <div className={styles.inputBox}>
+                                        <input
+                                            type="text"
+                                            onChange={(e) => this.setState({ PochRemark: (e.target.value || "").toUpperCase() })}
+                                            value={this.state.PochRemark}
+                                            required
+                                        />
+                                        <span>Poch Remark</span>
                                         <i></i>
                                     </div>
                                 </Col>
@@ -769,15 +903,35 @@ export default class AddData extends Component {
                             </Row>
                             <Row>
 
-                                {/* Net Amount */}
+                                {/* Poch Amount */}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Amount</span>
+                                        <span style={{ color: "#1f5457" }}>Poch Amount</span>
                                         <input
                                             type="number"
-                                            value={(this.state.LabourStatus === "ByDriver") 
-                                            ? this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage 
-                                            : this.state.Rate * this.state.Weight - this.state.Comission - this.state.Shortage - this.state.LabourAmount}
+                                            value={
+                                                (this.state.PochPaymentStatus === "RECEIVED")
+                                                    ? 0
+                                                    : (this.state.LabourStatus === "ByDriver")
+                                                        ? this.state.Rate * this.state.Weight - this.state.Shortage - (this.state.Cash + this.state.Cheque + this.state.Online)
+                                                        : this.state.Rate * this.state.Weight - this.state.Shortage - this.state.LabourAmount - (this.state.Cash + this.state.Cheque + this.state.Online)
+                                            }
+                                            disabled
+                                        />
+                                        <i></i>
+                                    </div>
+
+                                </Col>
+
+                                {/* Net Amount Received*/}
+                                <Col >
+                                    <div className={styles.disabledInput}>
+                                        <span style={{ color: "#1f5457" }}>Net Amount Received</span>
+                                        <input
+                                            type="number"
+                                            value={(this.state.PochPaymentStatus === "RECEIVED")
+                                                ? (this.state.LabourStatus === "ByDriver") ? this.state.Rate * this.state.Weight - this.state.Shortage : this.state.Rate * this.state.Weight - this.state.Shortage - this.state.LabourAmount
+                                                : (this.state.Cash + this.state.Cheque + this.state.Online)}
                                             disabled
                                         />
                                         <i></i>

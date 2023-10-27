@@ -61,9 +61,6 @@ export default class MyLedger extends Component {
                                         MT (location)
                                     </th>
                                     <th>
-                                        MT (FN)
-                                    </th>
-                                    <th>
                                         From (location)
                                     </th>
                                     <th>
@@ -86,16 +83,22 @@ export default class MyLedger extends Component {
                                         Product
                                     </th>
                                     <th>
-                                        Payment Status
+                                        Total Advance
                                     </th>
                                     <th>
-                                        Payment Mode
+                                        Advance Status
+                                    </th>
+                                    <th>
+                                        Remaining
+                                    </th>
+                                    <th>
+                                        Payment Status
                                     </th>
                                     <th>
                                         Remarks
                                     </th>
                                     <th>
-                                        Paid On
+                                        Received On
                                     </th>
                                     <th>
                                         Agent
@@ -116,16 +119,19 @@ export default class MyLedger extends Component {
                                         Shortage
                                     </th>
                                     <th>
-                                        Poch Amount
+                                        Poch Payment Status
                                     </th>
                                     <th>
-                                        Poch Payment Status
+                                        Poch Remark
                                     </th>
                                     <th>
                                         Poch Send Date
                                     </th>
                                     <th>
-                                        Net Amount
+                                        Poch Amount
+                                    </th>
+                                    <th>
+                                        Net Amount Received
                                     </th>
                                 </tr>
                             </thead>
@@ -136,8 +142,19 @@ export default class MyLedger extends Component {
                                         <tr key={i} >
 
                                             <th scope="row">
+                                               
                                                 <details>
-                                                    <summary>{i + 1}</summary>
+                                                    <summary>{i + 1}
+                                                    {item.AdvanceReceivedStatus === "Complete" ?
+                                                        <div style={{width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "green"}}></div>
+                                                        :
+                                                        item.AdvanceReceivedStatus === "Partial" ?
+                                                        <div style={{width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "yellow"}}></div>
+                                                        :
+                                                        <div style={{width: "10px", height: "10px", borderRadius: "50%", backgroundColor: "red"}}></div>   
+
+                                                    }
+                                                    </summary>
                                                     <div style={{ display: "flex" }}>
                                                         <button onClick={() => this.props.handleDelete(item.id)} style={{ border: "none", backgroundColor: "Transparent", padding: "0", margin: "4px" }}>
                                                             <Image
@@ -177,9 +194,6 @@ export default class MyLedger extends Component {
                                                 {item.MT_Location}
                                             </td>
                                             <td>
-                                                {item.MT_FN}
-                                            </td>
-                                            <td>
                                                 {item.FromLocation}
                                             </td>
                                             <td>
@@ -201,6 +215,16 @@ export default class MyLedger extends Component {
                                             </td>
                                             <td>
                                                 {item.Product}
+                                            </td>
+                                            <td>
+                                                {item.TotalAdvance} ₹
+                                                : {item.Cash || 0} + {item.Online || 0} + {item.Cheque || 0} 
+                                            </td>
+                                            <td>
+                                                {item.AdvanceReceivedStatus}
+                                            </td>
+                                            <td>
+                                                {item.Remaining}
                                             </td>
                                             <td>
                                                 {item.PaymentStatus}
@@ -246,7 +270,7 @@ export default class MyLedger extends Component {
                                                 {this.formatDate(item.PochSendDate)}
                                             </td>
                                             <td>
-                                                {item.NetAmount}
+                                                {item.NetAmountReceived}
                                             </td>
 
                                         </tr>
