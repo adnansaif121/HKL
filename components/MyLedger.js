@@ -61,6 +61,9 @@ export default class MyLedger extends Component {
                                         MT (location)
                                     </th>
                                     <th>
+                                        LR Number
+                                    </th>
+                                    <th>
                                         From (location)
                                     </th>
                                     <th>
@@ -107,6 +110,9 @@ export default class MyLedger extends Component {
                                         Agent Commission
                                     </th>
                                     <th>
+                                        Agent Commission Payment Date
+                                    </th>
+                                    <th>
                                         Agent Payment Status
                                     </th>
                                     <th>
@@ -131,7 +137,7 @@ export default class MyLedger extends Component {
                                         Poch Amount
                                     </th>
                                     <th>
-                                        Net Amount Received
+                                        Net Received
                                     </th>
                                 </tr>
                             </thead>
@@ -194,6 +200,9 @@ export default class MyLedger extends Component {
                                                 {item.MT_Location}
                                             </td>
                                             <td>
+                                                {item.LRNumber}
+                                            </td>
+                                            <td>
                                                 {item.FromLocation}
                                             </td>
                                             <td>
@@ -230,10 +239,6 @@ export default class MyLedger extends Component {
                                                 {item.PaymentStatus}
                                             </td>
                                             <td>
-                                                {item.PaymentMode}
-                                                {item.PaymentMode === "Online" && <span style={{ color: "green" }}>{item.ContactNumber}</span>}
-                                            </td>
-                                            <td>
                                                 {item.Remark}
                                             </td>
                                             <td>
@@ -244,6 +249,9 @@ export default class MyLedger extends Component {
                                             </td>
                                             <td>
                                                 {item.Comission}
+                                            </td>
+                                            <td>
+                                                {item.ComissionPaidDate}
                                             </td>
                                             <td>
                                                 {item.AgentPaymentStatus}
@@ -258,16 +266,13 @@ export default class MyLedger extends Component {
                                                 {item.Shortage}
                                             </td>
                                             <td>
-                                                {item.PochAmount}
-                                            </td>
-
-                                            <td>
                                                 {item.PochPaymentStatus}
                                             </td>
-
-
                                             <td>
                                                 {this.formatDate(item.PochSendDate)}
+                                            </td>
+                                            <td>
+                                                {item.PochAmount}
                                             </td>
                                             <td>
                                                 {item.NetAmountReceived}

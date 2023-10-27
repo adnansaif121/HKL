@@ -31,17 +31,15 @@ export default class UpdateData extends Component {
             Weight: this.props.data.Weight || "",
             Product: this.props.data.Product || "",
             TotalAdvance: this.props.data.TotalAdvance || "",
-            Cash: this.props.data.Cash || "",
+            Cash: this.props.data.Cash || 0,
             CashRemark: this.props.data.CashRemark || "",
-            Online: this.props.data.Online || "",
+            Online: this.props.data.Online || 0,
             OnlineRemark: this.props.data.OnlineRemark || "",
-            Cheque: this.props.data.Cheque || "",
+            Cheque: this.props.data.Cheque || 0,
             ChequeRemark: this.props.data.ChequeRemark || "",
             AdvanceReceivedStatus: this.props.data.AdvanceReceivedStatus || "Complete",
             Remaining: this.props.data.Remaining || "",
             PaymentStatus: this.props.data.PaymentStatus || "",
-            PaymentMode: this.props.data.PaymentMode || "",
-            ContactNumber: this.props.data.ContactNumber || "",
             Remark: this.props.data.Remark || "",
             PaidOn: this.props.data.PaidOn || "",
             Agent: this.props.data.Agent || "",
@@ -197,8 +195,6 @@ export default class UpdateData extends Component {
             AdvanceReceivedStatus: this.state.AdvanceReceivedStatus,
             Remaining: this.state.Remaining,
             PaymentStatus: this.state.PaymentStatus,
-            PaymentMode: this.state.PaymentMode,
-            ContactNumber: (this.state.ContactNumber || ""),
             Remark: (this.state.Remark || ""),
             PaidOn: this.state.PaidOn,
             Agent: (this.state.Agent || ""),
@@ -661,24 +657,21 @@ export default class UpdateData extends Component {
                                             </Col>
                                         </Row>
 
-                                        {
-                                            this.state.AdvanceReceivedStatus === "Partial" &&
-                                            <Row>
-                                                <Col>
-                                                    <div className={styles.inputBox}>
-                                                        <input
-                                                            type="text"
-                                                            onChange={(e) => this.setState({ Remaining: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                                            value={this.state.Remaining}
-                                                            required
-                                                        />
-                                                        <span>Remaining</span>
-                                                        <i></i>
+                                        <Row>
+                                            {/* Remaining*/}
+                                            <Col >
+                                                <div className={styles.disabledInput}>
+                                                    <span style={{ color: "#1f5457" }}>Remaining</span>
+                                                    <input
+                                                        type="number"
+                                                        value={this.state.Rate*this.state.Weight - (this.state.Cash + this.state.Online + this.state.Cheque)}
+                                                        disabled
+                                                    />
+                                                    <i></i>
+                                                </div>
 
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        }
+                                            </Col>
+                                        </Row>
                                     </div>
                                 </Col>
                             </Row>
@@ -943,7 +936,7 @@ export default class UpdateData extends Component {
                                 {/* Net Amount */}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Amount</span>
+                                        <span style={{ color: "#1f5457" }}>Net Received</span>
                                         <input
                                             type="number"
                                             value={(this.state.PochPaymentStatus === "RECEIVED")

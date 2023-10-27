@@ -40,8 +40,6 @@ export default class AddData extends Component {
             AdvanceReceivedStatus: "Complete",
             Remaining: 0,
             PaymentStatus: "PAID",
-            PaymentMode: "Cash",
-            ContactNumber: "",
             Remark: "",
             PaidOn: "",
             Agent: "",
@@ -177,7 +175,7 @@ export default class AddData extends Component {
             VehicleNo: (this.state.VehicleNo || ""),
             PartyName: (this.state.PartyName || ""),
             MT_Location: (this.state.MT_Location || ""),
-            LRNumber: (this.state.LRNumber|| ""),
+            LRNumber: (this.state.LRNumber || ""),
             FromLocation: (this.state.FromLocation || ""),
             FromFN: (this.state.FromFN || ""),
             ToLocation: (this.state.ToLocation || ""),
@@ -195,8 +193,6 @@ export default class AddData extends Component {
             AdvanceReceivedStatus: this.state.AdvanceReceivedStatus,
             Remaining: this.state.Remaining,
             PaymentStatus: this.state.PaymentStatus,
-            PaymentMode: this.state.PaymentMode,
-            ContactNumber: (this.state.ContactNumber || ""),
             Remark: (this.state.Remark || ""),
             PaidOn: this.state.PaidOn,
             Agent: (this.state.Agent || ""),
@@ -222,7 +218,7 @@ export default class AddData extends Component {
         this.props.updateData(obj);
     }
 
-   
+
     render() {
         return (
             <>
@@ -404,7 +400,7 @@ export default class AddData extends Component {
                                     </div>
                                 </Col>
 
-                                
+
 
                                 {/* From Factory Name */}
                                 <Col md={4}>
@@ -632,7 +628,7 @@ export default class AddData extends Component {
 
                                             </Col>
                                         </Row>
-                                        
+
                                         {/* Advance Received Status */}
                                         <Row>
                                             <Col>
@@ -652,24 +648,22 @@ export default class AddData extends Component {
                                             </Col>
                                         </Row>
 
-                                        {
-                                            this.state.AdvanceReceivedStatus === "Partial" &&
-                                            <Row>
-                                                <Col>
-                                                    <div className={styles.inputBox}>
-                                                        <input
-                                                            type="text"
-                                                            onChange={(e) => this.setState({ Remaining: (e.target.value === "") ? 0 : parseFloat(e.target.value) })}
-                                                            value={this.state.Remaining}
-                                                            required
-                                                        />
-                                                        <span>Remaining</span>
-                                                        <i></i>
+                                        <Row>
+                                            {/* Remaining*/}
+                                            <Col >
+                                                <div className={styles.disabledInput}>
+                                                    <span style={{ color: "#1f5457" }}>Remaining</span>
+                                                    <input
+                                                        type="number"
+                                                        value={this.state.Rate*this.state.Weight - (this.state.Cash + this.state.Online + this.state.Cheque)}
+                                                        disabled
+                                                    />
+                                                    <i></i>
+                                                </div>
 
-                                                    </div>
-                                                </Col>
-                                            </Row>
-                                        }
+                                            </Col>
+                                        </Row>
+
                                     </div>
                                 </Col>
                             </Row>
@@ -926,7 +920,7 @@ export default class AddData extends Component {
                                 {/* Net Amount Received*/}
                                 <Col >
                                     <div className={styles.disabledInput}>
-                                        <span style={{ color: "#1f5457" }}>Net Amount Received</span>
+                                        <span style={{ color: "#1f5457" }}>Net Received</span>
                                         <input
                                             type="number"
                                             value={(this.state.PochPaymentStatus === "RECEIVED")
